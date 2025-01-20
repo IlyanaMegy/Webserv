@@ -30,7 +30,8 @@ void	Socket::_setOpt(void)
 {
 	if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &_opt, sizeof(_opt)) < 0)
 		throw std::runtime_error("Failed to set socket options");
-	//machin fcntl
+	if (fcntl(_fd, F_SETFL, O_NONBLOCK) == -1)
+		throw std::runtime_error("Failed to set socket options");
 }
 
 void	Socket::fill(int fd, struct sockaddr_in addr)
