@@ -20,7 +20,7 @@ void	runServer(void)
 		for (int i = 0; i < epoll.getReadyFd(); i++) {
 			if (epoll.getFd(i) == server.getSocket().getFd()) {
 				try {
-					server.acceptClient();
+					server.acceptClient(epoll);
 				} catch (std::exception &e) {
 					std::cout << e.what() << std::endl;
 				}

@@ -8,6 +8,7 @@
 
 # include "Socket.hpp"
 # include "Client.hpp"
+# include "Epoll.hpp"
 
 # define MAXCONNECT 30
 
@@ -24,7 +25,7 @@ class Server {
 		Socket	&getSocket(void);
 		Client	&getClient(int i);
 
-		void acceptClient(void);
+		void acceptClient(Epoll &epoll);
 		void readFrom(int clientFd);
 		void sendTo(int clientFd);
 		

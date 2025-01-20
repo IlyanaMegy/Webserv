@@ -6,8 +6,6 @@
 # include <exception>
 # include <iostream>
 
-# include "Server.hpp"
-
 # define MAX_EVENTS 100
 
 class Epoll {

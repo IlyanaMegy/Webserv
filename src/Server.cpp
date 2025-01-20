@@ -23,13 +23,15 @@ Client &Server::getClient(int i)
 	return _clients[i];
 }
 
-void Server::acceptClient(void)
+void Server::acceptClient(Epoll &epoll)
 {
 	int		clientSocket;
 	Client	client(_socket.getFd());
 
 	clientSocket = client.getSocket().getFd();
 	_clients[clientSocket] = client;
+	std::cout << "New client accepted!" << std::endl;
+	epoll.addFd(clientSocket, EPOLLIN | EPOLLOUT);
 }
 
 void Server::readFrom(int clientFd)
