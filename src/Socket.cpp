@@ -6,7 +6,7 @@
 #include <iostream>
 #include <stdexcept>
 
-Socket::Socket(void) {}
+Socket::Socket(void) : _opt (1), _fd(-1) {}
 
 Socket::Socket(int port) : _opt(1) {
 	_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -40,7 +40,6 @@ Socket	&Socket::operator=(const Socket &ref)
 	_addr.sin_addr.s_addr = ref._addr.sin_addr.s_addr;
 	return *this;
 }
-
 
 void	Socket::_setOpt(void)
 {

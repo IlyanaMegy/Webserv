@@ -1,12 +1,12 @@
 #include "../inc/Client.hpp"
 
-Client::Client(void) {}
+Client::Client(void) : _buffer("") {}
 
-Client::Client(int serverFd)
+Client::Client(int serverFd) : _buffer("")
 {
 	int	clientFd;
 	struct sockaddr_in addr;
-	socklen_t	addrLen;
+	socklen_t	addrLen = sizeof(struct sockaddr_in);
 
 	clientFd = accept(serverFd, (struct sockaddr *)&addr, &addrLen);
 	if (clientFd == -1)
