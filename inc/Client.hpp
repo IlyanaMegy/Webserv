@@ -2,6 +2,7 @@
 # define CLIENT_HPP
 
 # include <stdexcept>
+# include <cstring>
 
 # include "Socket.hpp"
 
@@ -17,7 +18,10 @@ private:
 
 public:
 	Client(int serverFd);
+	Client(Client const &ref);
 	~Client();
+
+	Client	&operator=(Client const &ref);
 
 	Socket &getSocket();
 	void read();

@@ -17,8 +17,10 @@ class Socket
 	public:
 		Socket(void);
 		Socket(int port);
+		Socket(Socket const &ref);
 		~Socket(void);
 
+		Socket	&operator=(const Socket &ref);
 
 		int getFd(void) const;
 

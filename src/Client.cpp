@@ -1,6 +1,7 @@
 #include "../inc/Client.hpp"
 
 Client::~Client(){}
+
 Client::Client(int serverFd)
 {
 	int	clientFd;
@@ -11,6 +12,17 @@ Client::Client(int serverFd)
 	if (clientFd == -1)
 		throw std::runtime_error("Failed to accept client");
 	_socket.fill(clientFd, addr);
+}
+
+Client::Client(Client const &ref)
+{
+	*this = ref;
+}
+
+Client	&Client::operator=(Client const &ref)
+{
+	std::strcpy(buffer, ref.buffer);
+	_socket = ref._socket;
 }
 
 Socket &Client::getSocket(void)
