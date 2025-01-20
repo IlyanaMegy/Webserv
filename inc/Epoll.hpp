@@ -12,10 +12,9 @@
 
 class Epoll {
 	private:
-		// Server				_server;
-		int                 _epollFd;
-		int                 _ReadyFdsNb;
-		struct epoll_event  _events[MAX_EVENTS];
+		int					_epollFd;
+		int					_ReadyFdsNb;
+		struct epoll_event	_events[MAX_EVENTS];
 
 	public:
 		Epoll(int serverFd);
@@ -28,8 +27,6 @@ class Epoll {
 
 		void addFd(int fd, int flags);
 		void wait(void);
-
-		// exceptions
 };
 
 #endif

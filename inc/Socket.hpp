@@ -6,17 +6,18 @@
 
 class Socket
 {
-    private:
+	private:
 		int _opt;
-    	int _fd;
+		int _fd;
 		struct sockaddr_in _addr;
 
 		void	_setOpt(void);
 
-    public:
+	public:
 		Socket(void);
-        Socket(int port);
-        ~Socket(void);
+		Socket(int port);
+		~Socket(void);
+
 
 		int getFd(void) const;
 

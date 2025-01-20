@@ -33,36 +33,11 @@ void	Socket::_setOpt(void)
 	//machin fcntl
 }
 
-// Fonction pour mettre un socket en mode non-bloquant
-// int make_socket_non_blocking(int socket_fd) {
-// 	int flags = fcntl(socket_fd, F_GETFL, 0);
-// 	if (flags == -1) {
-// 		perror("fcntl(F_GETFL)");
-// 		return -1;
-// 	}
-
-// 	flags |= O_NONBLOCK;
-// 	if (fcntl(socket_fd, F_SETFL, flags) == -1) {
-// 		perror("fcntl(F_SETFL)");
-// 		return -1;
-// 	}
-
-// 	return 0;
-// }
-
 void	Socket::fill(int fd, struct sockaddr_in addr)
 {
 	_fd = fd;
 	_addr = addr;
 }
-
-// SERVER
-// Listening socket
-// void Socket::listen_socket(int backlog) {
-// 	if (listen(_fd, backlog) < 0)
-// 		throw std::runtime_error("Failed to listen on socket");
-// 	std::cout << "server's socket listening..." << std::endl;
-// }
 
 int Socket::getFd(void) const
 {
