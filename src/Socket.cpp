@@ -17,6 +17,8 @@ Socket::Socket(int port) : _opt(1) {
 	_addr.sin_port = htons(port);
 	_addr.sin_addr.s_addr = INADDR_ANY;
 
+	_setOpt();
+
 	if (bind(_fd, (struct sockaddr *)&_addr, sizeof(_addr)) == -1)
 		throw std::runtime_error("Failed to bind socket");
 }
@@ -53,6 +55,7 @@ void	Socket::fill(int fd, struct sockaddr_in addr)
 {
 	_fd = fd;
 	_addr = addr;
+	_setOpt();
 }
 
 int Socket::getFd(void) const
