@@ -4,6 +4,7 @@ NAME		:=	webserv
 SRCS_DIR	:=	src
 
 SRCS		:=	Server.cpp \
+				ServerConf.cpp \
 				Client.cpp \
 				Epoll.cpp \
 				Socket.cpp \
