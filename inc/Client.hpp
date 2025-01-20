@@ -17,6 +17,7 @@ class Client {
 		Socket	_socket;
 
 	public:
+		Client(void);
 		Client(int serverFd);
 		Client(Client const &ref);
 		~Client(void);

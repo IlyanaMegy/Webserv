@@ -1,5 +1,5 @@
-#include "../inc/Epoll.hpp"
-#include "../inc/Server.hpp"
+#include "Epoll.hpp"
+#include "Server.hpp"
 
 #define PORT 8080
 

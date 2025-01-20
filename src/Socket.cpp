@@ -38,6 +38,7 @@ Socket	&Socket::operator=(const Socket &ref)
 	_addr.sin_family = ref._addr.sin_family;
 	_addr.sin_port = ref._addr.sin_port;
 	_addr.sin_addr.s_addr = ref._addr.sin_addr.s_addr;
+	return *this;
 }
 
 

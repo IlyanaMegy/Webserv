@@ -28,10 +28,10 @@ class Server {
 		void readFrom(int clientFd);
 		void sendTo(int clientFd);
 		
-		class SocketCreationErrException : public std::exception {
-			public:
-				virtual const char *what() const throw();
-		};
+		// class SocketCreationErrException : public std::exception {
+		// 	public:
+		// 		virtual const char *what() const throw();
+		// };
 };
 
 #endif

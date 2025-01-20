@@ -35,6 +35,11 @@ int Epoll::getReadyFd(void) const
 	return _ReadyFdsNb;
 }
 
+int	Epoll::getFd(int i) const
+{
+	return _events[i].data.fd;
+}
+
 void Epoll::addFd(int fd, int flags)
 {
 	struct epoll_event event;

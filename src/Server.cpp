@@ -2,8 +2,9 @@
 
 #include <iostream>
 
-Server::Server(int port) : _socket(port)
+Server::Server(int port) : _port(port), _socket(port)
 {
+	(void) _port;
 	if (listen(_socket.getFd(), MAXCONNECT) < 0)
 		throw std::runtime_error("Failed to listen on socket");
 	// std::cout << "server's socket listening..." << std::endl;
@@ -31,11 +32,16 @@ void Server::acceptClient(void)
 	_clients[clientSocket] = client;
 }
 
-void Server::readFrom(int clientFd) {}
-
-void Server::sendTo(int clientFd) {}
-
-const char *Server::SocketCreationErrException::what() const throw() {
-	std::cerr << "Erreur lors de la création du socket" << std::endl;
-	exit(EXIT_FAILURE);
+void Server::readFrom(int clientFd)
+{
+	(void) clientFd;
 }
+
+void Server::sendTo(int clientFd)
+{
+	(void) clientFd;
+}
+
+// const char *Server::SocketCreationErrException::what() const throw() {
+// 	std::cerr << "Erreur lors de la création du socket" << std::endl;
+// }
