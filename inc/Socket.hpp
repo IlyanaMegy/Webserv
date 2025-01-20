@@ -8,9 +8,9 @@
 class Socket
 {
 	private:
-		int _opt;
-		int _fd;
-		struct sockaddr_in _addr;
+		int					_opt;
+		int 				_fd;
+		struct sockaddr_in	_addr;
 
 		void	_setOpt(void);
 
@@ -22,7 +22,7 @@ class Socket
 
 		Socket	&operator=(const Socket &ref);
 
-		int getFd(void) const;
+		int	getFd(void) const;
 
 		void	fill(int fd, struct sockaddr_in addr);
 };

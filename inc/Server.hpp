@@ -13,16 +13,16 @@
 
 class Server {
 	private:
-		int _port;
-		Socket	_socket;
-		std::map<int, Client> _clients;	
+		int						_port;
+		Socket					_socket;
+		std::map<int, Client>	_clients;	
 
 	public:
 		Server(int port);
 		~Server(void);
 
-		Socket &getSocket(void);
-		Client  &getClient(int i);
+		Socket	&getSocket(void);
+		Client	&getClient(int i);
 
 		void acceptClient(void);
 		void readFrom(int clientFd);

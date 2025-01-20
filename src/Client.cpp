@@ -1,6 +1,6 @@
 #include "../inc/Client.hpp"
 
-Client::~Client(){}
+Client::~Client(void){}
 
 Client::Client(int serverFd)
 {
@@ -21,7 +21,7 @@ Client::Client(Client const &ref)
 
 Client	&Client::operator=(Client const &ref)
 {
-	std::strcpy(buffer, ref.buffer);
+	std::strcpy(_buffer, ref._buffer);
 	_socket = ref._socket;
 }
 

@@ -10,21 +10,22 @@
 
 class Client {
 
-private:
-	char buffer[BUFFER_SIZE];
-	// HTTPReq request;
-	// HTTPRep reponse;
-	Socket _socket;
+	private:
+		char	_buffer[BUFFER_SIZE];
+		// HTTPReq request;
+		// HTTPRep reponse;
+		Socket	_socket;
 
-public:
-	Client(int serverFd);
-	Client(Client const &ref);
-	~Client();
+	public:
+		Client(int serverFd);
+		Client(Client const &ref);
+		~Client(void);
 
-	Client	&operator=(Client const &ref);
+		Client	&operator=(Client const &ref);
 
-	Socket &getSocket();
-	void read();
+		Socket	&getSocket(void);
+
+		void	read(void);
 
 };
 
