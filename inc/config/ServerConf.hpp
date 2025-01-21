@@ -3,7 +3,9 @@
 
 #include <iostream>
 
-#include "ConfigBlock.hpp"
+#include "../Socket.hpp"
+#include "../tools/style.hpp"
+#include "ConfigParser.hpp"
 
 /**
  * @brief  Charge, check and valide the configuration file's data
@@ -11,19 +13,30 @@
  */
 class ServerConf {
    private:
-	std::string _configFile;
-	std::vector<ConfigBlock> _configBlocks;
+	// std::string _configFile;
+	// uint16_t _port;
+	// in_addr_t _host;
+	// std::string _server_name;
+	// std::string _root;
+	// unsigned long _client_max_body_size;
+	// std::string _index;
+	// bool _autoindex;
+	// // std::map<short, std::string> _error_pages;
+	// // std::vector<Location> _locations;
+	// Socket _socket;
+	// std::vector<ConfigBlock> _configBlocks;
 
-	void parseConfigFile(void);
-	void validateConfigFile(const ConfigBlock &block);
+	// void parseConfigFile(void);
+	// void validateConfigFile(const ConfigBlock &block);
 
    public:
-	ServerConf(const std::string filePath);
-	~ServerConf(void);
+   ServerConf(void) {};
+	// ServerConf(const std::string filePath);
+	~ServerConf(void) {};
 
 	// Retourne la valeur d'une directive
-	std::string getValue(const std::string &key) const;
-	const std::vector<ConfigBlock> &getConfigBlocks() const;
+	// std::string getValue(const std::string &key) const;
+	// const std::vector<ConfigBlock> &getConfigBlocks() const;
 };
 
 #endif
