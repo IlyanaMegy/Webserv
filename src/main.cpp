@@ -60,7 +60,7 @@ int main(int ac, char** av) {
 		ConfigParser parser;
 		try
 		{
-			parser.createCluster(ac == 1 ? "webserv.conf" : av[1]);
+			parser.createCluster(ac == 1 ? "../config/webserv.conf" : av[1]);
 			// std::cout << "Root: " << parser.getValue("root") << std::endl;
 			// std::cout << "Port: " << parser.getValue("listen") << std::endl;
 		}
