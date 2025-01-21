@@ -1,13 +1,13 @@
 NAME		:=	webserv
 
-
 SRCS_DIR	:=	src
 
 SRCS		:=	Server.cpp \
-				ServerConf.cpp \
+				config/Socket.cpp \
+				config/ServerConf.cpp \
+				config/ConfigParser.cpp \
 				Client.cpp \
 				Epoll.cpp \
-				Socket.cpp \
 				main.cpp
 
 SRCS		:=	${SRCS:%=${SRCS_DIR}/%}
