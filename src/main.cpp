@@ -1,6 +1,7 @@
-#include "../inc/config/ServerConf.hpp"
 #include "../inc/Epoll.hpp"
 #include "../inc/Server.hpp"
+#include "../inc/config/ServerConf.hpp"
+#include "../inc/config/ConfigParser.hpp"
 #include "../inc/tools/Debugger.hpp"
 
 // #define PORT 8080
@@ -49,32 +50,34 @@
 
 #define PORT 9001
 
-#define FILE "configs/default.conf"
+// void runServer(void) {
+// 	Server server(PORT);
+// 	Epoll epoll(server.getSocket().getFd());
+// }
 
-void runServer(void) {
-	Server server(PORT);
-	Epoll epoll(server.getSocket().getFd());
-}
+int main(int ac, char** av) {
+	if (ac == 1 || ac == 2) {
+		ConfigParser parser;
+		try
+		{
+			parser.createCluster(ac == 1 ? "webserv.conf" : av[1]);
+			// std::cout << "Root: " << parser.getValue("root") << std::endl;
+			// std::cout << "Port: " << parser.getValue("listen") << std::endl;
+		}
+		catch (std::exception& e)
+		{
+			std::cerr << e.what() << std::endl;
+		}
 
-int main(void) {
-	try 
-	{
-		ServerConf parser("conf/webserv.conf");
-		std::cout << "Root: " << parser.getValue("root") << std::endl;
-		std::cout << "Port: " << parser.getValue("listen") << std::endl;
-		
-	} 
-	catch (std::exception& e) 
-	{
-		std::cerr << e.what() << std::endl;
+		// try {
+		// 	runServer();
+		// } catch (std::exception& e) {
+		// 	std::cout << e.what() << std::endl;
+		// 	return 1;
+		// }
+		// std::cout << "Closing server, bye !" << std::endl;
+		return 0;
 	}
 
-	try {
-		runServer();
-	} catch (std::exception& e) {
-		std::cout << e.what() << std::endl;
-		return 1;
-	}
-	std::cout << "Closing server, bye !" << std::endl;
-	return 0;
+	return (std::cout << "Error: wrong number of arguments." << std::endl, 1);
 }

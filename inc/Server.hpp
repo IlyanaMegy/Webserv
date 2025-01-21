@@ -1,37 +1,45 @@
 #ifndef SERVER_HPP
-# define SERVER_HPP
+#define SERVER_HPP
 
-# include <map>
-# include <sys/socket.h>
-# include <netinet/in.h>
-# include <exception>
+#include <netinet/in.h>
+#include <sys/socket.h>
 
-# include "Socket.hpp"
-# include "Client.hpp"
+#include <exception>
+#include <map>
 
-# define MAXCONNECT 30
+#include "./config/ServerConf.hpp"
+#include "Client.hpp"
 
+#define MAXCONNECT 30
+
+/**
+ * @brief  manage running server(s) with configuration
+ * from config file
+ * @note access to ServerConf servers + Client clients
+ */
 class Server {
-	private:
-		int						_port;
-		Socket					_socket;
-		std::map<int, Client>	_clients;	
+   private:
+	// int						_port;
+	// std::vector<ServerConf> _servers;
+	// // std::map<int, ServerConf> _servers_map;
+	// std::map<int, Client>	_clients;
 
-	public:
-		Server(int port);
-		~Server(void);
+   public:
+	Server(void) {};
+	// Server(int port);
+	~Server(void) {};
 
-		Socket	&getSocket(void);
-		Client	&getClient(int i);
+	// Socket &getSocket(void);
+	// Client &getClient(int i);
 
-		void acceptClient(void);
-		void readFrom(int clientFd);
-		void sendTo(int clientFd);
-		
-		// class SocketCreationErrException : public std::exception {
-		// 	public:
-		// 		virtual const char *what() const throw();
-		// };
+	// void acceptClient(void);
+	// void readFrom(int clientFd);
+	// void sendTo(int clientFd);
+
+	// class SocketCreationErrException : public std::exception {
+	// 	public:
+	// 		virtual const char *what() const throw();
+	// };
 };
 
 #endif
