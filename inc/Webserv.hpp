@@ -3,6 +3,7 @@
 
 #define BUFFER_SIZE 42
 #define MAXCONNECT 30
+#define MAX_CONTENT_LENGTH 30000000
 
 #include <fcntl.h>
 #include <netinet/in.h>
@@ -10,6 +11,7 @@
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <arpa/inet.h>
 
 #include <cstring>
 #include <exception>

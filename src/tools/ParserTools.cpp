@@ -53,3 +53,26 @@ void removeWhiteSpace(std::string &content) {
 	while (i > 0 && isspace(content[i])) i--;
 	content = content.substr(0, i + 1);
 }
+
+void checkToken(std::string &parametr)
+{
+	size_t pos = parametr.rfind(';');
+	if (pos != parametr.size() - 1)
+		throw std::runtime_error("Token is invalid");
+	parametr.erase(pos);
+}
+
+int ft_stoi(std::string str)
+{
+    std::stringstream ss(str);
+    if (str.length() > 10)
+        throw std::exception();
+    for (size_t i = 0; i < str.length(); ++i)
+    {
+        if(!isdigit(str[i]))
+            throw std::exception();
+    }
+    int res;
+    ss >> res;
+    return (res);
+}

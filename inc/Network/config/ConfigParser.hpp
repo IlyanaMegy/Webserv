@@ -2,7 +2,9 @@
 #define CONFIGPARSER_HPP
 
 #include "../../Webserv.hpp"
+#include "ServerConf.hpp"
 
+class ServerConf;
 class ConfigParser {
    private:
 	std::vector<ServerConf> _servers;
@@ -10,12 +12,13 @@ class ConfigParser {
 	size_t _nb_server;
 
    public:
-	ConfigParser() : _nb_server(0) {(void)_nb_server; };
+	ConfigParser() : _nb_server(0) { (void)_nb_server; };
 	~ConfigParser() {};
 
 	int createCluster(const std::string &config_file);
 	void splitServers(std::string &content);
-	// void createServer(std::string &config, ServerConf &server);
+	void createServer(std::string &config, ServerConf &server);
+
 	// void addDirective(const std::string &key, const std::string &value) {
 	// 	_directives[key] = value;
 	// }
@@ -35,5 +38,8 @@ class ConfigParser {
 	// const std::vector<ConfigParser> &getChildren() const { return _children;
 	// }
 };
+
+int isFileExistAndReadable(std::string const path, std::string const index);
+int getTypePath(std::string const path);
 
 #endif

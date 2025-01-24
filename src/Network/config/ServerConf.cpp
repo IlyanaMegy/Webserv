@@ -1,24 +1,102 @@
-// #include "../../inc/config/ServerConf.hpp"
+#include "../../../inc/Network/config/ServerConf.hpp"
 
-// ServerConf::ServerConf(const std::string filePath) : _configFile(filePath)
-// {
+ServerConf::ServerConf() {
+	_port = 0;
+	_host = 0;
+	_server_name = "";
+	_root = "";
+	_client_max_body_size = MAX_CONTENT_LENGTH;
+	_index = "";
+	_autoindex = false;
+}
+
+void ServerConf::setServerName(std::string server_name) {
+	checkToken(server_name);
+	_server_name = server_name;
+}
+
+void ServerConf::setHost(std::string param)
+{
+	checkToken(param);
+	if (param == "localhost")
+		param = "127.0.0.1";
+	if (!isValidHost(param))
+		throw std::runtime_error("Error: Wrong syntax: host");
+	// !__
+	_host = inet_addr(param.data());
+	// !__
+	std::cout << "host = " << _host << std::endl;
+}
+
+void ServerConf::setRoot(std::string root) {
+	checkToken(root);
+	if (getTypePath(root) == 2) {
+		_root = root;
+		return;
+	}
+	char dir[1024];
+	getcwd(dir, 1024);
+	std::string complete_root = dir + root;
+	std::cout << "-> full root = " << complete_root << std::endl;
+	if (getTypePath(complete_root) != 2)
+		throw std::runtime_error("Error: Wrong syntax: root");
+	_root = complete_root;
+}
+
+void ServerConf::setPort(std::string parametr)
+{
+	unsigned int port;
 	
-// 	try 
-// 	{
-// 		parseConfigFile(); 
-// 	}
-// 	catch (std::exception& e) 
-// 	{
-// 		std::cerr << e.what() << std::endl;
-// 	}
-// }
+	port = 0;
+	checkToken(parametr);
+	for (size_t i = 0; i < parametr.length(); i++)
+		if (!std::isdigit(parametr[i]))
+			throw std::runtime_error("Wrong syntax: port");
+	port = ft_stoi((parametr));
+	if (port < 1 || port > 65636)
+		throw std::runtime_error("Wrong syntax: port");
+	_port = (uint16_t) port;
+}
 
-// ServerConf::~ServerConf() {}
+void ServerConf::setClientMaxBodySize(std::string parametr)
+{
+	unsigned long body_size;
+	
+	body_size = 0;
+	checkToken(parametr);
+	for (size_t i = 0; i < parametr.length(); i++)
+	{
+		if (parametr[i] < '0' || parametr[i] > '9')
+			throw std::runtime_error("Wrong syntax: client_max_body_size");
+	}
+	if (!ft_stoi(parametr))
+		throw std::runtime_error("Wrong syntax: client_max_body_size");
+	body_size = ft_stoi(parametr);
+	_client_max_body_size = body_size;
+}
 
-// void ServerConf::parseConfigFile(void) {
+void ServerConf::setIndex(std::string index)
+{
+	checkToken(index);
+	_index = index;
+}
 
+void ServerConf::setAutoindex(std::string autoindex)
+{
+	checkToken(autoindex);
+	if (autoindex != "on" && autoindex != "off")
+		throw std::runtime_error("Wrong syntax: autoindex");
+	if (autoindex == "on")
+		_autoindex = true;
+}
 
-
+bool ServerConf::isValidHost(std::string host) const
+{
+	struct sockaddr_in sockaddr;
+	// !__
+  	return (inet_pton(AF_INET, host.c_str(), &(sockaddr.sin_addr)) ? true : false);
+	// !__
+}
 
 // 	// std::ifstream file(_configFile.c_str());
 // 	// if (!file.is_open())
@@ -46,7 +124,8 @@
 // 	// 		insideBlock = true;
 // 	// 		continue;
 // 	// 	}
-// 	// 	std::cout << BLUE << "insideBlock = " << RESET << insideBlock << std::endl;
+// 	// 	std::cout << BLUE << "insideBlock = " << RESET << insideBlock <<
+// std::endl;
 
 // 	// 	if (word == "}") {
 // 	// 		if (!insideBlock)
@@ -95,7 +174,8 @@
 // }
 
 // std::string ServerConf::getValue(const std::string &key) const {
-// 	for (std::vector<ConfigBlock>::const_iterator it = _configBlocks.begin(); it != _configBlocks.end(); ++it)
+// 	for (std::vector<ConfigBlock>::const_iterator it = _configBlocks.begin(); it
+// != _configBlocks.end(); ++it)
 // 	{
 // 		const ConfigBlock &block = *it;
 // 		// Vérification dans les directives du bloc courant
@@ -103,7 +183,8 @@
 
 // 		// Si la directive n'est pas trouvée dans ce bloc, on cherche dans ses
 // 		// sous-blocs (enfants)
-// 		for (std::vector<ConfigBlock>::const_iterator childIt = block.getChildren().begin(); childIt != block.getChildren().end(); ++childIt)
+// 		for (std::vector<ConfigBlock>::const_iterator childIt =
+// block.getChildren().begin(); childIt != block.getChildren().end(); ++childIt)
 // 		{
 //         	const ConfigBlock &child = *childIt;
 //        		if (child.hasDirective(key)) return child.getDirective(key);
