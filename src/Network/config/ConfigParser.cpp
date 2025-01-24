@@ -1,5 +1,11 @@
 #include "../../../inc/Network/config/ConfigParser.hpp"
 
+/**
+ * @brief	Get type of that path you passed
+ * @note	is it a file? folder? or other?
+ * @param	`path`
+ * @retval	1=file 2=folder 3=other -1=non-existant
+ */
 int getTypePath(std::string const path) {
 	struct stat buff;
 	int res = stat(path.c_str(), &buff);
@@ -13,10 +19,22 @@ int getTypePath(std::string const path) {
 	return -1;
 }
 
+/**
+ * @brief  Check file's accessibility with specific rights
+ * @param  `path`= config file
+ * @param  `mode`= permission
+ * @retval 0=false 1=true
+ */
 int checkFile(std::string const path, int mode) {
 	return (access(path.c_str(), mode));
 }
 
+/**
+ * @brief  getTypePath + checkFile
+ * @param  `path` 
+ * @param  `index`
+ * @retval 0=false 1=true
+ */
 int isFileExistAndReadable(std::string const path, std::string const index) {
 	if (getTypePath(index) == 1 && checkFile(index, 4) == 0) return (0);
 	if (getTypePath(path + index) == 1 && checkFile(path + index, 4) == 0)
@@ -24,6 +42,12 @@ int isFileExistAndReadable(std::string const path, std::string const index) {
 	return (-1);
 }
 
+/**
+ * @brief  Read file
+ * @note   it reads a file..
+ * @param  `path`
+ * @retval file's content
+ */
 static std::string readFile(std::string path) {
 	if (path.empty() || path.length() == 0) return (NULL);
 	std::ifstream file(path.c_str());
@@ -33,7 +57,13 @@ static std::string readFile(std::string path) {
 	return (stream_binding.str());
 }
 
-void ConfigParser::splitServers(std::string &content) {
+/**
+ * @brief  Split content of each servers' block
+ * @note	Each block start with a big 'server' loop
+ * @param  `content`= config file
+ * @retval None
+ */
+void ConfigParser::splitBlocks(std::string &content) {
 	size_t start = 0;
 	size_t end = 1;
 
@@ -50,6 +80,12 @@ void ConfigParser::splitServers(std::string &content) {
 	}
 }
 
+/**
+ * @brief  Check config file and then split servers into clusters,
+ * @note   then create ServerConf objs
+ * @param  `config_file`
+ * @retval 0=all's good
+ */
 int ConfigParser::createCluster(const std::string &config_file) {
 	if (getTypePath(config_file) != 1)
 		throw std::runtime_error("Error: Invalid configuration file.");
@@ -64,7 +100,7 @@ int ConfigParser::createCluster(const std::string &config_file) {
 	removeWhiteSpace(content);
 	std::cout << OLIV << "[CONFIG] Comments and whitespaces removed." << RESET << std::endl;
 
-	splitServers(content);
+	splitBlocks(content);
 	if (this->_server_config.size() != this->_nb_server)
 		throw std::runtime_error("Error: Coudn't split config file.");
 	std::cout << OLIV << "[CONFIG] Success spliting config file." << RESET << std::endl;
@@ -99,6 +135,13 @@ std::vector<std::string> splitParametrs(std::string line, std::string sep)
 	return (str);
 }
 
+/**
+ * @brief  Split the block into parameters, check each parameter,
+ * @note   set server's data
+ * @param  `config`= config file
+ * @param  `server`
+ * @retval None
+ */
 void ConfigParser::createServer(std::string &config, ServerConf &server)
 {
 	(void)server;
@@ -107,7 +150,6 @@ void ConfigParser::createServer(std::string &config, ServerConf &server)
 	// int		flag_loc = 1;
 	// bool	flag_autoindex = false;
 	// bool	flag_max_size = false;
-
 	parametrs = splitParametrs(config += ' ', std::string(" \n\t"));
 	if (parametrs.size() < 3)
 		throw std::runtime_error("Failed server validation");

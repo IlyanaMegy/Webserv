@@ -16,7 +16,7 @@ class ConfigParser {
 	~ConfigParser() {};
 
 	int createCluster(const std::string &config_file);
-	void splitServers(std::string &content);
+	void splitBlocks(std::string &content);
 	void createServer(std::string &config, ServerConf &server);
 
 	// void addDirective(const std::string &key, const std::string &value) {
