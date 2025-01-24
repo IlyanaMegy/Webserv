@@ -1,11 +1,9 @@
 #ifndef SERVERCONF_HPP
 #define SERVERCONF_HPP
 
-#include <iostream>
 
+#include "../../Webserv.hpp"
 #include "../Socket.hpp"
-#include "../tools/style.hpp"
-#include "ConfigParser.hpp"
 
 /**
  * @brief  Charge, check and valide the configuration file's data

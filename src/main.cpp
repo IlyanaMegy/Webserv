@@ -1,12 +1,5 @@
-#include "../inc/Epoll.hpp"
-#include "../inc/Server.hpp"
-#include "../inc/config/ServerConf.hpp"
-#include "../inc/config/ConfigParser.hpp"
-#include "../inc/tools/Debugger.hpp"
-
-// #define PORT 8080
-
-// #define FILE "configs/default.conf"
+#include "../inc/Webserv.hpp"
+#include "../inc/Network/config/ConfigParser.hpp"
 
 // void	runServer(void)
 // {
@@ -60,7 +53,7 @@ int main(int ac, char** av) {
 		ConfigParser parser;
 		try
 		{
-			parser.createCluster(ac == 1 ? "../config/webserv.conf" : av[1]);
+			parser.createCluster(ac == 1 ? "config/webserv.conf" : av[1]);
 			// std::cout << "Root: " << parser.getValue("root") << std::endl;
 			// std::cout << "Port: " << parser.getValue("listen") << std::endl;
 		}
@@ -73,7 +66,7 @@ int main(int ac, char** av) {
 		// 	runServer();
 		// } catch (std::exception& e) {
 		// 	std::cout << e.what() << std::endl;
-		// 	return 1;
+		// 	return 1m 
 		// }
 		// std::cout << "Closing server, bye !" << std::endl;
 		return 0;

@@ -1,12 +1,8 @@
 #ifndef CLIENT_HPP
 # define CLIENT_HPP
 
-# include <stdexcept>
-# include <cstring>
-
+# include "../Webserv.hpp"
 # include "Socket.hpp"
-
-# define BUFFER_SIZE 42
 
 class Client {
 

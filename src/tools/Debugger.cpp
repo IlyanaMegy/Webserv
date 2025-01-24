@@ -1,4 +1,4 @@
-#include "../inc/tools/Debugger.hpp"
+#include "../../inc/Webserv.hpp"
 
 Debugger::Debugger(void) {}
 Debugger::~Debugger(void) {}

@@ -1,10 +1,4 @@
-#include "../inc/Socket.hpp"
-
-#include <sys/socket.h>
-#include <unistd.h>
-#include <cstring>
-#include <iostream>
-#include <stdexcept>
+#include "../../inc/Webserv.hpp"
 
 Socket::Socket(void) : _opt (1), _fd(-1) {}
 

@@ -1,6 +1,5 @@
-#include "../inc/Server.hpp"
+#include "../../inc/Webserv.hpp"
 
-#include <iostream>
 
 // Server::Server(int port) : _port(port), _socket(port)
 // {

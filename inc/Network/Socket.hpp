@@ -1,9 +1,7 @@
 #ifndef SOCKET_HPP
 # define SOCKET_HPP
 
-# include <sys/socket.h>
-# include <netinet/in.h>
-# include <fcntl.h>
+#include "../Webserv.hpp"
 
 class Socket
 {

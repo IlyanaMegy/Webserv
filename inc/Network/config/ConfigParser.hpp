@@ -1,19 +1,11 @@
 #ifndef CONFIGPARSER_HPP
 #define CONFIGPARSER_HPP
 
-#include <sys/stat.h>
-#include <unistd.h>
-#include <iostream>
-#include <map>
-#include <vector>
-#include <sstream>
-#include <fstream>
-
-#include "ServerConf.hpp"
+#include "../../Webserv.hpp"
 
 class ConfigParser {
    private:
-	// std::vector<ServerConf> _servers;
+	std::vector<ServerConf> _servers;
 	std::vector<std::string> _server_config;
 	size_t _nb_server;
 
@@ -22,6 +14,7 @@ class ConfigParser {
 	~ConfigParser() {};
 
 	int createCluster(const std::string &config_file);
+	void splitServers(std::string &content);
 	// void createServer(std::string &config, ServerConf &server);
 	// void addDirective(const std::string &key, const std::string &value) {
 	// 	_directives[key] = value;

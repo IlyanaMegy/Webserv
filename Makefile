@@ -1,13 +1,21 @@
 NAME		:=	webserv
 
+CONFIG		:=	Network/config/ServerConf.cpp \
+				Network/config/ConfigParser.cpp
+
+NETWORK		:=	Network/Server.cpp \
+				Network/Client.cpp \
+				Network/Epoll.cpp \
+				Network/Socket.cpp
+
+TOOLS		:=	tools/ParserTools.cpp \
+				tools/Debugger.cpp
+
 SRCS_DIR	:=	src
 
-SRCS		:=	Server.cpp \
-				config/Socket.cpp \
-				config/ServerConf.cpp \
-				config/ConfigParser.cpp \
-				Client.cpp \
-				Epoll.cpp \
+SRCS		:=	$(CONFIG) \
+				$(NETWORK) \
+				$(TOOLS) \
 				main.cpp
 
 SRCS		:=	${SRCS:%=${SRCS_DIR}/%}

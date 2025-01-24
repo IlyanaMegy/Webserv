@@ -1,16 +1,7 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include <netinet/in.h>
-#include <sys/socket.h>
-
-#include <exception>
-#include <map>
-
-#include "./config/ServerConf.hpp"
-#include "Client.hpp"
-
-#define MAXCONNECT 30
+#include "config/ServerConf.hpp"
 
 /**
  * @brief  manage running server(s) with configuration
