@@ -30,17 +30,14 @@ class ServerConf {
 	void setServerName(std::string server_name);
 	void setHost(std::string parametr);
 	void setRoot(std::string root);
-	void setFd(int);
 	void setPort(std::string parametr);
 	void setClientMaxBodySize(std::string parametr);
-	void setErrorPages(std::vector<std::string> &parametr);
+	// void setErrorPages(std::vector<std::string> &parametr);
 	void setIndex(std::string index);
-	void setLocation(std::string nameLocation,
-					 std::vector<std::string> parametr);
+	// void setLocation(std::string nameLocation, std::vector<std::string> parametr);
 	void setAutoindex(std::string autoindex);
 
-	bool isValidHost(std::string host) const;
-	bool isValidErrorPages();
+	// bool isValidErrorPages();
 	// int isValidLocation(Location &location) const;
 
 	const std::string &getServerName();
@@ -49,7 +46,7 @@ class ServerConf {
 	const size_t &getClientMaxBodySize();
 	// const std::vector<Location> &getLocations();
 	const std::string &getRoot();
-	const std::map<short, std::string> &getErrorPages();
+	// const std::map<short, std::string> &getErrorPages();
 	const std::string &getIndex();
 	const bool &getAutoindex();
 	// const std::string &getPathErrorPage(short key);
