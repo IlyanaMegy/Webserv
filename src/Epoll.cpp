@@ -50,9 +50,14 @@ void Epoll::addFd(int fd, int flags)
 		throw std::exception();
 }
 
-void Epoll::wait(void)
+void	Epoll::deleteFd(int fd)
 {
-	_ReadyFdsNb = epoll_wait(_epollFd, _events, MAX_EVENTS, -1);
+	epoll_ctl(_epollFd, EPOLL_CTL_DEL, fd, NULL);
+}
+
+void	Epoll::wait(void)
+{
+	_ReadyFdsNb = epoll_wait(_epollFd, _events, MAX_EVENTS, TIMEOUT);
 	if (_ReadyFdsNb == -1)
 		throw std::exception();
 }

@@ -29,6 +29,7 @@ class Server
 		void acceptClient(Epoll &epoll);
 		void readFrom(int clientFd);
 		void sendTo(int clientFd);
+		void	closeConnection(int clientFd);
 		
 		// class SocketCreationErrException : public std::exception {
 		// 	public:

@@ -28,6 +28,11 @@ void	runServer(void)
 			else { 
 				server.readFrom(i);
 				server.sendTo(i);
+
+				if (server.getClient(epoll.getFd(i))->getShouldClose()) {
+					epoll.deleteFd(epoll.getFd(i));
+					server.closeConnection(epoll.getFd(i));
+				}
 			}
 		}
 	}

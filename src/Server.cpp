@@ -19,7 +19,13 @@ Server::~Server(void)
 	}
 }
 
-Socket &Server::getSocket(void)
+void	Server::closeConnection(int clientFd)
+{
+	delete _clients[clientFd];
+	_clients.erase(clientFd);
+}
+
+Socket	&Server::getSocket(void)
 {
 	return _socket;
 }
@@ -44,7 +50,7 @@ void Server::acceptClient(Epoll &epoll)
 
 void Server::readFrom(int clientFd)
 {
-	(void) clientFd;
+	_clients[clientFd]->read();
 }
 
 void Server::sendTo(int clientFd)

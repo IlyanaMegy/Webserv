@@ -14,6 +14,7 @@ class Client
 	private:
 		// HTTPReq request;
 		Socket	_socket;
+		bool	_shouldClose;
 
 	public:
 		Client(void);
@@ -21,6 +22,7 @@ class Client
 		~Client(void);
 
 		Socket	&getSocket(void);
+		bool	getShouldClose(void) const;
 
 		void	read(void);
 

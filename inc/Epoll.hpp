@@ -24,8 +24,9 @@ class Epoll
 		int getReadyFdsNb(void) const;
 		int getFd(int i) const;
 
-		void addFd(int fd, int flags);
-		void wait(void);
+		void	addFd(int fd, int flags);
+		void	deleteFd(int fd);
+		void	wait(void);
 };
 
 #endif
