@@ -30,7 +30,7 @@ int Epoll::getEvent(int i) const
 	return _events[i].events;
 }
 
-int Epoll::getReadyFd(void) const
+int Epoll::getReadyFdsNb(void) const
 {
 	return _ReadyFdsNb;
 }

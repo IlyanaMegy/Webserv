@@ -21,7 +21,7 @@ class Epoll
 
 		int getEpollFd(void) const;
 		int getEvent(int i) const;
-		int getReadyFd(void) const;
+		int getReadyFdsNb(void) const;
 		int getFd(int i) const;
 
 		void addFd(int fd, int flags);
