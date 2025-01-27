@@ -25,8 +25,7 @@ Socket::Socket(int port) : _opt(1) {
 
 Socket::~Socket()
 {
-	if (_fd >= 0)
-		close(_fd);
+	close(_fd);
 }
 
 
