@@ -14,18 +14,9 @@ Client::Client(int serverFd) : _buffer("")
 	_socket.fill(clientFd, addr);
 }
 
-Client::Client(Client const &ref)
-{
-	*this = ref;
-}
-
 Client::~Client(void){}
 
-Client	&Client::operator=(Client const &ref)
 {
-	std::strcpy(_buffer, ref._buffer);
-	_socket = ref._socket;
-	return *this;
 }
 
 Socket &Client::getSocket(void)

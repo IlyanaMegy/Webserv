@@ -23,26 +23,12 @@ Socket::Socket(int port) : _opt(1) {
 		throw std::runtime_error("Failed to bind socket");
 }
 
-Socket::Socket(Socket const& ref)
-{
-	*this = ref;
-}
-
 Socket::~Socket()
 {
 	if (_fd >= 0)
 		close(_fd);
 }
 
-Socket	&Socket::operator=(const Socket &ref)
-{
-	_opt = ref._opt;
-	_fd = ref._fd;
-	_addr.sin_family = ref._addr.sin_family;
-	_addr.sin_port = ref._addr.sin_port;
-	_addr.sin_addr.s_addr = ref._addr.sin_addr.s_addr;
-	return *this;
-}
 
 void	Socket::_setOpt(void)
 {

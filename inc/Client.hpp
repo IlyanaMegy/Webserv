@@ -8,7 +8,8 @@
 
 # define BUFFER_SIZE 42
 
-class Client {
+class Client
+{
 
 	private:
 		char	_buffer[BUFFER_SIZE];
@@ -19,10 +20,7 @@ class Client {
 	public:
 		Client(void);
 		Client(int serverFd);
-		Client(Client const &ref);
 		~Client(void);
-
-		Client	&operator=(Client const &ref);
 
 		Socket	&getSocket(void);
 
