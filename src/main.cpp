@@ -17,7 +17,7 @@ void	runServer(void)
 			std::cout << e.what() << std::endl;
 		}
 
-		for (int i = 0; i < epoll.getReadyFd(); i++) {
+		for (int i = 0; i < epoll.getReadyFdsNb(); i++) {
 			if (epoll.getFd(i) == server.getSocket().getFd()) {
 				try {
 					server.acceptClient(epoll);
