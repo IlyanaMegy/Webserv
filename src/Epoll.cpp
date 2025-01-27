@@ -1,4 +1,4 @@
-#include "../inc/Epoll.hpp"
+#include "Epoll.hpp"
 
 Epoll::Epoll(int serverFd)
 {
