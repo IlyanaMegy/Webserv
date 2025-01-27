@@ -30,9 +30,9 @@ Socket	&Server::getSocket(void)
 	return _socket;
 }
 
-Client *Server::getClient(int i)
+Client	*Server::getClient(int clientFd)
 {
-	return _clients[i];
+	return _clients[clientFd];
 }
 
 void	Server::acceptClient(Epoll &epoll)

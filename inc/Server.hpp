@@ -19,12 +19,13 @@ class Server
 		Socket					_socket;
 		std::map<int, Client*>	_clients;
 
+
 	public:
 		Server(int port);
 		~Server(void);
 
 		Socket	&getSocket(void);
-		Client	*getClient(int i);
+		Client	*getClient(int clientFd);
 
 		void	acceptClient(Epoll &epoll);
 		void	readFrom(int clientFd);
