@@ -35,7 +35,7 @@ Client *Server::getClient(int i)
 	return _clients[i];
 }
 
-void Server::acceptClient(Epoll &epoll)
+void	Server::acceptClient(Epoll &epoll)
 {
 	int		clientSocket;
 	Client	*client = new Client(_socket.getFd());
@@ -48,12 +48,12 @@ void Server::acceptClient(Epoll &epoll)
 	epoll.addFd(clientSocket, EPOLLIN | EPOLLOUT);
 }
 
-void Server::readFrom(int clientFd)
+void	Server::readFrom(int clientFd)
 {
 	_clients[clientFd]->read();
 }
 
-void Server::sendTo(int clientFd)
+void	Server::sendTo(int clientFd)
 {
 	(void) clientFd;
 }

@@ -19,10 +19,10 @@ class Epoll
 		Epoll(int serverFd);
 		~Epoll(void);
 
-		int getEpollFd(void) const;
-		int getEvent(int i) const;
-		int getReadyFdsNb(void) const;
-		int getFd(int i) const;
+		int	getEpollFd(void) const;
+		int	getEvent(int i) const;
+		int	getReadyFdsNb(void) const;
+		int	getFd(int i) const;
 
 		void	addFd(int fd, int flags);
 		void	deleteFd(int fd);

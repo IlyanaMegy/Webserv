@@ -26,9 +26,9 @@ class Server
 		Socket	&getSocket(void);
 		Client	*getClient(int i);
 
-		void acceptClient(Epoll &epoll);
-		void readFrom(int clientFd);
-		void sendTo(int clientFd);
+		void	acceptClient(Epoll &epoll);
+		void	readFrom(int clientFd);
+		void	sendTo(int clientFd);
 		void	closeConnection(int clientFd);
 		
 		// class SocketCreationErrException : public std::exception {

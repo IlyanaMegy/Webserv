@@ -40,7 +40,7 @@ int	Epoll::getFd(int i) const
 	return _events[i].data.fd;
 }
 
-void Epoll::addFd(int fd, int flags)
+void	Epoll::addFd(int fd, int flags)
 {
 	struct epoll_event event;
 
