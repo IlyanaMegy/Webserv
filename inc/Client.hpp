@@ -13,7 +13,6 @@ class Client
 
 	private:
 		// HTTPReq request;
-		// HTTPRep reponse;
 		Socket	_socket;
 
 	public:
