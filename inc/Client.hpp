@@ -12,7 +12,6 @@ class Client
 {
 
 	private:
-		char	_buffer[BUFFER_SIZE];
 		// HTTPReq request;
 		// HTTPRep reponse;
 		Socket	_socket;

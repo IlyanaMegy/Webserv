@@ -1,8 +1,8 @@
 #include "Client.hpp"
 
-Client::Client(void) : _buffer("") {}
+Client::Client(void) {}
 
-Client::Client(int serverFd) : _buffer("")
+Client::Client(int serverFd)
 {
 	int	clientFd;
 	struct sockaddr_in addr;
