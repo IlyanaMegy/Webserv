@@ -3,6 +3,9 @@
 
 #include "../Webserv.hpp"
 
+int getTypePath(std::string const path);
+int checkFile(std::string const path, int mode);
+int isFileExistAndReadable(std::string const path, std::string const index);
 size_t findStartServer(size_t start, std::string &content);
 size_t findEndServer(size_t start, std::string &content);
 void removeComments(std::string &content);

@@ -1,48 +1,6 @@
 #include "../../../inc/Network/config/ConfigParser.hpp"
 
 /**
- * @brief	Get type of that path you passed
- * @note	is it a file? folder? or other?
- * @param	`path`
- * @retval	1=file 2=folder 3=other -1=non-existant
- */
-int getTypePath(std::string const path) {
-	struct stat buff;
-	int res = stat(path.c_str(), &buff);
-	if (!res) {
-		if (buff.st_mode & S_IFREG)
-			return 1;
-		else if (buff.st_mode & S_IFDIR)
-			return 2;
-		return 3;
-	}
-	return -1;
-}
-
-/**
- * @brief  Check file's accessibility with specific rights
- * @param  `path`= config file
- * @param  `mode`= permission
- * @retval 0=false 1=true
- */
-int checkFile(std::string const path, int mode) {
-	return (access(path.c_str(), mode));
-}
-
-/**
- * @brief  getTypePath + checkFile
- * @param  `path` 
- * @param  `index`
- * @retval 0=false 1=true
- */
-int isFileExistAndReadable(std::string const path, std::string const index) {
-	if (getTypePath(index) == 1 && checkFile(index, 4) == 0) return (0);
-	if (getTypePath(path + index) == 1 && checkFile(path + index, 4) == 0)
-		return (0);
-	return (-1);
-}
-
-/**
  * @brief  Read file
  * @note   it reads a file..
  * @param  `path`
@@ -72,7 +30,7 @@ void ConfigParser::splitBlocks(std::string &content) {
 	while (start != end && start < content.length()) {
 		start = findStartServer(start, content);
 		end = findEndServer(start, content);
-		if (start == end)
+		if (start == end || !(content[start] == '{' && content[end] == '}'))
 			throw std::runtime_error("Error: Wrong server scope{}");
 		this->_server_config.push_back(content.substr(start, end - start + 1));
 		this->_nb_server++;
@@ -146,109 +104,115 @@ void ConfigParser::createServer(std::string &config, ServerConf &server)
 {
 	(void)server;
 	std::vector<std::string>	parametrs;
-	// std::vector<std::string>	error_codes;
-	// int		flag_loc = 1;
-	// bool	flag_autoindex = false;
-	// bool	flag_max_size = false;
-	parametrs = splitParametrs(config += ' ', std::string(" \n\t"));
+	std::vector<std::string>	error_codes;
+	Location loca;
+	int		flag_loc = 1;
+	bool	flag_autoindex = false;
+	bool	flag_max_size = false;
+	parametrs = splitParametrs(config += ' ', std::string(" \n\t;"));
 	if (parametrs.size() < 3)
 		throw std::runtime_error("Failed server validation");
-	// for (size_t i = 0; i < parametrs.size(); i++)
-	// {
-	// 	if (parametrs[i] == "listen" && (i + 1) < parametrs.size() && flag_loc)
-	// 	{
-	// 		if (server.getPort())
-	// 			throw std::runtime_error("Port is duplicated");
-	// 		server.setPort(parametrs[++i]);
-	// 	}
-	// 	else if (parametrs[i] == "location" && (i + 1) < parametrs.size())
-	// 	{
-	// 		std::string	path;
-	// 		i++;
-	// 		if (parametrs[i] == "{" || parametrs[i] == "}")
-	// 			throw std::runtime_error("Wrong character in server scope{}");
-	// 		path = parametrs[i];
-	// 		std::vector<std::string> codes;
-	// 		if (parametrs[++i] != "{")
-	// 			throw std::runtime_error("Wrong character in server scope{}");
-	// 		i++;
-	// 		while (i < parametrs.size() && parametrs[i] != "}")
-	// 			codes.push_back(parametrs[i++]);
-	// 		server.setLocation(path, codes);
-	// 		if (i < parametrs.size() && parametrs[i] != "}")
-	// 			throw std::runtime_error("Wrong character in server scope{}");
-	// 		flag_loc = 0;
-	// 	}
-	// 	else if (parametrs[i] == "host" && (i + 1) < parametrs.size() && flag_loc)
-	// 	{
-	// 		if (server.getHost())
-	// 			throw std::runtime_error("Host is duplicated");
-	// 		server.setHost(parametrs[++i]);
-	// 	}
-	// 	else if (parametrs[i] == "root" && (i + 1) < parametrs.size() && flag_loc)
-	// 	{
-	// 		if (!server.getRoot().empty())
-	// 			throw std::runtime_error("Root is duplicated");
-	// 		server.setRoot(parametrs[++i]);
-	// 	}
-	// 	else if (parametrs[i] == "error_page" && (i + 1) < parametrs.size() && flag_loc)
-	// 	{
-	// 		while (++i < parametrs.size())
-	// 		{
-	// 			error_codes.push_back(parametrs[i]);
-	// 			if (parametrs[i].find(';') != std::string::npos)
-	// 				break ;
-	// 			if (i + 1 >= parametrs.size())
-	// 				throw std::runtime_error("Wrong character out of server scope{}");
-	// 		}
-	// 	}
-	// 	else if (parametrs[i] == "client_max_body_size" && (i + 1) < parametrs.size() && flag_loc)
-	// 	{
-	// 		if (flag_max_size)
-	// 			throw std::runtime_error("Client_max_body_size is duplicated");
-	// 		server.setClientMaxBodySize(parametrs[++i]);
-	// 		flag_max_size = true;
-	// 	}
-	// 	else if (parametrs[i] == "server_name" && (i + 1) < parametrs.size() && flag_loc)
-	// 	{
-	// 		if (!server.getServerName().empty())
-	// 			throw std::runtime_error("Server_name is duplicated");
-	// 		server.setServerName(parametrs[++i]);
-	// 	}
-	// 	else if (parametrs[i] == "index" && (i + 1) < parametrs.size() && flag_loc)
-	// 	{
-	// 		if (!server.getIndex().empty())
-	// 			throw std::runtime_error("Index is duplicated");
-	// 		server.setIndex(parametrs[++i]);
-	// 	}
-	// 	else if (parametrs[i] == "autoindex" && (i + 1) < parametrs.size() && flag_loc)
-	// 	{
-	// 		if (flag_autoindex)
-	// 			throw std::runtime_error("Autoindex of server is duplicated");
-	// 		server.setAutoindex(parametrs[++i]);
-	// 		flag_autoindex = true;
-	// 	}
-	// 	else if (parametrs[i] != "}" && parametrs[i] != "{")
-	// 	{
-	// 		if (!flag_loc)
-	// 			throw std::runtime_error("Parametrs after location");
-	// 		else
-	// 			throw std::runtime_error("Unsupported directive");
-	// 	}
-	// }
-	// if (server.getRoot().empty())
-	// 	server.setRoot("/;");
-	// if (server.getHost() == 0)
-	// 	server.setHost("localhost;");
-	// if (server.getIndex().empty())
-	// 	server.setIndex("index.html;");
-	// if (isFileExistAndReadable(server.getRoot(), server.getIndex()))
-	// 	throw std::runtime_error("Index from config file not found or unreadable");
+
+	for (size_t i = 0; i < parametrs.size(); i++)
+		std::cout << "parametre[" << SLVR << i << RESET << "] = " << parametrs[i] << std::endl;
+	for (size_t i = 0; i < parametrs.size(); i++)
+	{
+		if (parametrs[i] == "listen" && (i + 1) < parametrs.size() && flag_loc)
+		{
+			if (server.getPort())
+				throw std::runtime_error("Port is duplicated");
+			server.setPort(parametrs[++i]);
+		}
+		else if (parametrs[i] == "location" && (i + 1) < parametrs.size())
+		{
+			std::string	path;
+			i++;
+			if (parametrs[i] == "{" || parametrs[i] == "}")
+				throw std::runtime_error("Wrong character in server scope{}");
+			path = parametrs[i];
+			std::vector<std::string> codes;
+			if (parametrs[++i] != "{")
+				throw std::runtime_error("Wrong character in server scope{}");
+			i++;
+			while (i < parametrs.size() && parametrs[i] != "}")
+				codes.push_back(parametrs[i++]);
+			server.setLocation(path, codes);
+			if (i < parametrs.size() && parametrs[i] != "}")
+				throw std::runtime_error("Wrong character in server scope{}");
+			flag_loc = 0;
+		}
+		else if (parametrs[i] == "host" && (i + 1) < parametrs.size() && flag_loc)
+		{
+			if (server.getHost())
+				throw std::runtime_error("Host is duplicated");
+			server.setHost(parametrs[++i]);
+		}
+		else if (parametrs[i] == "root" && (i + 1) < parametrs.size() && flag_loc)
+		{
+			if (!server.getRoot().empty())
+				throw std::runtime_error("Root is duplicated");
+			server.setRoot(parametrs[++i]);
+		}
+		else if (parametrs[i] == "error_page" && (i + 1) < parametrs.size() && flag_loc)
+		{
+			while (++i < parametrs.size())
+			{
+				error_codes.push_back(parametrs[i]);
+				if (parametrs[i].find(';') != std::string::npos)
+					break ;
+				if (i + 1 >= parametrs.size())
+					throw std::runtime_error("Wrong character out of server scope{}");
+			}
+		}
+		else if (parametrs[i] == "client_max_body_size" && (i + 1) < parametrs.size() && flag_loc)
+		{
+			if (flag_max_size)
+				throw std::runtime_error("Client_max_body_size is duplicated");
+			server.setClientMaxBodySize(parametrs[++i]);
+			flag_max_size = true;
+		}
+		else if (parametrs[i] == "server_name" && (i + 1) < parametrs.size() && flag_loc)
+		{
+			if (!server.getServerName().empty())
+				throw std::runtime_error("Server_name is duplicated");
+			server.setServerName(parametrs[++i]);
+		}
+		else if (parametrs[i] == "index" && (i + 1) < parametrs.size() && flag_loc)
+		{
+			if (!server.getIndex().empty())
+				throw std::runtime_error("Index is duplicated");
+			server.setIndex(parametrs[++i]);
+		}
+		else if (parametrs[i] == "autoindex" && (i + 1) < parametrs.size() && flag_loc)
+		{
+			if (flag_autoindex)
+				throw std::runtime_error("Autoindex of server is duplicated");
+			server.setAutoindex(parametrs[++i]);
+			flag_autoindex = true;
+		}
+		else if (parametrs[i] != "}" && parametrs[i] != "{")
+		{
+			if (!flag_loc)
+				throw std::runtime_error("Parametrs after location");
+			else
+				throw std::runtime_error("Unsupported directive");
+		}
+	}
+	if (server.getRoot().empty())
+		server.setRoot("/;");
+	if (server.getHost() == 0)
+		server.setHost("localhost;");
+	if (server.getIndex().empty())
+		server.setIndex("index.html;");
+	if (isFileExistAndReadable(server.getRoot(), server.getIndex()))
+		throw std::runtime_error("Index from config file not found or unreadable");
 	// if (server.checkLocaitons())
 	// 	throw std::runtime_error("Locaition is duplicated");
 	// if (!server.getPort())
 	// 	throw std::runtime_error("Port not found");
 	// server.setErrorPages(error_codes);
 	// if (!server.isValidErrorPages())
-		// throw std::runtime_error("Incorrect path for error page or number of error");
+	// 	throw std::runtime_error("Incorrect path for error page or number of error");
+	// }
 }
+

@@ -1,5 +1,47 @@
 #include "../../inc/Webserv.hpp"
 
+/**
+ * @brief	Get type of that path you passed
+ * @note	is it a file? folder? or other?
+ * @param	`path`
+ * @retval	1=file 2=folder 3=other -1=non-existant
+ */
+int getTypePath(std::string const path) {
+	struct stat buff;
+	int res = stat(path.c_str(), &buff);
+	if (!res) {
+		if (buff.st_mode & S_IFREG)
+			return 1;
+		else if (buff.st_mode & S_IFDIR)
+			return 2;
+		return 3;
+	}
+	return -1;
+}
+
+/**
+ * @brief  Check file's accessibility with specific rights
+ * @param  `path`= config file
+ * @param  `mode`= permission
+ * @retval 0=false 1=true
+ */
+int checkFile(std::string const path, int mode) {
+	return (access(path.c_str(), mode));
+}
+
+/**
+ * @brief  getTypePath + checkFile
+ * @param  `path` 
+ * @param  `index`
+ * @retval 0=false 1=true
+ */
+int isFileExistAndReadable(std::string const path, std::string const index) {
+	if (getTypePath(index) == 1 && checkFile(index, 4) == 0) return (0);
+	if (getTypePath(path + index) == 1 && checkFile(path + index, 4) == 0)
+		return (0);
+	return (-1);
+}
+
 size_t findStartServer(size_t start, std::string &content) {
 	size_t i;
 

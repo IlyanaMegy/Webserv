@@ -1,6 +1,7 @@
 NAME		:=	webserv
 
 CONFIG		:=	Network/config/ServerConf.cpp \
+				Network/config/Location.cpp \
 				Network/config/ConfigParser.cpp
 
 NETWORK		:=	Network/Server.cpp \

@@ -1,10 +1,11 @@
 #ifndef SERVERCONF_HPP
-#define SERVERCONF_HPP
+# define SERVERCONF_HPP
 
-#include "ConfigParser.hpp"
-#include "../../Webserv.hpp"
-#include "../Socket.hpp"
+# include "../../Webserv.hpp"
+# include "../Socket.hpp"
+# include "Location.hpp"
 
+class Location;
 /**
  * @brief  Charge, check and valide the configuration file's data
  * @note   this class must read and extract data then store them
@@ -20,7 +21,7 @@ class ServerConf {
 	std::string _index;
 	bool _autoindex;
 	// std::map<short, std::string> _error_pages;
-	// std::vector<Location> _locations;
+	std::vector<Location> _locations;
 	Socket _socket;
 
    public:
@@ -28,33 +29,30 @@ class ServerConf {
 	~ServerConf(void) {};
 
 	void setServerName(std::string server_name);
-	void setHost(std::string parametr);
+	void setHost(std::string params);
 	void setRoot(std::string root);
-	void setPort(std::string parametr);
-	void setClientMaxBodySize(std::string parametr);
-	// void setErrorPages(std::vector<std::string> &parametr);
+	void setPort(std::string params);
+	void setClientMaxBodySize(std::string params);
+	// void setErrorPages(std::vector<std::string> &params);
 	void setIndex(std::string index);
-	// void setLocation(std::string nameLocation, std::vector<std::string> parametr);
+	void setLocation(std::string path, std::vector<std::string> params);
 	void setAutoindex(std::string autoindex);
 
 	// bool isValidErrorPages();
-	// int isValidLocation(Location &location) const;
+	int isValidLocation(Location &location) const;
 
 	const std::string &getServerName();
 	const uint16_t &getPort();
 	const in_addr_t &getHost();
 	const size_t &getClientMaxBodySize();
-	// const std::vector<Location> &getLocations();
+	const std::vector<Location> &getLocations();
 	const std::string &getRoot();
 	// const std::map<short, std::string> &getErrorPages();
 	const std::string &getIndex();
 	const bool &getAutoindex();
+	int getFd();
 	// const std::string &getPathErrorPage(short key);
 	// const std::vector<Location>::iterator getLocationKey(std::string key);
-
-	// Retourne la valeur d'une directive
-	// std::string getValue(const std::string &key) const;
-	// const std::vector<ConfigBlock> &getConfigBlocks() const;
 };
 
 #endif

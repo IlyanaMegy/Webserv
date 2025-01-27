@@ -19,8 +19,10 @@
 #include <iostream>
 #include <map>
 #include <sstream>
+#include <iterator>
 #include <stdexcept>
 #include <vector>
+#include <algorithm>
 
 #include "Network/Client.hpp"
 #include "Network/Epoll.hpp"
