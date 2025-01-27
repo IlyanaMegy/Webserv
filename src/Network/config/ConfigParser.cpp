@@ -103,101 +103,101 @@ std::vector<std::string> splitParametrs(std::string line, std::string sep)
 void ConfigParser::createServer(std::string &config, ServerConf &server)
 {
 	(void)server;
-	std::vector<std::string>	parametrs;
+	std::vector<std::string>	params;
 	std::vector<std::string>	error_codes;
 	Location loca;
-	int		flag_loc = 1;
+	int		flag_loca = 1;
 	bool	flag_autoindex = false;
 	bool	flag_max_size = false;
-	parametrs = splitParametrs(config += ' ', std::string(" \n\t;"));
-	if (parametrs.size() < 3)
+	params = splitParametrs(config += ' ', std::string(" \n\t;"));
+	if (params.size() < 3)
 		throw std::runtime_error("Failed server validation");
 
-	for (size_t i = 0; i < parametrs.size(); i++)
-		std::cout << "parametre[" << SLVR << i << RESET << "] = " << parametrs[i] << std::endl;
-	for (size_t i = 0; i < parametrs.size(); i++)
+	for (size_t i = 0; i < params.size(); i++)
 	{
-		if (parametrs[i] == "listen" && (i + 1) < parametrs.size() && flag_loc)
+		if (params[i] == "listen" && (i + 1) < params.size() && flag_loca)
 		{
 			if (server.getPort())
 				throw std::runtime_error("Port is duplicated");
-			server.setPort(parametrs[++i]);
+			server.setPort(params[++i]);
 		}
-		else if (parametrs[i] == "location" && (i + 1) < parametrs.size())
+		else if (params[i] == "location" && (i + 1) < params.size())
 		{
 			std::string	path;
 			i++;
-			if (parametrs[i] == "{" || parametrs[i] == "}")
+			if (params[i] == "{" || params[i] == "}")
 				throw std::runtime_error("Wrong character in server scope{}");
-			path = parametrs[i];
+			path = params[i];
 			std::vector<std::string> codes;
-			if (parametrs[++i] != "{")
+			if (params[++i] != "{")
 				throw std::runtime_error("Wrong character in server scope{}");
 			i++;
-			while (i < parametrs.size() && parametrs[i] != "}")
-				codes.push_back(parametrs[i++]);
+			while (i < params.size() && params[i] != "}")
+				codes.push_back(params[i++]);
 			server.setLocation(path, codes);
-			if (i < parametrs.size() && parametrs[i] != "}")
+			if (i < params.size() && params[i] != "}")
 				throw std::runtime_error("Wrong character in server scope{}");
-			flag_loc = 0;
+			flag_loca = 0;
 		}
-		else if (parametrs[i] == "host" && (i + 1) < parametrs.size() && flag_loc)
+		else if (params[i] == "host" && (i + 1) < params.size() && flag_loca)
 		{
 			if (server.getHost())
 				throw std::runtime_error("Host is duplicated");
-			server.setHost(parametrs[++i]);
+			server.setHost(params[++i]);
 		}
-		else if (parametrs[i] == "root" && (i + 1) < parametrs.size() && flag_loc)
+		else if (params[i] == "root" && (i + 1) < params.size() && flag_loca)
 		{
 			if (!server.getRoot().empty())
 				throw std::runtime_error("Root is duplicated");
-			server.setRoot(parametrs[++i]);
+			server.setRoot(params[++i]);
 		}
-		else if (parametrs[i] == "error_page" && (i + 1) < parametrs.size() && flag_loc)
+		else if (params[i] == "error_page" && (i + 1) < params.size() && flag_loca)
 		{
-			while (++i < parametrs.size())
+			while (++i < params.size())
 			{
-				error_codes.push_back(parametrs[i]);
-				if (parametrs[i].find(';') != std::string::npos)
+				error_codes.push_back(params[i]);
+				if (params[i].find(';') != std::string::npos)
 					break ;
-				if (i + 1 >= parametrs.size())
+				if (i + 1 >= params.size())
 					throw std::runtime_error("Wrong character out of server scope{}");
 			}
 		}
-		else if (parametrs[i] == "client_max_body_size" && (i + 1) < parametrs.size() && flag_loc)
+		else if (params[i] == "client_max_body_size" && (i + 1) < params.size() && flag_loca)
 		{
 			if (flag_max_size)
 				throw std::runtime_error("Client_max_body_size is duplicated");
-			server.setClientMaxBodySize(parametrs[++i]);
+			server.setClientMaxBodySize(params[++i]);
 			flag_max_size = true;
 		}
-		else if (parametrs[i] == "server_name" && (i + 1) < parametrs.size() && flag_loc)
+		else if (params[i] == "server_name" && (i + 1) < params.size() && flag_loca)
 		{
 			if (!server.getServerName().empty())
 				throw std::runtime_error("Server_name is duplicated");
-			server.setServerName(parametrs[++i]);
+			server.setServerName(params[++i]);
 		}
-		else if (parametrs[i] == "index" && (i + 1) < parametrs.size() && flag_loc)
+		else if (params[i] == "index" && (i + 1) < params.size() && flag_loca)
 		{
 			if (!server.getIndex().empty())
 				throw std::runtime_error("Index is duplicated");
-			server.setIndex(parametrs[++i]);
+			server.setIndex(params[++i]);
 		}
-		else if (parametrs[i] == "autoindex" && (i + 1) < parametrs.size() && flag_loc)
+		else if (params[i] == "autoindex" && (i + 1) < params.size() && flag_loca)
 		{
 			if (flag_autoindex)
 				throw std::runtime_error("Autoindex of server is duplicated");
-			server.setAutoindex(parametrs[++i]);
+			server.setAutoindex(params[++i]);
 			flag_autoindex = true;
 		}
-		else if (parametrs[i] != "}" && parametrs[i] != "{")
+		else if (params[i] != "}" && params[i] != "{")
 		{
-			if (!flag_loc)
+			if (!flag_loca)
 				throw std::runtime_error("Parametrs after location");
 			else
 				throw std::runtime_error("Unsupported directive");
 		}
 	}
+	if (!server.getPort())
+		throw std::runtime_error("Port not found");
 	if (server.getRoot().empty())
 		server.setRoot("/;");
 	if (server.getHost() == 0)
@@ -208,11 +208,8 @@ void ConfigParser::createServer(std::string &config, ServerConf &server)
 		throw std::runtime_error("Index from config file not found or unreadable");
 	// if (server.checkLocaitons())
 	// 	throw std::runtime_error("Locaition is duplicated");
-	// if (!server.getPort())
-	// 	throw std::runtime_error("Port not found");
 	// server.setErrorPages(error_codes);
 	// if (!server.isValidErrorPages())
 	// 	throw std::runtime_error("Incorrect path for error page or number of error");
-	// }
 }
 

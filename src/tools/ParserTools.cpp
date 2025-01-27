@@ -96,12 +96,13 @@ void removeWhiteSpace(std::string &content) {
 	content = content.substr(0, i + 1);
 }
 
-void checkToken(std::string &parametr)
+void checkToken(std::string &param)
 {
-	size_t pos = parametr.rfind(';');
-	if (pos != parametr.size() - 1)
-		throw std::runtime_error("Token is invalid");
-	parametr.erase(pos);
+	size_t pos = param.find(';');
+	if (pos != std::string::npos && pos != param.size() - 1)
+		throw std::runtime_error("Token is invalid : " + param);
+	if (pos != std::string::npos)
+		param.erase(pos);
 }
 
 int ft_stoi(std::string str)

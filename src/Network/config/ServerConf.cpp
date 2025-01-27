@@ -21,14 +21,14 @@ void ServerConf::setServerName(std::string server_name) {
  * @params  params: 
  * @retval None
  */
-void ServerConf::setHost(std::string params) {checkToken(params);
+void ServerConf::setHost(std::string params) {
+	checkToken(params);
 	if (params == "localhost")
 		params = "127.0.0.1";
 	struct sockaddr_in hostBinary;
-	if (inet_pton(AF_INET, params.c_str(), &(hostBinary.sin_addr)))
+	if (!inet_pton(AF_INET, params.c_str(), &(hostBinary.sin_addr)))
 		throw std::runtime_error("Error: Invalid IP address format for host");
 	_host = hostBinary.sin_addr.s_addr;
-	std::cout << "host = " << _host << std::endl;
 }
 
 /**
@@ -41,6 +41,10 @@ void ServerConf::setRoot(std::string root) {
 		_root = root;
 		return;
 	}
+	if (root.length() >= 2 && root[0] == '.' && root[1] == '/')
+		root.erase(0, 1);
+	else if (root[0] != '/')
+		root = "/" + root;
 	char dir[1024];
 	getcwd(dir, 1024);
 	std::string complete_root = dir + root;
