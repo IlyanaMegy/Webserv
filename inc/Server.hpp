@@ -12,18 +12,19 @@
 
 # define MAXCONNECT 30
 
-class Server {
+class Server
+{
 	private:
 		int						_port;
 		Socket					_socket;
-		std::map<int, Client>	_clients;	
+		std::map<int, Client*>	_clients;
 
 	public:
 		Server(int port);
 		~Server(void);
 
 		Socket	&getSocket(void);
-		Client	&getClient(int i);
+		Client	*getClient(int i);
 
 		void acceptClient(Epoll &epoll);
 		void readFrom(int clientFd);

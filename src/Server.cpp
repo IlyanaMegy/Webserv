@@ -11,14 +11,20 @@ Server::Server(int port) : _port(port), _socket(port)
 	std::cout << "Server is running on port " << port << "..." << std::endl;
 }
 
-Server::~Server(void) {}
+Server::~Server(void)
+{
+	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); it++) {
+		if (it->second)
+			delete it->second;
+	}
+}
 
 Socket &Server::getSocket(void)
 {
 	return _socket;
 }
 
-Client &Server::getClient(int i)
+Client *Server::getClient(int i)
 {
 	return _clients[i];
 }
@@ -26,9 +32,11 @@ Client &Server::getClient(int i)
 void Server::acceptClient(Epoll &epoll)
 {
 	int		clientSocket;
-	Client	client(_socket.getFd());
+	Client	*client = new Client(_socket.getFd());
 
-	clientSocket = client.getSocket().getFd();
+	if (!client)
+		throw std::exception();
+	clientSocket = client->getSocket().getFd();
 	_clients[clientSocket] = client;
 	std::cout << "New client accepted!" << std::endl;
 	epoll.addFd(clientSocket, EPOLLIN | EPOLLOUT);
