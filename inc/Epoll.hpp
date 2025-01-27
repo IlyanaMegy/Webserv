@@ -8,7 +8,8 @@
 
 # define MAX_EVENTS 100
 
-class Epoll {
+class Epoll
+{
 	private:
 		int					_epollFd;
 		int					_ReadyFdsNb;
