@@ -5,6 +5,7 @@
 # include <cstring>
 
 # include "Socket.hpp"
+# include "Request.hpp"
 
 # define BUFFER_SIZE 42
 
@@ -12,7 +13,7 @@ class Client
 {
 
 	private:
-		// HTTPReq request;
+		Request _request;
 		Socket	_socket;
 		bool	_shouldClose;
 
@@ -21,10 +22,11 @@ class Client
 		Client(int serverFd);
 		~Client(void);
 
+		Request	&getRequest(void);
 		Socket	&getSocket(void);
 		bool	getShouldClose(void) const;
 
-		void	read(void);
+		void	setShouldClose(bool shouldClose);
 
 };
 
