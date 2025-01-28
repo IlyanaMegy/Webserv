@@ -25,9 +25,14 @@ void	runServer(void)
 					std::cout << e.what() << std::endl;
 				}
 			}
-			else { 
-				server.readFrom(i);
-				server.sendTo(i);
+
+			else {
+				if (epoll.getEvent(i) == (EPOLLIN | EPOLLOUT)
+				|| epoll.getEvent(i) == EPOLLIN)
+					server.readFrom(epoll.getFd(i));
+				if (epoll.getEvent(i) == (EPOLLIN | EPOLLOUT)
+				|| epoll.getEvent(i) == EPOLLOUT)
+					server.sendTo(epoll.getFd(i));
 
 				if (server.getClient(epoll.getFd(i))->getShouldClose()) {
 					epoll.deleteFd(epoll.getFd(i));
