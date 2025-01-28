@@ -7,6 +7,8 @@ SRCS		:=	Server.cpp \
 				Client.cpp \
 				Epoll.cpp \
 				Socket.cpp \
+				Request.cpp \
+				Response.cpp \
 				main.cpp
 
 SRCS		:=	${SRCS:%=${SRCS_DIR}/%}
