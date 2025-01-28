@@ -10,6 +10,7 @@ class Response
 		~Response(void);
 
 		void	setStatusCode(std::string statusCode);
+		void	setReasonMessage(std::string reasonMessage);
 
 		std::string	getStatusCode(void) const;
 		std::string	getMessage(void) const;
@@ -20,6 +21,12 @@ class Response
 		std::string	_message;
 
 		std::string	_statusCode;
+		std::string _reasonMessage;
+
+		void	_createStatusLine(void);
+		void	_createHeader(void);
+		void	_createBody(void);
+
 };
 
 #endif
