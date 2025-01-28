@@ -53,7 +53,7 @@ void	Server::readFrom(int clientFd)
 	char	buffer[BUFFER_SIZE] = "";
 	ssize_t	res;
 
-	res = recv(_clients[clientFd]->getSocket().getFd(), buffer, BUFFER_SIZE, 0);
+	res = recv(_clients[clientFd]->getSocket().getFd(), buffer, BUFFER_SIZE - 1, 0);
 	if (res == 0)
 		_clients[clientFd]->setShouldClose(true);
 	else
