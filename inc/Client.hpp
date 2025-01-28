@@ -2,7 +2,6 @@
 # define CLIENT_HPP
 
 # include <stdexcept>
-# include <cstring>
 
 # include "Socket.hpp"
 # include "Request.hpp"
