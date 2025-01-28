@@ -26,7 +26,10 @@ std::vector<std::string>	Request::getFieldValues(std::string fieldName)
 }
 
 void	Request::parse(std::string buffer)
+Response	&Request::getResponse(void)
 {
+	return _response;
+}
 
 }
 
