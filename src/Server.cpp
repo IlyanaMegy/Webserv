@@ -58,14 +58,26 @@ void	Server::readFrom(int clientFd)
 		_clients[clientFd]->setShouldClose(true);
 	else
 		_clients[clientFd]->getRequest().parse(std::string(buffer));
-
 	std::cout << "End of reading!" << std::endl;
 }
 
 void	Server::sendTo(int clientFd)
 {
-	(void) clientFd;
+	Response	response;
+	std::string	responseMessage;
+
+	if (!_clients[clientFd]->getRequest().getIsComplete())
+		return ;
+	response = _clients[clientFd]->getRequest().getResponse();
+	response.createMessage();
+	if (response.getStatusCode()[0] == '4' || response.getStatusCode()[0] == '5')
+		_clients[clientFd]->setShouldClose(true);
+	responseMessage = response.getMessage();
+	if (send(clientFd, responseMessage.c_str(), responseMessage.length(), 0) == -1)
+		throw std::exception();
+	std::cout << "Sent to client " << CYAN << clientFd << RESET << std::endl;
 }
+
 
 // const char *Server::SocketCreationErrException::what() const throw() {
 // 	std::cerr << "Erreur lors de la création du socket" << std::endl;
