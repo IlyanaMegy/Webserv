@@ -2,6 +2,10 @@
 # define RESPONSE_HPP
 
 # include <string>
+# include <map>
+# include <vector>
+
+# define SERVERNAME "webserv"
 
 class Response
 {
@@ -20,8 +24,9 @@ class Response
 	private:
 		std::string	_message;
 
-		std::string	_statusCode;
-		std::string _reasonMessage;
+		std::string											_statusCode;
+		std::string											_reasonMessage;
+		std::map< std::string, std::vector<std::string> >	_fields;
 
 		void	_createStatusLine(void);
 		void	_createHeader(void);

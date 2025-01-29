@@ -1,6 +1,9 @@
 #include "Response.hpp"
 
-Response::Response(void) : _message(""), _statusCode("") {}
+Response::Response(void) : _message(""), _statusCode("")
+{
+	_fields["Server"].push_back(SERVERNAME);
+}
 
 Response::~Response(void) {}
 
