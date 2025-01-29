@@ -22,11 +22,6 @@ std::string	Response::getMessage(void) const
 	return _message;
 }
 
-std::string	Response::getStatusCode(void) const
-{
-	return _statusCode;
-}
-
 bool	Response::getShouldClose(void) const
 {
 	return _shouldClose;

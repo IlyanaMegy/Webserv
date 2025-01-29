@@ -18,7 +18,6 @@ class Response
 		void	setStatusCode(std::string statusCode);
 		void	setReasonMessage(std::string reasonMessage);
 
-		std::string	getStatusCode(void) const;
 		std::string	getMessage(void) const;
 		bool		getShouldClose(void) const;
 
