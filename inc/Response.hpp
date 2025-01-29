@@ -4,8 +4,10 @@
 # include <string>
 # include <map>
 # include <vector>
+# include <ctime>
 
 # define SERVERNAME "webserv"
+# define TIMEBUFFERSIZE 100
 
 class Response
 {
@@ -31,6 +33,8 @@ class Response
 		void	_createStatusLine(void);
 		void	_createHeader(void);
 		void	_createBody(void);
+
+		void	_updateTime(void);
 
 };
 
