@@ -43,7 +43,8 @@ void	Response::_createStatusLine(void)
 
 void	Response::_createHeader(void)
 {
-	_updateTime();
+	_updateDate();
+
 	for (std::map< std::string, std::vector<std::string> >::iterator it = _fields.begin(); it != _fields.end(); it++) {
 		for (size_t i = 0; i != it->second.size(); i++)
 			_message+=it->first+": "+it->second[i]+"\r\n";
@@ -55,7 +56,7 @@ void	Response::_createBody(void)
 
 }
 
-void	Response::_updateTime(void)
+void	Response::_updateDate(void)
 {
 	char	buffer[TIMEBUFFERSIZE];
 

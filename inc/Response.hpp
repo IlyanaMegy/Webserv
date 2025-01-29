@@ -34,7 +34,7 @@ class Response
 		void	_createHeader(void);
 		void	_createBody(void);
 
-		void	_updateTime(void);
+		void	_updateDate(void);
 
 };
 
