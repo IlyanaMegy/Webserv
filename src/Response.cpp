@@ -1,6 +1,6 @@
 #include "Response.hpp"
 
-Response::Response(void) : _message(""), _statusCode("")
+Response::Response(void) : _message(""), _shouldClose(false), _statusCode("")
 {
 	_fields["Server"].push_back(SERVERNAME);
 }
@@ -27,6 +27,11 @@ std::string	Response::getStatusCode(void) const
 	return _statusCode;
 }
 
+bool	Response::getShouldClose(void) const
+{
+	return _shouldClose;
+}
+
 void	Response::createMessage(void)
 {
 	_createStatusLine();
@@ -44,6 +49,7 @@ void	Response::_createStatusLine(void)
 void	Response::_createHeader(void)
 {
 	_updateDate();
+	_updateConnection();
 
 	for (std::map< std::string, std::vector<std::string> >::iterator it = _fields.begin(); it != _fields.end(); it++) {
 		for (size_t i = 0; i != it->second.size(); i++)
@@ -65,4 +71,12 @@ void	Response::_updateDate(void)
 
 	std::strftime(buffer, TIMEBUFFERSIZE - 1, "%a, %d %b %Y %H:%M:%S %Z", &tm);
 	_fields["Date"].push_back(std::string(buffer));
+}
+
+void	Response::_updateConnection(void)
+{
+	if (_statusCode[0] == '4' || _statusCode[0] == '5') {
+		_fields["Connection"].push_back("close");
+		_shouldClose = true;
+	}
 }

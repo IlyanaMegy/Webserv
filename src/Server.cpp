@@ -70,7 +70,7 @@ void	Server::sendTo(int clientFd)
 		return ;
 	response = _clients[clientFd]->getRequest().getResponse();
 	response.createMessage();
-	if (response.getStatusCode()[0] == '4' || response.getStatusCode()[0] == '5')
+	if (response.getShouldClose())
 		_clients[clientFd]->setShouldClose(true);
 	responseMessage = response.getMessage();
 	if (send(clientFd, responseMessage.c_str(), responseMessage.length(), 0) == -1)

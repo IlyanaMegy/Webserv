@@ -20,11 +20,13 @@ class Response
 
 		std::string	getStatusCode(void) const;
 		std::string	getMessage(void) const;
+		bool		getShouldClose(void) const;
 
 		void	createMessage(void);
 
 	private:
 		std::string	_message;
+		bool		_shouldClose;
 
 		std::string											_statusCode;
 		std::string											_reasonMessage;
@@ -35,6 +37,7 @@ class Response
 		void	_createBody(void);
 
 		void	_updateDate(void);
+		void	_updateConnection(void);
 
 };
 
