@@ -95,3 +95,20 @@ void	Request::_fillResponse(std::string statusCode, std::string reasonMessage, b
 	_isComplete = isComplete;
 }
 
+int	Request::_parseMethod(std::string startLine, std::string::size_type sp1Pos)
+{
+	std::string	methodString;
+
+	methodString = startLine.substr(0, sp1Pos);
+	if (methodString == "GET")
+		_method = GET;
+	else if (methodString == "POST")
+		_method = POST;
+	else if (methodString == "DELETE")
+		_method = DELETE;
+	else {
+		_fillResponse("501", "Not Implemented", true);
+		return 1;
+	}
+	return 0;
+}
