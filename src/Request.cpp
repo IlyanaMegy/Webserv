@@ -112,3 +112,20 @@ int	Request::_parseMethod(std::string startLine, std::string::size_type sp1Pos)
 	}
 	return 0;
 }
+
+int	Request::_parseHTTPVer(std::string startLine, std::string::size_type sp2Pos)
+{
+	std::string	HTTPVerString;
+
+	HTTPVerString = startLine.substr(sp2Pos + 1, startLine.length() - (sp2Pos + 1));
+	if (HTTPVerString.length() != 8 || HTTPVerString.substr(0, 5) != "HTTP/"
+		|| HTTPVerString[6] != '.' || !std::isdigit(HTTPVerString[5]) || !std::isdigit(HTTPVerString[7])) {
+		_fillResponse("400", "Bad Request", true);
+		return 1;
+	}
+	if (HTTPVerString[5] != '1') {
+		_fillResponse("505", "HTTP Version Not Supported", true);
+		return 1;
+	}
+	return 0;
+}
