@@ -35,6 +35,8 @@ void	Request::parse(std::string buffer)
 	_untreatedMessage = _untreatedMessage+buffer;
 	if (_method == NONE)
 		_parseStartLine();
+	else if (_fields.empty())
+		_parseHeader();
 }
 
 void	Request::_parseStartLine(void)
@@ -46,6 +48,42 @@ void	Request::_parseStartLine(void)
 		return ;
 	_parseRequestLine(startLine);
 }
+
+void	Request::_parseHeader(void)
+{
+	std::string	header;
+
+	header = _findHeader();
+	if (header.empty())
+		return ;
+	_parseHeaderFields(header);
+}
+
+std::string	Request::_findHeader(void)
+{
+	std::string::size_type	crlfCrlfPos;
+	std::string				header;
+
+	if (_untreatedMessage.length() > MAXOCTETS) {
+		_fillResponse("400", "Bad Request", true);
+		return "";
+	}
+	crlfCrlfPos = _untreatedMessage.find("\r\n\r\n");
+	if (crlfCrlfPos == std::string::npos)
+		return "";
+	header = _untreatedMessage.substr(0, crlfCrlfPos + 2);
+	if (header.length() > MAXOCTETS) {
+		_fillResponse("400", "Bad Request", true);
+		return "";
+	}
+	_untreatedMessage = _untreatedMessage.substr(crlfCrlfPos + 4, _untreatedMessage.length() - (crlfCrlfPos + 4));
+}
+
+void	Request::_parseHeaderFields(std::string header)
+{
+	
+}
+
 
 std::string	Request::_findStartLine(void)
 {

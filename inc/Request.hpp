@@ -49,6 +49,10 @@ class Request
 		int							_parseUri(std::string startLine, std::string::size_type sp1Pos, std::string::size_type sp2Pos);
 		int							_parseHTTPVer(std::string startLine, std::string::size_type sp2Pos);
 
+		void						_parseHeader(void);
+		std::string					_findHeader(void);
+		void						_parseHeaderFields(std::string header);
+
 		void						_fillResponse(std::string statusCode, std::string reasonMessage, bool isComplete);
 
 };
