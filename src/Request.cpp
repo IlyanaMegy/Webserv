@@ -113,6 +113,12 @@ int	Request::_parseMethod(std::string startLine, std::string::size_type sp1Pos)
 	return 0;
 }
 
+int	Request::_parseUri(std::string startLine, std::string::size_type sp1Pos, std::string::size_type sp2Pos)
+{
+	_uri = startLine.substr(sp1Pos + 1, sp2Pos - (sp1Pos + 1));
+	return 0;
+}
+
 int	Request::_parseHTTPVer(std::string startLine, std::string::size_type sp2Pos)
 {
 	std::string	HTTPVerString;
