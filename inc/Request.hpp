@@ -43,6 +43,13 @@ class Request
 		std::map< std::string, std::vector<std::string> >	_fields;
 
 		void						_parseStartLine(void);
+		std::string					_findStartLine(void);
+		void						_parseRequestLine(std::string startLine);
+		int							_parseMethod(std::string startLine, std::string::size_type sp1Pos);
+		int							_parseUri(std::string startLine, std::string::size_type sp1Pos, std::string::size_type sp2Pos);
+		int							_parseHTTPVer(std::string startLine, std::string::size_type sp2Pos);
+
+		void						_fillResponse(std::string statusCode, std::string reasonMessage, bool isComplete);
 
 };
 
