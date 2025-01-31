@@ -52,6 +52,9 @@ class Request
 		void						_parseHeader(void);
 		std::string					_findHeader(void);
 		void						_parseHeaderFields(std::string header);
+		int							_parseFieldLine(std::string fieldLine);
+		int							_parseFieldName(std::string fieldName);
+		int							_parseFieldValue(std::string fieldValue);
 
 		void						_fillResponse(std::string statusCode, std::string reasonMessage, bool isComplete);
 

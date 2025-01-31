@@ -39,16 +39,6 @@ void	Request::parse(std::string buffer)
 		_parseHeader();
 }
 
-void	Request::_parseStartLine(void)
-{
-	std::string	startLine;
-
-	startLine = _findStartLine();
-	if (startLine.empty())
-		return ;
-	_parseRequestLine(startLine);
-}
-
 void	Request::_parseHeader(void)
 {
 	std::string	header;
@@ -82,9 +72,61 @@ std::string	Request::_findHeader(void)
 
 void	Request::_parseHeaderFields(std::string header)
 {
+	std::string::size_type	crlfPos;
+	std::string				fieldLine;
+
+	crlfPos = header.find("\r\n");
+	while (!header.empty() && crlfPos != std::string::npos) {
+		fieldLine = header.substr(0, crlfPos);
+		if (_parseFieldLine(fieldLine))
+			return ;
+		header = header.substr(crlfPos + 2, header.length() - (crlfPos + 2));
+		crlfPos = header.find("\r\n");
+	}
+}
+
+int	Request::_parseFieldLine(std::string fieldLine)
+{
+	std::string				fieldName;
+	std::string				fieldValue;
+	std::string::size_type	delimiterPos;
+
+	if (fieldLine.empty()) {
+		_fillResponse("400", "Bad Request", true);
+		return 1;
+	}
+	delimiterPos = fieldLine.find(":");
+	if (delimiterPos == std::string::npos) {
+		_fillResponse("400", "Bad Request", true);
+		return 1;
+	}
+
+	fieldName = fieldLine.substr(0, delimiterPos);
+	if (std::isspace(fieldLine[delimiterPos + 1]))
+		delimiterPos++;
+	if (std::isspace(fieldLine[fieldLine.length() - 1]))
+		fieldValue = fieldLine.substr(delimiterPos + 1, fieldLine.length() - 2);
+	else
+		fieldValue = fieldLine.substr(delimiterPos + 1, fieldLine.length() - 1);
+	if (_parseFieldName(fieldName) || _parseFieldValue(fieldValue))
+		return 1;
+	_fields[_toLower(fieldName)].push_back(_toLower(fieldValue));//
+	return 0;
+}
+
+{
 	
 }
 
+void	Request::_parseStartLine(void)
+{
+	std::string	startLine;
+
+	startLine = _findStartLine();
+	if (startLine.empty())
+		return ;
+	_parseRequestLine(startLine);
+}
 
 std::string	Request::_findStartLine(void)
 {
