@@ -77,6 +77,7 @@ std::string	Request::_findHeader(void)
 		return "";
 	}
 	_untreatedMessage = _untreatedMessage.substr(crlfCrlfPos + 4, _untreatedMessage.length() - (crlfCrlfPos + 4));
+	return header;
 }
 
 void	Request::_parseHeaderFields(std::string header)
