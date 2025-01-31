@@ -60,6 +60,8 @@ class Request
 
 
 		static std::string			_toLower(std::string s);
+		static bool					_isDelimiter(char c);
+
 };
 
 #endif

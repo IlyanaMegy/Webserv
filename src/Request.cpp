@@ -114,6 +114,16 @@ int	Request::_parseFieldLine(std::string fieldLine)
 	return 0;
 }
 
+int	Request::_parseFieldName(std::string fieldName)
+{
+	for (std::string::iterator it = fieldName.begin(); it != fieldName.end(); it++) {
+		if (!std::isprint(*it) || _isDelimiter(*it))
+			return 1;
+	}
+	return 0;
+}
+
+int	Request::_parseFieldValue(std::string fieldValue)
 {
 	
 }
@@ -227,4 +237,13 @@ std::string	Request::_toLower(std::string s)
 	for (std::string::iterator it = ++s.begin(); it != s.end(); it++)
 		lowerS.push_back(std::tolower(*it));
 	return lowerS;
+}
+
+bool	Request::_isDelimiter(char c)
+{
+	static	std::string	delimiters("\"(),/:;<=>?@[\\]{}");
+
+	return (delimiters.find(c) != std::string::npos);
+}
+
 }
