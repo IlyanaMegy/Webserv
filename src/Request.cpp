@@ -174,3 +174,15 @@ int	Request::_parseHTTPVer(std::string startLine, std::string::size_type sp2Pos)
 	}
 	return 0;
 }
+
+std::string	Request::_toLower(std::string s)
+{
+	std::string	lowerS;
+
+	if (s.empty())
+		return "";
+	lowerS.push_back(std::toupper(s[0]));
+	for (std::string::iterator it = ++s.begin(); it != s.end(); it++)
+		lowerS.push_back(std::tolower(*it));
+	return lowerS;
+}

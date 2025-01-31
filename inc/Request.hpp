@@ -55,6 +55,8 @@ class Request
 
 		void						_fillResponse(std::string statusCode, std::string reasonMessage, bool isComplete);
 
+
+		static std::string			_toLower(std::string s);
 };
 
 #endif
