@@ -117,7 +117,7 @@ int	Request::_parseFieldLine(std::string fieldLine)
 int	Request::_parseFieldName(std::string fieldName)
 {
 	for (std::string::iterator it = fieldName.begin(); it != fieldName.end(); it++) {
-		if (!std::isprint(*it) || _isDelimiter(*it))
+		if (!_isVChar(*it) || _isDelimiter(*it))
 			return 1;
 	}
 	return 0;
@@ -244,6 +244,11 @@ bool	Request::_isDelimiter(char c)
 	static	std::string	delimiters("\"(),/:;<=>?@[\\]{}");
 
 	return (delimiters.find(c) != std::string::npos);
+}
+
+bool	Request::_isVChar(char c)
+{
+	return (32 < c && c < 127);
 }
 
 }
