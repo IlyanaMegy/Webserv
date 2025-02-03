@@ -258,14 +258,14 @@ std::string	Request::_toLower(std::string s)
 	return lowerS;
 }
 
-bool	Request::_isDelimiter(char c)
+bool	Request::_isDelimiter(unsigned char c)
 {
 	static	std::string	delimiters("\"(),/:;<=>?@[\\]{}");
 
 	return (delimiters.find(c) != std::string::npos);
 }
 
-bool	Request::_isVChar(char c)
+bool	Request::_isVChar(unsigned char c)
 {
 	return (32 < c && c < 127);
 }

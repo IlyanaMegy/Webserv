@@ -60,7 +60,9 @@ class Request
 
 
 		static std::string			_toLower(std::string s);
-		static bool					_isDelimiter(char c);
+		static bool					_isDelimiter(unsigned char c);
+		static bool					_isVChar(unsigned char c);
+		static bool					_isObsText(unsigned char c);
 
 };
 
