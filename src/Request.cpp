@@ -127,7 +127,24 @@ int	Request::_parseFieldName(std::string fieldName)
 
 int	Request::_parseFieldValue(std::string fieldValue)
 {
-	
+	unsigned int	midcharsCounter = 0;
+
+	if (fieldValue.empty())
+		return 1;
+	if (!_isVChar(fieldValue[0]) && !_isObsText(fieldValue[0]))
+		return 1;
+	if (fieldValue.length() == 1)
+		return 0;
+	for (size_t i = 1; i < fieldValue.length() - 1; i++) {
+		if (!_isVChar(fieldValue[i]) && !_isObsText(fieldValue[i])
+			&& fieldValue[i] != ' ' && fieldValue[i] != '\t')
+			return 1;
+		midcharsCounter++;
+	}
+	if ((!_isVChar(fieldValue[fieldValue.length() - 1]) && !_isObsText(fieldValue.length() - 1))
+		|| midcharsCounter == 0)
+		return 1;
+	return 0;
 }
 
 void	Request::_parseStartLine(void)
@@ -251,6 +268,11 @@ bool	Request::_isDelimiter(char c)
 bool	Request::_isVChar(char c)
 {
 	return (32 < c && c < 127);
+}
+
+bool	Request::_isObsText(unsigned char c)
+{
+	return (127 < c);
 }
 
 }
