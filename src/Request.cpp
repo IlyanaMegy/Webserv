@@ -105,10 +105,9 @@ int	Request::_parseFieldLine(std::string fieldLine)
 	if (std::isspace(fieldLine[delimiterPos + 1]))
 		delimiterPos++;
 	if (std::isspace(fieldLine[fieldLine.length() - 1]))
-		fieldValue = fieldLine.substr(delimiterPos + 1, fieldLine.length() - 2);
+		fieldValue = fieldLine.substr(delimiterPos + 1, fieldLine.length() - (delimiterPos + 1) - 1);
 	else
-		fieldValue = fieldLine.substr(delimiterPos + 1, fieldLine.length() - 1);
-	if (_parseFieldName(fieldName) || _parseFieldValue(fieldValue))
+		fieldValue = fieldLine.substr(delimiterPos + 1, fieldLine.length() - (delimiterPos + 1));
 	if (_parseFieldName(fieldName) || _parseFieldValue(fieldValue)) {
 		_fillResponse("400", "Bad Request", true);
 		return 1;
