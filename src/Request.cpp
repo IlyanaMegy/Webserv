@@ -109,7 +109,10 @@ int	Request::_parseFieldLine(std::string fieldLine)
 	else
 		fieldValue = fieldLine.substr(delimiterPos + 1, fieldLine.length() - 1);
 	if (_parseFieldName(fieldName) || _parseFieldValue(fieldValue))
+	if (_parseFieldName(fieldName) || _parseFieldValue(fieldValue)) {
+		_fillResponse("400", "Bad Request", true);
 		return 1;
+	}
 	_fields[_toLower(fieldName)].push_back(_toLower(fieldValue));//
 	return 0;
 }
