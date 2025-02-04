@@ -1,14 +1,9 @@
 #include "Request.hpp"
 
 Request::Request(void)
-	: _isComplete(false), _method(NONE), _uri(""), _fields(std::map< std::string, std::vector<std::string> >())  {}
+	: _method(NONE), _uri(""), _fields(std::map< std::string, std::vector<std::string> >())  {}
 
 Request::~Request(void) {}
-
-bool	Request::getIsComplete(void) const
-{
-	return _isComplete;
-}
 
 Request::Method	Request::getMethod(void) const
 {
@@ -55,7 +50,7 @@ std::string	Request::_findHeader(void)
 	std::string				header;
 
 	if (_untreatedMessage.length() > MAXOCTETS) {
-		_fillResponse("400", "Bad Request", true);
+		_response.fillError("400", "Bad Request");
 		return "";
 	}
 	crlfCrlfPos = _untreatedMessage.find("\r\n\r\n");
@@ -63,7 +58,7 @@ std::string	Request::_findHeader(void)
 		return "";
 	header = _untreatedMessage.substr(0, crlfCrlfPos + 2);
 	if (header.length() > MAXOCTETS) {
-		_fillResponse("400", "Bad Request", true);
+		_response.fillError("400", "Bad Request");
 		return "";
 	}
 	_untreatedMessage = _untreatedMessage.substr(crlfCrlfPos + 4, _untreatedMessage.length() - (crlfCrlfPos + 4));
@@ -92,12 +87,12 @@ int	Request::_parseFieldLine(std::string fieldLine)
 	std::string::size_type	delimiterPos;
 
 	if (fieldLine.empty()) {
-		_fillResponse("400", "Bad Request", true);
+		_response.fillError("400", "Bad Request");
 		return 1;
 	}
 	delimiterPos = fieldLine.find(":");
 	if (delimiterPos == std::string::npos) {
-		_fillResponse("400", "Bad Request", true);
+		_response.fillError("400", "Bad Request");
 		return 1;
 	}
 
@@ -109,7 +104,7 @@ int	Request::_parseFieldLine(std::string fieldLine)
 	else
 		fieldValue = fieldLine.substr(delimiterPos + 1, fieldLine.length() - (delimiterPos + 1));
 	if (_parseFieldName(fieldName) || _parseFieldValue(fieldValue)) {
-		_fillResponse("400", "Bad Request", true);
+		_response.fillError("400", "Bad Request");
 		return 1;
 	}
 	_fields[_toLower(fieldName)].push_back(_toLower(fieldValue));//
@@ -163,7 +158,7 @@ std::string	Request::_findStartLine(void)
 	std::string				startLine;
 
 	if (_untreatedMessage.length() > MAXOCTETS) {
-		_fillResponse("400", "Bad Request", true);
+		_response.fillError("400", "Bad Request");
 		return "";
 	}
 	crlfPos = _untreatedMessage.find("\r\n");
@@ -171,7 +166,7 @@ std::string	Request::_findStartLine(void)
 		return "";
 	startLine = _untreatedMessage.substr(0, crlfPos);
 	if (startLine.length() > MAXOCTETS) {
-		_fillResponse("400", "Bad Request", true);
+		_response.fillError("400", "Bad Request");
 		return "";
 	}
 	_untreatedMessage = _untreatedMessage.substr(crlfPos + 2, _untreatedMessage.length() - (crlfPos + 2));
@@ -187,7 +182,7 @@ void	Request::_parseRequestLine(std::string startLine)
 	sp2Pos = startLine.find(" ", sp1Pos + 1);
 	if (sp1Pos == std::string::npos || sp2Pos == std::string::npos
 		|| startLine.find(" ", sp2Pos + 1) != std::string::npos) {
-		_fillResponse("400", "Bad Request", true);
+		_response.fillError("400", "Bad Request");
 		return ;
 	}
 
@@ -196,13 +191,6 @@ void	Request::_parseRequestLine(std::string startLine)
 	if (_parseUri(startLine, sp1Pos, sp2Pos))
 		return ;
 	_parseHTTPVer(startLine, sp2Pos);
-}
-
-void	Request::_fillResponse(std::string statusCode, std::string reasonMessage, bool isComplete)
-{
-	_response.setStatusCode(statusCode);
-	_response.setReasonMessage(reasonMessage);
-	_isComplete = isComplete;
 }
 
 int	Request::_parseMethod(std::string startLine, std::string::size_type sp1Pos)
@@ -217,7 +205,7 @@ int	Request::_parseMethod(std::string startLine, std::string::size_type sp1Pos)
 	else if (methodString == "DELETE")
 		_method = DELETE;
 	else {
-		_fillResponse("501", "Not Implemented", true);
+		_response.fillError("501", "Not Implemented");
 		return 1;
 	}
 	return 0;
@@ -236,11 +224,11 @@ int	Request::_parseHTTPVer(std::string startLine, std::string::size_type sp2Pos)
 	HTTPVerString = startLine.substr(sp2Pos + 1, startLine.length() - (sp2Pos + 1));
 	if (HTTPVerString.length() != 8 || HTTPVerString.substr(0, 5) != "HTTP/"
 		|| HTTPVerString[6] != '.' || !std::isdigit(HTTPVerString[5]) || !std::isdigit(HTTPVerString[7])) {
-		_fillResponse("400", "Bad Request", true);
+		_response.fillError("400", "Bad Request");
 		return 1;
 	}
 	if (HTTPVerString[5] != '1') {
-		_fillResponse("505", "HTTP Version Not Supported", true);
+		_response.fillError("505", "Not Implemented");
 		return 1;
 	}
 	return 0;

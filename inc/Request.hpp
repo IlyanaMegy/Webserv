@@ -23,7 +23,6 @@ class Request
 		Request(void);
 		~Request(void);
 
-		bool						getIsComplete(void) const;
 		Method						getMethod(void) const;
 		std::string					getUri(void) const;
 		std::vector<std::string>	getFieldValues(std::string fieldName);
@@ -33,7 +32,6 @@ class Request
 
 	private:
 
-		bool												_isComplete;
 		Response											_response;
 
 		std::string											_untreatedMessage;
@@ -56,7 +54,6 @@ class Request
 		int							_parseFieldName(std::string fieldName);
 		int							_parseFieldValue(std::string fieldValue);
 
-		void						_fillResponse(std::string statusCode, std::string reasonMessage, bool isComplete);
 
 
 		static std::string			_toLower(std::string s);

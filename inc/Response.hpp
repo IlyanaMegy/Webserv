@@ -20,12 +20,16 @@ class Response
 
 		std::string	getMessage(void) const;
 		bool		getShouldClose(void) const;
+		bool		getIsComplete(void) const;
 
-		void	createMessage(void);
+		void		createMessage(void);
+
+		void		fillError(std::string statusCode, std::string reasonMessage);
 
 	private:
 		std::string	_message;
 		bool		_shouldClose;
+		bool		_isComplete;
 
 		std::string											_statusCode;
 		std::string											_reasonMessage;

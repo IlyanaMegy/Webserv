@@ -66,7 +66,7 @@ void	Server::sendTo(int clientFd)
 	Response	response;
 	std::string	responseMessage;
 
-	if (!_clients[clientFd]->getRequest().getIsComplete())
+	if (!_clients[clientFd]->getRequest().getResponse().getIsComplete())
 		return ;
 	response = _clients[clientFd]->getRequest().getResponse();
 	response.createMessage();
