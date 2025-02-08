@@ -5,8 +5,12 @@
 # include <map>
 # include <vector>
 # include <ctime>
+# include <fstream>
+# include <iostream>
+# include <sstream>
 
 # define SERVERNAME "webserv"
+# define ERRORPATH "default/errors/"
 # define TIMEBUFFERSIZE 100
 
 class Response
@@ -25,6 +29,7 @@ class Response
 		void		createMessage(void);
 
 		void		fillError(std::string statusCode, std::string reasonMessage);
+		void		fillGET(std::string path);
 
 	private:
 		std::string	_message;
@@ -34,6 +39,7 @@ class Response
 		std::string											_statusCode;
 		std::string											_reasonMessage;
 		std::map< std::string, std::vector<std::string> >	_fields;
+		std::string											_content;
 
 		std::string											_path;
 
@@ -42,7 +48,12 @@ class Response
 		void	_createBody(void);
 
 		void	_updateDate(void);
-		void	_updateConnection(void);
+
+		void	_fillStatusLine(std::string statusCode, std::string reasonMessage);
+		void	_fillHeader(void);
+		int		_fillContent(std::string path);
+
+		static std::string	_itos(int value);
 
 };
 

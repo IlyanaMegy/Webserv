@@ -56,7 +56,7 @@ class Request
 		int							_parseFieldName(std::string fieldName);
 		int							_parseFieldValue(std::string fieldValue);
 
-
+		void						_treat(void);
 
 		static std::string			_toLower(std::string s);
 		static bool					_isDelimiter(unsigned char c);

@@ -33,6 +33,14 @@ void	Request::parse(std::string buffer)
 		_parseStartLine();
 	else if (!_isHeaderFound)
 		_parseHeader();
+	if (_method && _isHeaderFound)
+		_treat();
+}
+
+void	Request::_treat(void)
+{
+	if (_method == GET)
+		_response.fillGET(_uri);
 }
 
 void	Request::_parseHeader(void)

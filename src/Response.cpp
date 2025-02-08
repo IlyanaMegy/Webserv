@@ -45,9 +45,6 @@ void	Response::_createStatusLine(void)
 
 void	Response::_createHeader(void)
 {
-	_updateDate();
-	_updateConnection();
-
 	for (std::map< std::string, std::vector<std::string> >::iterator it = _fields.begin(); it != _fields.end(); it++) {
 		for (size_t i = 0; i != it->second.size(); i++)
 			_message+=it->first+": "+it->second[i]+"\r\n";
@@ -56,7 +53,61 @@ void	Response::_createHeader(void)
 
 void	Response::_createBody(void)
 {
+	_message+=_content;
+}
 
+void	Response::fillError(std::string statusCode, std::string reasonMessage)
+{
+	_fillStatusLine(statusCode, reasonMessage);
+	_shouldClose = true;
+	_fillHeader();
+	_fillContent(ERRORPATH+statusCode+".html");
+	_isComplete = true;
+}
+
+void	Response::fillGET(std::string path)
+{
+	if (_fillContent(path)) {
+		fillError("404", "Not found");
+		return ;
+	}
+	_fillStatusLine("200", "OK");
+	_fillHeader();
+	_isComplete = true;
+}
+
+void	Response::_fillStatusLine(std::string statusCode, std::string reasonMessage)
+{
+	_statusCode = statusCode;
+	_reasonMessage = reasonMessage;
+}
+
+void	Response::_fillHeader(void)
+{
+	_fields["Server"].push_back(SERVERNAME);
+	if (_shouldClose)
+		_fields["Connection"].push_back("close");
+	else
+		_fields["Connection"].push_back("keep-alive");
+	if (!_content.empty())
+		_fields["Content-Length"].push_back(_itos(_content.length()));
+	_updateDate();
+}
+
+int	Response::_fillContent(std::string path)
+{
+	std::string		line;
+	std::ifstream	ifs(path.c_str());
+
+	std::cerr << "path: " << GOLD << path << RESET << std::endl;
+	if (ifs.fail())
+		return 1;
+	while (!ifs.eof()) {
+		std::getline(ifs, line);
+		_content+=line+"\n";
+	}
+	_content.erase(_content.size() - 1, 1);
+	return 0;
 }
 
 void	Response::_updateDate(void)
@@ -70,10 +121,12 @@ void	Response::_updateDate(void)
 	_fields["Date"].push_back(std::string(buffer));
 }
 
-void	Response::_updateConnection(void)
+std::string	Response::_itos(int value)
 {
-	if (_statusCode[0] == '4' || _statusCode[0] == '5') {
-		_fields["Connection"].push_back("close");
-		_shouldClose = true;
-	}
+	std::string			res;
+	std::ostringstream	stream;
+
+	stream << value;
+	res = stream.str();
+	return res;
 }
