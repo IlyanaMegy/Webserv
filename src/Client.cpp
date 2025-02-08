@@ -1,8 +1,8 @@
 #include "Client.hpp"
 
-Client::Client(void) : _shouldClose(false) {}
+Client::Client(void) : _request(NULL), _shouldClose(false) {}
 
-Client::Client(int serverFd) : _shouldClose(false)
+Client::Client(int serverFd) : _request(NULL), _shouldClose(false)
 {
 	int	clientFd;
 	struct sockaddr_in addr;
@@ -16,7 +16,7 @@ Client::Client(int serverFd) : _shouldClose(false)
 
 Client::~Client(void){}
 
-Request	&Client::getRequest(void)
+Request	*Client::getRequest(void)
 {
 	return _request;
 }
@@ -34,4 +34,17 @@ bool	Client::getShouldClose(void) const
 void	Client::setShouldClose(bool shouldClose)
 {
 	_shouldClose = shouldClose;
+}
+
+void	Client::createNewRequest(void)
+{
+	_request = new Request();
+	if (!_request)
+		throw std::exception();
+}
+
+void	Client::deleteRequest(void)
+{
+	delete _request;
+	_request = NULL;
 }

@@ -12,7 +12,7 @@ class Client
 {
 
 	private:
-		Request _request;
+		Request	*_request;
 		Socket	_socket;
 		bool	_shouldClose;
 
@@ -21,11 +21,14 @@ class Client
 		Client(int serverFd);
 		~Client(void);
 
-		Request	&getRequest(void);
+		Request	*getRequest(void);
 		Socket	&getSocket(void);
 		bool	getShouldClose(void) const;
 
 		void	setShouldClose(bool shouldClose);
+
+		void	createNewRequest(void);
+		void	deleteRequest(void);
 
 };
 

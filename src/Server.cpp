@@ -54,10 +54,13 @@ void	Server::readFrom(int clientFd)
 	ssize_t	res;
 
 	res = recv(_clients[clientFd]->getSocket().getFd(), buffer, BUFFER_SIZE - 1, 0);
-	if (res == 0)
+	if (res == 0) {
 		_clients[clientFd]->setShouldClose(true);
-	else
-		_clients[clientFd]->getRequest().parse(std::string(buffer));
+		return ;
+	}
+	if (!_clients[clientFd]->getRequest())
+		_clients[clientFd]->createNewRequest();
+	_clients[clientFd]->getRequest()->parse(std::string(buffer));
 	std::cout << "End of reading!" << std::endl;
 }
 
@@ -66,15 +69,16 @@ void	Server::sendTo(int clientFd)
 	Response	response;
 	std::string	responseMessage;
 
-	if (!_clients[clientFd]->getRequest().getResponse().getIsComplete())
+	if (!_clients[clientFd]->getRequest() || !_clients[clientFd]->getRequest()->getResponse().getIsComplete())
 		return ;
-	response = _clients[clientFd]->getRequest().getResponse();
+	response = _clients[clientFd]->getRequest()->getResponse();
 	response.createMessage();
 	if (response.getShouldClose())
 		_clients[clientFd]->setShouldClose(true);
 	responseMessage = response.getMessage();
 	if (send(clientFd, responseMessage.c_str(), responseMessage.length(), 0) == -1)
 		throw std::exception();
+	_clients[clientFd]->deleteRequest();
 	std::cout << "Sent to client " << CYAN << clientFd << RESET << std::endl;
 }
 
