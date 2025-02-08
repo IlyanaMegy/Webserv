@@ -265,4 +265,3 @@ bool	Request::_isObsText(unsigned char c)
 	return (127 < c);
 }
 
-}
