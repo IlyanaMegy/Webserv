@@ -40,6 +40,8 @@ class Request
 		std::string											_uri;
 		std::map< std::string, std::vector<std::string> >	_fields;
 
+		bool												_isHeaderFound;
+
 		void						_parseStartLine(void);
 		std::string					_findStartLine(void);
 		void						_parseRequestLine(std::string startLine);

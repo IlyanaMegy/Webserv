@@ -1,7 +1,7 @@
 #include "Request.hpp"
 
 Request::Request(void)
-	: _method(NONE), _uri(""), _fields(std::map< std::string, std::vector<std::string> >())  {}
+	: _method(NONE), _uri(""), _fields(std::map< std::string, std::vector<std::string> >()), _isHeaderFound(false) {}
 
 Request::~Request(void) {}
 
@@ -27,10 +27,11 @@ Response	&Request::getResponse(void)
 
 void	Request::parse(std::string buffer)
 {
+
 	_untreatedMessage = _untreatedMessage+buffer;
 	if (_method == NONE)
 		_parseStartLine();
-	else if (_fields.empty())
+	else if (!_isHeaderFound)
 		_parseHeader();
 }
 
@@ -62,6 +63,7 @@ std::string	Request::_findHeader(void)
 		return "";
 	}
 	_untreatedMessage = _untreatedMessage.substr(crlfCrlfPos + 4, _untreatedMessage.length() - (crlfCrlfPos + 4));
+	_isHeaderFound = true;
 	return header;
 }
 
