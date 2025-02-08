@@ -35,6 +35,8 @@ class Response
 		std::string											_reasonMessage;
 		std::map< std::string, std::vector<std::string> >	_fields;
 
+		std::string											_path;
+
 		void	_createStatusLine(void);
 		void	_createHeader(void);
 		void	_createBody(void);

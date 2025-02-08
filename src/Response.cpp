@@ -1,9 +1,6 @@
 #include "Response.hpp"
 
-Response::Response(void) : _message(""), _shouldClose(false), _statusCode("")
-{
-	_fields["Server"].push_back(SERVERNAME);
-}
+Response::Response(void) : _message(""), _shouldClose(false), _isComplete(false),_statusCode(""), _path(PATH) {}
 
 Response::~Response(void) {}
 
@@ -25,6 +22,11 @@ std::string	Response::getMessage(void) const
 bool	Response::getShouldClose(void) const
 {
 	return _shouldClose;
+}
+
+bool	Response::getIsComplete(void) const
+{
+	return _isComplete;
 }
 
 void	Response::createMessage(void)
