@@ -33,7 +33,7 @@ void	Request::parse(std::string buffer)
 		_parseStartLine();
 	else if (!_isHeaderFound)
 		_parseHeader();
-	if (_method && _isHeaderFound)
+	if (_method && _isHeaderFound && !_response.getIsComplete())
 		_treat();
 }
 
