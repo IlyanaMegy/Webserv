@@ -31,7 +31,7 @@ void	Request::parse(std::string buffer)
 	_untreatedMessage = _untreatedMessage+buffer;
 	if (_stage == SEEKING_STATUS_LINE)
 		_parseStartLine();
-	else if (_stage == SEEKING_HEADER)
+	if (_stage == SEEKING_HEADER)
 		_parseHeader();
 	if (_stage == PROCESSING)
 		_treat();
