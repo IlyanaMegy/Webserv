@@ -43,6 +43,10 @@ void	Request::_treat(void)
 		_response.fillGET(_uri);
 		_stage = DONE;
 	}
+	else if (_method == DELETE) {
+		_response.fillDELETE(_uri);
+		_stage = DONE;
+	}
 }
 
 void	Request::_parseHeader(void)

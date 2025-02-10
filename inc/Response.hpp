@@ -8,6 +8,7 @@
 # include <fstream>
 # include <iostream>
 # include <sstream>
+# include <unistd.h>
 
 # define SERVERNAME "webserv"
 # define ERRORPATH "default/errors/"
@@ -30,6 +31,7 @@ class Response
 
 		void		fillError(std::string statusCode, std::string reasonMessage);
 		void		fillGET(std::string path);
+		void		fillDELETE(std::string path);
 
 	private:
 		std::string	_message;
@@ -52,6 +54,8 @@ class Response
 		void	_fillStatusLine(std::string statusCode, std::string reasonMessage);
 		void	_fillHeader(void);
 		int		_fillContent(std::string path);
+
+		int		_deleteTarget(std::string path);
 
 		static std::string	_itos(int value);
 

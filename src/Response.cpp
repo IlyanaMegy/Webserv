@@ -76,6 +76,28 @@ void	Response::fillGET(std::string path)
 	_isComplete = true;
 }
 
+void	Response::fillDELETE(std::string path)
+{
+	if (_deleteTarget(path))
+		return ;
+	_fillStatusLine("204", "No Content");
+	_fillHeader();
+	_isComplete = true;
+}
+
+int	Response::_deleteTarget(std::string path)
+{
+	if (access(path.c_str(), F_OK)) {
+		fillError("404", "Not found");
+		return 1;
+	}
+	if (std::remove(path.c_str())) {
+		fillError("500", "Internal Server Error");
+		return 1;
+	}
+	return 0;
+}
+
 void	Response::_fillStatusLine(std::string statusCode, std::string reasonMessage)
 {
 	_statusCode = statusCode;
