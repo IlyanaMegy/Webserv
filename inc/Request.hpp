@@ -14,7 +14,6 @@ class Request
 
 	public:
 		enum Method {
-			NONE,
 			GET,
 			POST,
 			DELETE
@@ -32,6 +31,16 @@ class Request
 
 	private:
 
+		enum STAGE {
+			SEEKING_STATUS_LINE,
+			SEEKING_HEADER,
+			PROCESSING,
+			SEEKING_BODY,
+			DONE
+		};
+
+		STAGE												_stage;
+
 		Response											_response;
 
 		std::string											_untreatedMessage;
@@ -40,18 +49,16 @@ class Request
 		std::string											_uri;
 		std::map< std::string, std::vector<std::string> >	_fields;
 
-		bool												_isHeaderFound;
-
 		void						_parseStartLine(void);
 		std::string					_findStartLine(void);
-		void						_parseRequestLine(std::string startLine);
+		int							_parseRequestLine(std::string startLine);
 		int							_parseMethod(std::string startLine, std::string::size_type sp1Pos);
 		int							_parseUri(std::string startLine, std::string::size_type sp1Pos, std::string::size_type sp2Pos);
 		int							_parseHTTPVer(std::string startLine, std::string::size_type sp2Pos);
 
 		void						_parseHeader(void);
 		std::string					_findHeader(void);
-		void						_parseHeaderFields(std::string header);
+		int							_parseHeaderFields(std::string header);
 		int							_parseFieldLine(std::string fieldLine);
 		int							_parseFieldName(std::string fieldName);
 		int							_parseFieldValue(std::string fieldValue);

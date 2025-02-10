@@ -1,7 +1,7 @@
 #include "Request.hpp"
 
 Request::Request(void)
-	: _method(NONE), _uri(""), _fields(std::map< std::string, std::vector<std::string> >()), _isHeaderFound(false) {}
+	: _stage(SEEKING_STATUS_LINE), _uri(""), _fields(std::map< std::string, std::vector<std::string> >()) {}
 
 Request::~Request(void) {}
 
@@ -29,18 +29,20 @@ void	Request::parse(std::string buffer)
 {
 
 	_untreatedMessage = _untreatedMessage+buffer;
-	if (_method == NONE)
+	if (_stage == SEEKING_STATUS_LINE)
 		_parseStartLine();
-	else if (!_isHeaderFound)
+	else if (_stage == SEEKING_HEADER)
 		_parseHeader();
-	if (_method && _isHeaderFound && !_response.getIsComplete())
+	if (_stage == PROCESSING)
 		_treat();
 }
 
 void	Request::_treat(void)
 {
-	if (_method == GET)
+	if (_method == GET) {
 		_response.fillGET(_uri);
+		_stage = DONE;
+	}
 }
 
 void	Request::_parseHeader(void)
@@ -50,7 +52,9 @@ void	Request::_parseHeader(void)
 	header = _findHeader();
 	if (header.empty())
 		return ;
-	_parseHeaderFields(header);
+	if (_parseHeaderFields(header))
+		return ;
+	_stage = PROCESSING;
 }
 
 std::string	Request::_findHeader(void)
@@ -60,6 +64,7 @@ std::string	Request::_findHeader(void)
 
 	if (_untreatedMessage.length() > MAXOCTETS) {
 		_response.fillError("400", "Bad Request");
+		_stage = DONE;
 		return "";
 	}
 	crlfCrlfPos = _untreatedMessage.find("\r\n\r\n");
@@ -68,14 +73,14 @@ std::string	Request::_findHeader(void)
 	header = _untreatedMessage.substr(0, crlfCrlfPos + 2);
 	if (header.length() > MAXOCTETS) {
 		_response.fillError("400", "Bad Request");
+		_stage = DONE;
 		return "";
 	}
 	_untreatedMessage = _untreatedMessage.substr(crlfCrlfPos + 4, _untreatedMessage.length() - (crlfCrlfPos + 4));
-	_isHeaderFound = true;
 	return header;
 }
 
-void	Request::_parseHeaderFields(std::string header)
+int	Request::_parseHeaderFields(std::string header)
 {
 	std::string::size_type	crlfPos;
 	std::string				fieldLine;
@@ -84,10 +89,11 @@ void	Request::_parseHeaderFields(std::string header)
 	while (!header.empty() && crlfPos != std::string::npos) {
 		fieldLine = header.substr(0, crlfPos);
 		if (_parseFieldLine(fieldLine))
-			return ;
+			return 1;
 		header = header.substr(crlfPos + 2, header.length() - (crlfPos + 2));
 		crlfPos = header.find("\r\n");
 	}
+	return 0;
 }
 
 int	Request::_parseFieldLine(std::string fieldLine)
@@ -98,11 +104,13 @@ int	Request::_parseFieldLine(std::string fieldLine)
 
 	if (fieldLine.empty()) {
 		_response.fillError("400", "Bad Request");
+		_stage = DONE;
 		return 1;
 	}
 	delimiterPos = fieldLine.find(":");
 	if (delimiterPos == std::string::npos) {
 		_response.fillError("400", "Bad Request");
+		_stage = DONE;
 		return 1;
 	}
 
@@ -115,6 +123,7 @@ int	Request::_parseFieldLine(std::string fieldLine)
 		fieldValue = fieldLine.substr(delimiterPos + 1, fieldLine.length() - (delimiterPos + 1));
 	if (_parseFieldName(fieldName) || _parseFieldValue(fieldValue)) {
 		_response.fillError("400", "Bad Request");
+		_stage = DONE;
 		return 1;
 	}
 	_fields[_toLower(fieldName)].push_back(_toLower(fieldValue));//
@@ -159,7 +168,9 @@ void	Request::_parseStartLine(void)
 	startLine = _findStartLine();
 	if (startLine.empty())
 		return ;
-	_parseRequestLine(startLine);
+	if (_parseRequestLine(startLine))
+		return ;
+	_stage = SEEKING_HEADER;
 }
 
 std::string	Request::_findStartLine(void)
@@ -169,6 +180,7 @@ std::string	Request::_findStartLine(void)
 
 	if (_untreatedMessage.length() > MAXOCTETS) {
 		_response.fillError("400", "Bad Request");
+		_stage = DONE;
 		return "";
 	}
 	crlfPos = _untreatedMessage.find("\r\n");
@@ -177,13 +189,14 @@ std::string	Request::_findStartLine(void)
 	startLine = _untreatedMessage.substr(0, crlfPos);
 	if (startLine.length() > MAXOCTETS) {
 		_response.fillError("400", "Bad Request");
+		_stage = DONE;
 		return "";
 	}
 	_untreatedMessage = _untreatedMessage.substr(crlfPos + 2, _untreatedMessage.length() - (crlfPos + 2));
 	return startLine;
 }
 
-void	Request::_parseRequestLine(std::string startLine)
+int	Request::_parseRequestLine(std::string startLine)
 {
 	std::string::size_type	sp1Pos;
 	std::string::size_type	sp2Pos;
@@ -193,14 +206,17 @@ void	Request::_parseRequestLine(std::string startLine)
 	if (sp1Pos == std::string::npos || sp2Pos == std::string::npos
 		|| startLine.find(" ", sp2Pos + 1) != std::string::npos) {
 		_response.fillError("400", "Bad Request");
-		return ;
+		_stage = DONE;
+		return 1;
 	}
 
 	if (_parseMethod(startLine, sp1Pos))
-		return ;
+		return 1;
 	if (_parseUri(startLine, sp1Pos, sp2Pos))
-		return ;
-	_parseHTTPVer(startLine, sp2Pos);
+		return 1;
+	if (_parseHTTPVer(startLine, sp2Pos))
+		return 1;
+	return 0;
 }
 
 int	Request::_parseMethod(std::string startLine, std::string::size_type sp1Pos)
@@ -216,6 +232,7 @@ int	Request::_parseMethod(std::string startLine, std::string::size_type sp1Pos)
 		_method = DELETE;
 	else {
 		_response.fillError("501", "Not Implemented");
+		_stage = DONE;
 		return 1;
 	}
 	return 0;
@@ -235,10 +252,12 @@ int	Request::_parseHTTPVer(std::string startLine, std::string::size_type sp2Pos)
 	if (HTTPVerString.length() != 8 || HTTPVerString.substr(0, 5) != "HTTP/"
 		|| HTTPVerString[6] != '.' || !std::isdigit(HTTPVerString[5]) || !std::isdigit(HTTPVerString[7])) {
 		_response.fillError("400", "Bad Request");
+		_stage = DONE;
 		return 1;
 	}
 	if (HTTPVerString[5] != '1') {
 		_response.fillError("505", "Not Implemented");
+		_stage = DONE;
 		return 1;
 	}
 	return 0;
