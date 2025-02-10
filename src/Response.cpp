@@ -1,6 +1,6 @@
 #include "Response.hpp"
 
-Response::Response(void) : _message(""), _shouldClose(false), _isComplete(false),_statusCode(""), _path(PATH) {}
+Response::Response(void) : _message(""), _shouldClose(false), _isComplete(false), _statusCode(""), _reasonMessage(""), _content(""), _path(PATH) {}
 
 Response::~Response(void) {}
 
