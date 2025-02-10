@@ -67,10 +67,8 @@ void	Response::fillError(std::string statusCode, std::string reasonMessage)
 
 void	Response::fillGET(std::string path)
 {
-	if (_fillContent(path)) {
-		fillError("404", "Not found");
+	if (_fillContent(path))
 		return ;
-	}
 	_fillStatusLine("200", "OK");
 	_fillHeader();
 	_isComplete = true;
@@ -122,8 +120,10 @@ int	Response::_fillContent(std::string path)
 	std::ifstream	ifs(path.c_str());
 
 	std::cerr << "path: " << GOLD << path << RESET << std::endl;
-	if (ifs.fail())
+	if (ifs.fail()) {
+		fillError("404", "Not found");
 		return 1;
+	}
 	while (!ifs.eof()) {
 		std::getline(ifs, line);
 		_content+=line+"\n";
