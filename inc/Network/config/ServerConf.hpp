@@ -50,7 +50,7 @@ class ServerConf {
 	// const std::map<short, std::string> &getErrorPages();
 	const std::string &getIndex();
 	const bool &getAutoindex();
-	int getFd();
+	int getFd() const;
 	// const std::string &getPathErrorPage(short key);
 	// const std::vector<Location>::iterator getLocationKey(std::string key);
 };

@@ -1,10 +1,9 @@
 #ifndef CONFIGPARSER_HPP
 #define CONFIGPARSER_HPP
 
+#include <cstddef>
 #include "../../Webserv.hpp"
-#include "ServerConf.hpp"
 
-class ServerConf;
 class ConfigParser {
    private:
 	std::vector<ServerConf> _servers;
@@ -13,12 +12,16 @@ class ConfigParser {
 
    public:
 	ConfigParser() : _nb_server(0) { (void)_nb_server; };
-	~ConfigParser() {};
+	~ConfigParser();
 
 	int createCluster(const std::string &config_file);
 	void splitBlocks(std::string &content);
 	void createServer(std::string &config, ServerConf &server);
 
+	int getServerFd(int serverId) const;
+	ServerConf	&getServerConfig(int serverId);
+	uint16_t	getServerPort(int serveurId);
+	size_t	getNbServer() const;
 	// void addDirective(const std::string &key, const std::string &value) {
 	// 	_directives[key] = value;
 	// }

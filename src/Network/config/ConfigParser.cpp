@@ -52,7 +52,7 @@ int ConfigParser::createCluster(const std::string &config_file) {
 	std::string content = readFile(config_file);
 	if (content.empty())
 		throw std::runtime_error("Error: Empty configuration file.");
-	std::cout << OLIV << "[CONFIG] First checks passed !" << RESET << std::endl;
+	std::cout << OLIV << "[CONFIG] First checks passed !\n         Reading " << BOLD << config_file << RESET << std::endl;
 
 	removeComments(content);
 	removeWhiteSpace(content);
@@ -69,7 +69,10 @@ int ConfigParser::createCluster(const std::string &config_file) {
 		createServer(this->_server_config[i], server);
 		this->_servers.push_back(server);
 	}
-	std::cout << OLIV << "[CONFIG] Created server(s)." << RESET << std::endl;
+	if (_nb_server > 1)
+		std::cout << OLIV << "[CONFIG] " << _nb_server << " created servers." << RESET << std::endl;
+	else
+		std::cout << OLIV << "[CONFIG] " << _nb_server << " created server." << RESET << std::endl;
 	return 0;
 }
 
@@ -213,3 +216,16 @@ void ConfigParser::createServer(std::string &config, ServerConf &server)
 	// 	throw std::runtime_error("Incorrect path for error page or number of error");
 }
 
+int	ConfigParser::getServerFd(int serveurId) const {
+	return _servers[serveurId].getFd();
+}
+
+uint16_t	ConfigParser::getServerPort(int serveurId) {
+	return _servers[serveurId].getPort();
+}
+
+size_t	ConfigParser::getNbServer() const {
+	return _nb_server;
+}
+
+ServerConf	&ConfigParser::getServerConfig(int serverId){ return _servers[serverId]; }

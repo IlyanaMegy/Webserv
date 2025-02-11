@@ -289,7 +289,7 @@ const std::vector<Location> &ServerConf::getLocations() {return (_locations); }
 const std::string &ServerConf::getRoot() {return (_root); }
 const std::string &ServerConf::getIndex() {return (_index); }
 const bool &ServerConf::getAutoindex() {return (_autoindex); }
-int	ServerConf::getFd() {return (_socket.getFd()); }
+int	ServerConf::getFd() const {return (_socket.getFd()); }
 
 // const std::string &ServerConfig::getPathErrorPage(short key)
 // {

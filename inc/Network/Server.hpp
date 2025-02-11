@@ -1,8 +1,11 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include "config/ServerConf.hpp"
+#include "../Webserv.hpp"
+#include "config/ConfigParser.hpp"
 
+class ConfigParser;
+class ServerConf;
 /**
  * @brief  manage running server(s) with configuration
  * from config file
@@ -10,15 +13,14 @@
  */
 class Server {
    private:
-	// int						_port;
-	// std::vector<ServerConf> _servers;
+	ServerConf		_serverConfig;
 	// // std::map<int, ServerConf> _servers_map;
 	// std::map<int, Client>	_clients;
 
    public:
-	Server(void) {};
-	// Server(int port);
-	~Server(void) {};
+   // Server(ServerConf config);
+	Server(ConfigParser allConfigs, int serverId);
+	~Server(void);
 
 	// Socket &getSocket(void);
 	// Client &getClient(int i);
