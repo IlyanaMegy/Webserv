@@ -32,7 +32,7 @@ void ConfigParser::splitBlocks(std::string &content) {
 		end = findEndServer(start, content);
 		if (start == end || !(content[start] == '{' && content[end] == '}'))
 			throw std::runtime_error("Error: Wrong server scope{}");
-		this->_server_config.push_back(content.substr(start, end - start + 1));
+		this->_servers_config.push_back(content.substr(start, end - start + 1));
 		this->_nb_server++;
 		start = end + 1;
 	}
@@ -59,14 +59,14 @@ int ConfigParser::createCluster(const std::string &config_file) {
 	std::cout << OLIV << "[CONFIG] Comments and whitespaces removed." << RESET << std::endl;
 
 	splitBlocks(content);
-	if (this->_server_config.size() != this->_nb_server)
+	if (this->_servers_config.size() != this->_nb_server)
 		throw std::runtime_error("Error: Coudn't split config file.");
 	std::cout << OLIV << "[CONFIG] Success spliting config file." << RESET << std::endl;
 	
 	for (size_t i = 0; i < this->_nb_server; i++)
 	{
 		ServerConf server;
-		createServer(this->_server_config[i], server);
+		createServer(this->_servers_config[i], server);
 		this->_servers.push_back(server);
 	}
 	if (_nb_server > 1)
@@ -216,7 +216,7 @@ void ConfigParser::createServer(std::string &config, ServerConf &server)
 	// 	throw std::runtime_error("Incorrect path for error page or number of error");
 }
 
-int	ConfigParser::getServerFd(int serveurId) const {
+int	ConfigParser::getServerFd(int serveurId) {
 	return _servers[serveurId].getSocketFd();
 }
 

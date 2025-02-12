@@ -1,8 +1,9 @@
 #ifndef CLIENT_HPP
 # define CLIENT_HPP
 
-# include "../Webserv.hpp"
 # include "Socket.hpp"
+# include "../Webserv.hpp"
+
 
 class Client {
 

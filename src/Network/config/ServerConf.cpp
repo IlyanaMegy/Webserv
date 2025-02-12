@@ -15,12 +15,6 @@ void ServerConf::setServerName(std::string server_name) {
 	_server_name = server_name;
 }
 
-/**
- * @brief  set host after binary conversion
- * @note   
- * @params  params: 
- * @retval None
- */
 void ServerConf::setHost(std::string params) {
 	checkToken(params);
 	if (params == "localhost")
@@ -33,7 +27,6 @@ void ServerConf::setHost(std::string params) {
 
 /**
  * @brief  set root's absolute path
- * @retval None
  */
 void ServerConf::setRoot(std::string root) {
 	checkToken(root);
@@ -65,13 +58,10 @@ void ServerConf::setPort(std::string params) {unsigned int port;
 	if (port < 1 || port > 65636)
 		throw std::runtime_error("Wrong syntax: port");
 	_port = (uint16_t) port;
-	_socket = Socket(_port);
 }
 
 /**
  * @brief  set max size of clients' body request
- * @params  `params`
- * @retval None
  */
 void ServerConf::setClientMaxBodySize(std::string params) {checkToken(params);
 	for (size_t i = 0; i < params.length(); i++)
@@ -290,8 +280,10 @@ const std::vector<Location> &ServerConf::getLocations() {return (_locations); }
 const std::string &ServerConf::getRoot() {return (_root); }
 const std::string &ServerConf::getIndex() {return (_index); }
 const bool &ServerConf::getAutoindex() {return (_autoindex); }
-int	ServerConf::getSocketFd() const {return (_socket.getFd()); }
+int	ServerConf::getSocketFd() {return (_socket.getFd()); }
 Socket &ServerConf::getSocket() {return (_socket); }
+void	ServerConf::setSocketServer(void) { _socket = Socket(_port); }
+
 // const std::string &ServerConfig::getPathErrorPage(short key)
 // {
 // 	std::map<short, std::string>::iterator it = _error_pages.find(key);

@@ -3,16 +3,15 @@
 Socket::Socket(void) : _opt (1), _fd(-1) {}
 
 Socket::Socket(int port) : _opt(1) {
-	_fd = socket(AF_INET, SOCK_STREAM, 0);
-	if (_fd == -1) 
+	if ((_fd = socket(AF_INET, SOCK_STREAM, 0) == -1))
 		throw std::runtime_error("Failed to create socket");
+
+	_setOpt();
 
 	_addr.sin_family = AF_INET;
 	_addr.sin_port = htons(port);
 	_addr.sin_addr.s_addr = INADDR_ANY;
-
-	_setOpt();
-
+	
 	if (bind(_fd, (struct sockaddr *)&_addr, sizeof(_addr)) == -1)
 		throw std::runtime_error("Failed to bind socket");
 }
@@ -32,9 +31,7 @@ Socket	&Socket::operator=(const Socket &ref)
 {
 	_opt = ref._opt;
 	_fd = ref._fd;
-	_addr.sin_family = ref._addr.sin_family;
-	_addr.sin_port = ref._addr.sin_port;
-	_addr.sin_addr.s_addr = ref._addr.sin_addr.s_addr;
+	_addr = ref._addr;
 	return *this;
 }
 
@@ -53,7 +50,7 @@ void	Socket::fill(int fd, struct sockaddr_in addr)
 	_setOpt();
 }
 
-int Socket::getFd(void) const
+int Socket::getFd(void)
 {
 	return _fd;
 }

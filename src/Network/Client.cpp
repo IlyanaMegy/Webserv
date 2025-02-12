@@ -1,4 +1,4 @@
-#include "../../inc/Webserv.hpp"
+#include "../../inc/Network/Client.hpp"
 
 Client::Client(void) : _buffer("") {}
 

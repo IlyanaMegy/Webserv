@@ -1,9 +1,9 @@
 #ifndef SERVERCONF_HPP
-# define SERVERCONF_HPP
+#define SERVERCONF_HPP
 
-# include "../Socket.hpp"
-# include "Location.hpp"
-# include "../../Webserv.hpp"
+#include "../../Webserv.hpp"
+#include "../Socket.hpp"
+#include "Location.hpp"
 
 class Location;
 /**
@@ -38,20 +38,21 @@ class ServerConf {
 	void setLocation(std::string path, std::vector<std::string> params);
 	void setAutoindex(std::string autoindex);
 
-	// bool isValidErrorPages();
+	// bool isValidErrorPages(void);
 	int isValidLocation(Location &location) const;
 
-	const std::string &getServerName();
-	const uint16_t &getPort();
-	const in_addr_t &getHost();
-	const size_t &getClientMaxBodySize();
-	const std::vector<Location> &getLocations();
-	const std::string &getRoot();
-	// const std::map<short, std::string> &getErrorPages();
-	const std::string &getIndex();
-	const bool &getAutoindex();
-	int getSocketFd() const;
-	Socket &getSocket();
+	const std::string &getServerName(void);
+	const uint16_t &getPort(void);
+	const in_addr_t &getHost(void);
+	const size_t &getClientMaxBodySize(void);
+	const std::vector<Location> &getLocations(void);
+	const std::string &getRoot(void);
+	// const std::map<short, std::string> &getErrorPages(void);
+	const std::string &getIndex(void);
+	const bool &getAutoindex(void);
+	int getSocketFd(void);
+	Socket &getSocket(void);
+	void setSocketServer(void);
 	// const std::string &getPathErrorPage(short key);
 	// const std::vector<Location>::iterator getLocationKey(std::string key);
 };

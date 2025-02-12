@@ -1,9 +1,13 @@
 #include "../inc/Network/Epoll.hpp"
-#include "../inc/Network/Server.hpp"
+#include "../inc/Network/ServerMonitor.hpp"
 
-int runServer(const ServerConf serverConfig) {
-	Server server(serverConfig);
+int runServer(std::vector<ServerConf> serversConfig) {
+	ServerMonitor servers;
+
+	servers.createServers(serversConfig);
 	std::cout << PINK << "Server created" << RESET << std::endl;
+
+
 	// Epoll epoll(server.getSocket().getFd());
 
 	// while (true) {
@@ -33,26 +37,22 @@ int main(int ac, char** av) {
 	if (ac != 1 && ac != 2)
 		return (std::cout << "Error: wrong number of arguments." << std::endl, 1);
 
-	ConfigParser parser;
+	// ! \ change name ConfigParser to "ServersLst" be-like
+	ConfigParser data;
 	try {
-		parser.createCluster(ac == 1 ? "config/webserv.conf" : av[1]);
+		data.createCluster(ac == 1 ? "config/webserv.conf" : av[1]);
+
 	} catch (std::exception& e) {
 		std::cerr << e.what() << std::endl;
 		return 1;
 	}
 
-	for (size_t i = 0; i < parser.getNbServer(); i++) {
-		std::cout << LIME << "\ndealing with server n." << i << RESET << std::endl;
-		std::cout << OLIV << "Port: " << parser.getServerPort(i) << RESET << std::endl;
 
-		try {
-			runServer(parser.getServerConfig(i));
-		} catch (std::exception& e) {
-			std::cout << e.what() << std::endl;
-			return 1;
-		}
-		std::cout << "Closing server, bye !" << std::endl;
+	try {
+		runServer(data.getServers());
+	} catch (std::exception& e) {
+		std::cout << e.what() << std::endl;
+		return 1;
 	}
-
 	return 0;
 }

@@ -5,7 +5,10 @@ Server::Server(ServerConf config) : _serverConfig(config)
 {
 	std::cout << PINK << "Server Socket Fd = " << _serverConfig.getSocketFd() << RESET << std::endl;
 	if (listen(_serverConfig.getSocketFd(), MAXCONNECT) < 0)
-		throw std::runtime_error("Failed to listen on socket");
+	{
+		std::cerr << "Failed to listen on socket: " << strerror(errno) << std::endl;
+		throw std::runtime_error("Failed to listen on socket");	
+	}
 	std::cout << "server's socket listening..." << std::endl;
 	std::cout << "Server is running on port " << config.getPort() << "..." << std::endl;
 }

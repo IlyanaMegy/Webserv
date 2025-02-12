@@ -6,7 +6,7 @@
 class ConfigParser {
    private:
 	std::vector<ServerConf> _servers;
-	std::vector<std::string> _server_config;
+	std::vector<std::string> _servers_config;
 	size_t _nb_server;
 
    public:
@@ -17,7 +17,8 @@ class ConfigParser {
 	void splitBlocks(std::string &content);
 	void createServer(std::string &config, ServerConf &server);
 
-	int getServerFd(int serverId) const;
+	int getServerFd(int serverId);
+	std::vector<ServerConf> &getServers() { return _servers; }
 	ServerConf	&getServerConfig(int serverId);
 	uint16_t	getServerPort(int serveurId);
 	size_t	getNbServer() const;
