@@ -4,7 +4,8 @@ CONFIG		:=	Network/config/ServerConf.cpp \
 				Network/config/Location.cpp \
 				Network/config/ConfigParser.cpp
 
-NETWORK		:=	Network/Server.cpp \
+NETWORK		:=	Network/ServerMonitor.cpp \
+				Network/Server.cpp \
 				Network/Client.cpp \
 				Network/Epoll.cpp \
 				Network/Socket.cpp
