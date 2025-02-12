@@ -65,6 +65,7 @@ void ServerConf::setPort(std::string params) {unsigned int port;
 	if (port < 1 || port > 65636)
 		throw std::runtime_error("Wrong syntax: port");
 	_port = (uint16_t) port;
+	_socket = Socket(_port);
 }
 
 /**
@@ -289,8 +290,8 @@ const std::vector<Location> &ServerConf::getLocations() {return (_locations); }
 const std::string &ServerConf::getRoot() {return (_root); }
 const std::string &ServerConf::getIndex() {return (_index); }
 const bool &ServerConf::getAutoindex() {return (_autoindex); }
-int	ServerConf::getFd() const {return (_socket.getFd()); }
-
+int	ServerConf::getSocketFd() const {return (_socket.getFd()); }
+Socket &ServerConf::getSocket() {return (_socket); }
 // const std::string &ServerConfig::getPathErrorPage(short key)
 // {
 // 	std::map<short, std::string>::iterator it = _error_pages.find(key);

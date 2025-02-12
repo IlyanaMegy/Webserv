@@ -1,4 +1,4 @@
-#include "../../inc/Webserv.hpp"
+#include "../../inc/Network/Socket.hpp"
 
 Socket::Socket(void) : _opt (1), _fd(-1) {}
 

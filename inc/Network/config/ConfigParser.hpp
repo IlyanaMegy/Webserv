@@ -1,8 +1,7 @@
 #ifndef CONFIGPARSER_HPP
 #define CONFIGPARSER_HPP
 
-#include <cstddef>
-#include "../../Webserv.hpp"
+#include "ServerConf.hpp"
 
 class ConfigParser {
    private:
@@ -12,7 +11,7 @@ class ConfigParser {
 
    public:
 	ConfigParser() : _nb_server(0) { (void)_nb_server; };
-	~ConfigParser();
+	~ConfigParser() {};
 
 	int createCluster(const std::string &config_file);
 	void splitBlocks(std::string &content);

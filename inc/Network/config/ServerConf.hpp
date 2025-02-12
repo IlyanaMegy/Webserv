@@ -1,9 +1,9 @@
 #ifndef SERVERCONF_HPP
 # define SERVERCONF_HPP
 
-# include "../../Webserv.hpp"
 # include "../Socket.hpp"
 # include "Location.hpp"
+# include "../../Webserv.hpp"
 
 class Location;
 /**
@@ -50,7 +50,8 @@ class ServerConf {
 	// const std::map<short, std::string> &getErrorPages();
 	const std::string &getIndex();
 	const bool &getAutoindex();
-	int getFd() const;
+	int getSocketFd() const;
+	Socket &getSocket();
 	// const std::string &getPathErrorPage(short key);
 	// const std::vector<Location>::iterator getLocationKey(std::string key);
 };

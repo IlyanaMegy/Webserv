@@ -1,20 +1,21 @@
 #include "../../inc/Network/Server.hpp"
 
 
-Server::Server(ConfigParser allConfigs, int serverId) : _serverConfig(allConfigs.getServerConfig(serverId))
+Server::Server(ServerConf config) : _serverConfig(config)
 {
-	if (listen(_serverConfig.getFd(), MAXCONNECT) < 0)
+	std::cout << PINK << "Server Socket Fd = " << _serverConfig.getSocketFd() << RESET << std::endl;
+	if (listen(_serverConfig.getSocketFd(), MAXCONNECT) < 0)
 		throw std::runtime_error("Failed to listen on socket");
-	// std::cout << "server's socket listening..." << std::endl;
-	// std::cout << "Server is running on port " << config.getPort() << "..." << std::endl;
+	std::cout << "server's socket listening..." << std::endl;
+	std::cout << "Server is running on port " << config.getPort() << "..." << std::endl;
 }
 
 Server::~Server(void) {}
 
-// Socket &Server::getSocket(void)
-// {
-// 	return _socket;
-// }
+Socket &Server::getSocket(void)
+{
+	return _serverConfig.getSocket();
+}
 
 // Client &Server::getClient(int i)
 // {

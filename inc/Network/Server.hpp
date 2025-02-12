@@ -1,10 +1,8 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include "../Webserv.hpp"
 #include "config/ConfigParser.hpp"
 
-class ConfigParser;
 class ServerConf;
 /**
  * @brief  manage running server(s) with configuration
@@ -19,10 +17,10 @@ class Server {
 
    public:
    // Server(ServerConf config);
-	Server(ConfigParser allConfigs, int serverId);
+	Server(ServerConf config);
 	~Server(void);
 
-	// Socket &getSocket(void);
+	Socket &getSocket(void);
 	// Client &getClient(int i);
 
 	// void acceptClient(void);

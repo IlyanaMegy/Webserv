@@ -217,7 +217,7 @@ void ConfigParser::createServer(std::string &config, ServerConf &server)
 }
 
 int	ConfigParser::getServerFd(int serveurId) const {
-	return _servers[serveurId].getFd();
+	return _servers[serveurId].getSocketFd();
 }
 
 uint16_t	ConfigParser::getServerPort(int serveurId) {

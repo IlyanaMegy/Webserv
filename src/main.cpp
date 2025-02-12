@@ -1,30 +1,32 @@
-#include "../inc/Network/config/ConfigParser.hpp"
-#include "../inc/Webserv.hpp"
+#include "../inc/Network/Epoll.hpp"
+#include "../inc/Network/Server.hpp"
 
 int runServer(const ServerConf serverConfig) {
 	Server server(serverConfig);
-	Epoll epoll(server.getSocket().getFd());
+	std::cout << PINK << "Server created" << RESET << std::endl;
+	// Epoll epoll(server.getSocket().getFd());
 
-	while (true) {
-		try {
-			epoll.wait();
-		} catch (std::exception& e) {
-			std::cout << e.what() << std::endl;
-		}
+	// while (true) {
+	// 	try {
+	// 		epoll.wait();
+	// 	} catch (std::exception& e) {
+	// 		std::cout << e.what() << std::endl;
+	// 	}
 
-		// for (int i = 0; i < epoll.getReadyFd(); i++) {
-		// 	if (epoll.getFd(i) == server.getSocket().getFd()) {
-		// 		try {
-		// 			server.acceptClient();
-		// 		} catch (std::exception& e) {
-		// 			std::cout << e.what() << std::endl;
-		// 		}
-		// 	} else {
-		// 		server.readFrom(i);
-		// 		server.sendTo(i);
-		// 	}
-		// }
-	}
+	// 	// for (int i = 0; i < epoll.getReadyFd(); i++) {
+	// 	// 	if (epoll.getFd(i) == server.getSocket().getFd()) {
+	// 	// 		try {
+	// 	// 			server.acceptClient();
+	// 	// 		} catch (std::exception& e) {
+	// 	// 			std::cout << e.what() << std::endl;
+	// 	// 		}
+	// 	// 	} else {
+	// 	// 		server.readFrom(i);
+	// 	// 		server.sendTo(i);
+	// 	// 	}
+	// 	// }
+	// }
+	return 0;
 }
 
 int main(int ac, char** av) {

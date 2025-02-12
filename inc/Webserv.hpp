@@ -5,24 +5,25 @@
 #define MAXCONNECT 30
 #define MAX_CONTENT_LENGTH 30000000
 
+#include <arpa/inet.h>
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <sys/epoll.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <arpa/inet.h>
 
+#include <algorithm>
+#include <cstddef>
 #include <cstring>
 #include <exception>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <map>
 #include <sstream>
-#include <iterator>
 #include <stdexcept>
 #include <vector>
-#include <algorithm>
 
 // #include "Network/config/ServerConf.hpp"
 // #include "Network/config/ConfigParser.hpp"
