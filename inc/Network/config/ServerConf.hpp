@@ -40,6 +40,7 @@ class ServerConf {
 
 	// bool isValidErrorPages(void);
 	int isValidLocation(Location &location) const;
+	bool checkLocations() const;
 
 	const std::string &getServerName(void);
 	const uint16_t &getPort(void);

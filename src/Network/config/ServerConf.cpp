@@ -84,7 +84,9 @@ void ServerConf::setAutoindex(std::string autoindex) {checkToken(autoindex);
 		_autoindex = true;
 }
 
-void ServerConf::setLocation(std::string path, std::vector<std::string> params) {Location new_loca;
+void ServerConf::setLocation(std::string path, std::vector<std::string> params) 
+{
+	Location new_loca;
 	std::vector<std::string> methods;
 	bool flag_methods, flag_autoindex, flag_max_size = false;
 	int valid;
@@ -270,6 +272,19 @@ int ServerConf::isValidLocation(Location &location) const
 		if (!location.getAlias().empty()) if (isFileExistAndReadable(location.getRootLocation(), location.getAlias())) return (4);
 	}
 	return (0);
+}
+
+bool ServerConf::checkLocations() const
+{
+	if (this->_locations.size() < 2)
+		return (false);
+	std::vector<Location>::const_iterator first;
+	std::vector<Location>::const_iterator second;
+	for (first = this->_locations.begin(); first != this->_locations.end() - 1; first++)
+		for (second = first + 1; second != this->_locations.end(); second++)
+			if (first->getPath() == second->getPath())
+				return (true);
+	return (false);
 }
 
 const std::string &ServerConf::getServerName() {return (_server_name); }
