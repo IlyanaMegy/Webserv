@@ -37,17 +37,21 @@ int main(int ac, char** av) {
 
 	ConfigParser data;
 	ServerMonitor servers;
+
+	
 	try {
+		//	Parse Config
 		data.createCluster(ac == 1 ? "config/webserv.conf" : av[1]);
 
+		//	Init Servers
+		servers.setupServers(data.getServers());
+
+		// 	Run Servers
+		servers.runServers();
 	} catch (std::exception& e) {
 		return (std::cout << e.what() << std::endl, 1);
 	}
 
-	try {
-		servers.setupServers(data.getServers());
-	} catch (std::exception& e) {
-		return (std::cout << e.what() << std::endl, 1);
-	}
+
 	return 0;
 }

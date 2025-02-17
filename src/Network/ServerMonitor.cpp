@@ -25,3 +25,19 @@ void ServerMonitor::setupServers(std::vector<ServerConf> serversConfig)
 		std::cout << MAGENTA << "[CONFIG] Server '" << it->getServerName() << "' created." << RESET << std::endl;
 	}
 }
+
+void ServerMonitor::runServers(void)
+{
+	for(std::vector<ServerConf>::iterator it = _servers.begin(); it != _servers.end(); ++it)
+    {
+        //Now it calles listen() twice on even if two servers have the same host:port
+        if (listen(it->getSocketFd(), MAXCONNECT) < 0)
+        {
+          	throw std::runtime_error("Failed to listen on socket");
+            exit(EXIT_FAILURE);
+        }
+		std::cout << "server's socket listening..." << std::endl;
+		std::cout << "Server is running on port " << it->getPort() << "..." << std::endl;
+	}
+
+}
