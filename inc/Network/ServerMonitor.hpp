@@ -5,13 +5,15 @@
 
 class ServerConf;
 class ServerMonitor {
-	private:
-		std::map<int, ServerConf> _servers;
-	public:
-		ServerMonitor(void);
-		~ServerMonitor(void);
+   private:
+	std::vector<ServerConf> _servers;
+	std::map<int, ServerConf> _servers_lst;
 
-		void createServers(std::vector<ServerConf> servers);
+   public:
+	ServerMonitor(void);
+	~ServerMonitor(void);
+
+	void setupServers(std::vector<ServerConf> serverConfig);
 };
 
 #endif

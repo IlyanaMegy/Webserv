@@ -3,9 +3,8 @@
 Socket::Socket(void) : _opt (1), _fd(-1) {}
 
 Socket::Socket(int port) : _opt(1) {
-	if ((_fd = socket(AF_INET, SOCK_STREAM, 0) == -1))
+	if ((_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 		throw std::runtime_error("Failed to create socket");
-
 	_setOpt();
 
 	_addr.sin_family = AF_INET;
@@ -40,7 +39,7 @@ void	Socket::_setOpt(void)
 	if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &_opt, sizeof(_opt)) < 0)
 		throw std::runtime_error("Failed to set socket options");
 	if (fcntl(_fd, F_SETFL, O_NONBLOCK) == -1)
-		throw std::runtime_error("Failed to set socket options");
+		throw std::runtime_error("Failed to set socket to non-blocking");
 }
 
 void	Socket::fill(int fd, struct sockaddr_in addr)

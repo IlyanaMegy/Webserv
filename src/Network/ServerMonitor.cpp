@@ -4,10 +4,12 @@
 ServerMonitor::ServerMonitor(){}
 ServerMonitor::~ServerMonitor(){}
 
-void ServerMonitor::createServers(std::vector<ServerConf> servers)
+void ServerMonitor::setupServers(std::vector<ServerConf> serversConfig)
 {
-	for (std::vector<ServerConf>::iterator it = servers.begin(); it != servers.end(); ++it)
+	_servers = serversConfig;
+	for (std::vector<ServerConf>::iterator it = _servers.begin(); it != _servers.end(); ++it)
 	{
+		_servers_lst.insert(std::make_pair(it->getSocketFd(), *it));
 		bool serverDub = false;
 		// for (std::vector<ServerConf>::iterator it2 = servers.begin(); it2 != it; ++it2)
 		// {
@@ -19,7 +21,7 @@ void ServerMonitor::createServers(std::vector<ServerConf> servers)
 		// }
 		if (!serverDub)
 			it->setSocketServer();
-		std::cout << "" << std::endl;
-		std::cout << MAGENTA << "Server n." << it->getServerName() << " created." << RESET << std::endl;
+		
+		std::cout << MAGENTA << "[CONFIG] Server '" << it->getServerName() << "' created." << RESET << std::endl;
 	}
 }

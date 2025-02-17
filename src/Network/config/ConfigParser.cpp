@@ -46,22 +46,22 @@ void ConfigParser::splitBlocks(std::string &content) {
  */
 int ConfigParser::createCluster(const std::string &config_file) {
 	if (getTypePath(config_file) != 1)
-		throw std::runtime_error("Error: Invalid configuration file.");
+		throw std::runtime_error("Error: Invalid configuration file");
 	if (checkFile(config_file, 4) == -1)
-		throw std::runtime_error("Error: Inaccessible configuration file.");
+		throw std::runtime_error("Error: Inaccessible configuration file");
 	std::string content = readFile(config_file);
 	if (content.empty())
-		throw std::runtime_error("Error: Empty configuration file.");
-	std::cout << OLIV << "[CONFIG] First checks passed !\n         Reading " << BOLD << config_file << RESET << std::endl;
+		throw std::runtime_error("Error: Empty configuration file");
+	std::cout << MAGENTA << "[CONFIG] First checks passed !\n         Reading " << BOLD << config_file << RESET << std::endl;
 
 	removeComments(content);
 	removeWhiteSpace(content);
-	std::cout << OLIV << "[CONFIG] Comments and whitespaces removed." << RESET << std::endl;
+	std::cout << MAGENTA << "[CONFIG] Comments and whitespaces removed" << RESET << std::endl;
 
 	splitBlocks(content);
 	if (this->_servers_config.size() != this->_nb_server)
-		throw std::runtime_error("Error: Coudn't split config file.");
-	std::cout << OLIV << "[CONFIG] Success spliting config file." << RESET << std::endl;
+		throw std::runtime_error("Error: Coudn't split config file");
+	std::cout << MAGENTA << "[CONFIG] Success spliting config file" << RESET << std::endl;
 	
 	for (size_t i = 0; i < this->_nb_server; i++)
 	{
@@ -70,9 +70,9 @@ int ConfigParser::createCluster(const std::string &config_file) {
 		this->_servers.push_back(server);
 	}
 	if (_nb_server > 1)
-		std::cout << OLIV << "[CONFIG] " << _nb_server << " created servers." << RESET << std::endl;
+		std::cout << MAGENTA << "[CONFIG] " << _nb_server << " servers detected" << RESET << std::endl;
 	else
-		std::cout << OLIV << "[CONFIG] " << _nb_server << " created server." << RESET << std::endl;
+		std::cout << MAGENTA << "[CONFIG] " << _nb_server << " server detected" << RESET << std::endl;
 	return 0;
 }
 
