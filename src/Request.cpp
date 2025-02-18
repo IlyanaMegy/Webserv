@@ -66,7 +66,8 @@ std::string	Request::_findHeader(void)
 	std::string::size_type	crlfCrlfPos;
 	std::string				header;
 
-	if (_untreatedMessage.length() > MAXOCTETS) {
+	if (_untreatedMessage.length() > MAXOCTETS
+		|| (_untreatedMessage.length() > 1 && _untreatedMessage.substr(0, 2) == "\r\n")) {
 		_response.fillError("400", "Bad Request");
 		_stage = DONE;
 		return "";
