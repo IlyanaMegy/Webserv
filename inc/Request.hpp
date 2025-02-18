@@ -69,6 +69,8 @@ class Request
 		int							_findBodySize(void);
 		int							_parseContentLength(std::string contentLength);
 
+		void						_parseBody(void);
+
 		void						_treat(void);
 
 		static std::string			_toLower(std::string s);

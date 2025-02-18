@@ -18,6 +18,8 @@ void	Request::parse(std::string buffer)
 		_parseStartLine();
 	if (_stage == SEEKING_HEADER)
 		_parseHeader();
+	if (_stage == SEEKING_BODY)
+		_parseBody();
 	if (_stage == PROCESSING)
 		_treat();
 }
@@ -33,7 +35,17 @@ void	Request::_treat(void)
 	_stage = DONE;
 }
 
+void	Request::_parseBody(void)
+{
+	if (_bodyLength == 0) {
+		_stage = PROCESSING;
+		return ;
 	}
+	if (_untreatedMessage.length() < _bodyLength)
+		return ;
+	_body = _untreatedMessage.substr(0, _bodyLength);
+	_untreatedMessage = _untreatedMessage.substr(_bodyLength, _untreatedMessage.length() - _bodyLength);
+	_stage = PROCESSING;
 }
 
 void	Request::_parseHeader(void)
