@@ -323,8 +323,7 @@ std::string	Request::_toLower(std::string s)
 
 	if (s.empty())
 		return "";
-	lowerS.push_back(std::toupper(s[0]));
-	for (std::string::iterator it = ++s.begin(); it != s.end(); it++)
+	for (std::string::iterator it = s.begin(); it != s.end(); it++)
 		lowerS.push_back(std::tolower(*it));
 	return lowerS;
 }
