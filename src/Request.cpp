@@ -119,7 +119,7 @@ int	Request::_parseCompletedFields(void)
 
 int	Request::_findBodySize(void)
 {
-	if (_fields[_toLower("Content-Length")].empty()) {
+	if (_fields.find(_toLower("Content-Length")) == _fields.end()) {
 		if (_method == GET || _method == DELETE) {
 			_bodyLength = 0;
 			return 0;
