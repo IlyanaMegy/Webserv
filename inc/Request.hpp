@@ -7,7 +7,9 @@
 
 # include "Response.hpp"
 
-# define MAXOCTETS 4000
+# define MAXSTATUSLINEOCTETS 2000
+# define MAXHEADEROCTETS 4000
+# define MAXBODYOCTETS 2000000000
 
 class Request
 {

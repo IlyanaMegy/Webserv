@@ -66,7 +66,7 @@ std::string	Request::_findHeader(void)
 	std::string::size_type	crlfCrlfPos;
 	std::string				header;
 
-	if (_untreatedMessage.length() > MAXOCTETS
+	if (_untreatedMessage.length() > MAXHEADEROCTETS
 		|| (_untreatedMessage.length() > 1 && _untreatedMessage.substr(0, 2) == "\r\n")) {
 		_response.fillError("400", "Bad Request");
 		_stage = DONE;
@@ -76,7 +76,7 @@ std::string	Request::_findHeader(void)
 	if (crlfCrlfPos == std::string::npos)
 		return "";
 	header = _untreatedMessage.substr(0, crlfCrlfPos + 2);
-	if (header.length() > MAXOCTETS) {
+	if (header.length() > MAXHEADEROCTETS) {
 		_response.fillError("400", "Bad Request");
 		_stage = DONE;
 		return "";
@@ -179,7 +179,7 @@ std::string	Request::_findStartLine(void)
 	std::string::size_type	crlfPos;
 	std::string				startLine;
 
-	if (_untreatedMessage.length() > MAXOCTETS) {
+	if (_untreatedMessage.length() > MAXSTATUSLINEOCTETS) {
 		_response.fillError("400", "Bad Request");
 		_stage = DONE;
 		return "";
@@ -188,7 +188,7 @@ std::string	Request::_findStartLine(void)
 	if (crlfPos == std::string::npos)
 		return "";
 	startLine = _untreatedMessage.substr(0, crlfPos);
-	if (startLine.length() > MAXOCTETS) {
+	if (startLine.length() > MAXSTATUSLINEOCTETS) {
 		_response.fillError("400", "Bad Request");
 		_stage = DONE;
 		return "";
