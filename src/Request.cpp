@@ -145,10 +145,8 @@ int	Request::_parseFieldName(std::string fieldName)
 
 int	Request::_parseFieldValue(std::string fieldValue)
 {
-	unsigned int	midcharsCounter = 0;
-
 	if (fieldValue.empty())
-		return 1;
+		return 0;
 	if (!_isVChar(fieldValue[0]) && !_isObsText(fieldValue[0]))
 		return 1;
 	if (fieldValue.length() == 1)
@@ -157,10 +155,8 @@ int	Request::_parseFieldValue(std::string fieldValue)
 		if (!_isVChar(fieldValue[i]) && !_isObsText(fieldValue[i])
 			&& fieldValue[i] != ' ' && fieldValue[i] != '\t')
 			return 1;
-		midcharsCounter++;
 	}
-	if ((!_isVChar(fieldValue[fieldValue.length() - 1]) && !_isObsText(fieldValue.length() - 1))
-		|| midcharsCounter == 0)
+	if (!_isVChar(fieldValue[fieldValue.length() - 1]) && !_isObsText(fieldValue[fieldValue.length() - 1]))
 		return 1;
 	return 0;
 }
