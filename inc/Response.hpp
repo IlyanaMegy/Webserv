@@ -32,6 +32,7 @@ class Response
 		void		fillError(std::string statusCode, std::string reasonMessage);
 		void		fillGET(std::string path);
 		void		fillDELETE(std::string path);
+		void		fillPOST(std::string path);
 
 	private:
 		std::string	_message;

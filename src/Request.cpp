@@ -24,13 +24,15 @@ void	Request::parse(std::string buffer)
 
 void	Request::_treat(void)
 {
-	if (_method == GET) {
+	if (_method == GET)
 		_response.fillGET(_uri);
-		_stage = DONE;
-	}
-	else if (_method == DELETE) {
+	else if (_method == DELETE)
 		_response.fillDELETE(_uri);
-		_stage = DONE;
+	else
+		_response.fillPOST(_uri);
+	_stage = DONE;
+}
+
 	}
 }
 
