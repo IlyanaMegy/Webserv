@@ -5,21 +5,6 @@ Request::Request(void)
 
 Request::~Request(void) {}
 
-Request::Method	Request::getMethod(void) const
-{
-	return _method;
-}
-
-std::string	Request::getUri(void) const
-{
-	return _uri;
-}
-
-std::vector<std::string>	Request::getFieldValues(std::string fieldName)
-{
-	return _fields[fieldName];
-}
-
 Response	&Request::getResponse(void)
 {
 	return _response;

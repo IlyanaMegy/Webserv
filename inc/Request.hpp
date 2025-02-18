@@ -24,9 +24,6 @@ class Request
 		Request(void);
 		~Request(void);
 
-		Method						getMethod(void) const;
-		std::string					getUri(void) const;
-		std::vector<std::string>	getFieldValues(std::string fieldName);
 		Response					&getResponse(void);
 
 		void						parse(std::string buffer);
