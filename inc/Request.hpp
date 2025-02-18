@@ -68,7 +68,7 @@ class Request
 		int							_parseFieldName(std::string fieldName);
 		int							_parseFieldValue(std::string fieldValue);
 		int							_parseCompletedFields(void);
-		int							_findBodySize(void);
+		int							_findContentLength(void);
 		int							_parseContentLength(std::string contentLength);
 
 		void						_parseBody(void);

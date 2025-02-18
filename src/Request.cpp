@@ -112,12 +112,12 @@ int	Request::_parseHeaderFields(std::string header)
 
 int	Request::_parseCompletedFields(void)
 {
-	if (_findBodySize())
+	if (_findContentLength())
 		return 1;
 	return 0;
 }
 
-int	Request::_findBodySize(void)
+int	Request::_findContentLength(void)
 {
 	if (_fields.find(_toLower("Content-Length")) == _fields.end()) {
 		if (_method == GET || _method == DELETE) {
