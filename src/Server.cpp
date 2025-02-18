@@ -38,7 +38,7 @@ Client	*Server::getClient(int clientFd)
 void	Server::acceptClient(Epoll &epoll)
 {
 	int		clientSocket;
-	Client	*client = new Client(_socket.getFd());
+	Client	*client = new Client(_socket.getFd(), "");
 
 	if (!client)
 		throw std::exception();
@@ -59,7 +59,7 @@ void	Server::readFrom(int clientFd)
 		return ;
 	}
 	if (!_clients[clientFd]->getRequest())
-		_clients[clientFd]->createNewRequest();
+		_clients[clientFd]->createNewRequest(_clients[clientFd]->leftoverMessage);
 	_clients[clientFd]->getRequest()->parse(std::string(buffer));
 	std::cout << "End of reading!" << std::endl;
 }
@@ -75,6 +75,8 @@ void	Server::sendTo(int clientFd)
 	response.createMessage();
 	if (response.getShouldClose())
 		_clients[clientFd]->setShouldClose(true);
+	else
+		_clients[clientFd]->leftoverMessage = _clients[clientFd]->getRequest()->getUntreatedMessage();
 	responseMessage = response.getMessage();
 	if (send(clientFd, responseMessage.c_str(), responseMessage.length(), 0) == -1)
 		throw std::exception();

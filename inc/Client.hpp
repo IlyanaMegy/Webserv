@@ -18,8 +18,10 @@ class Client
 
 	public:
 		Client(void);
-		Client(int serverFd);
+		Client(int serverFd, std::string leftoverMessage);
 		~Client(void);
+
+		std::string	leftoverMessage;
 
 		Request	*getRequest(void);
 		Socket	&getSocket(void);
@@ -27,7 +29,7 @@ class Client
 
 		void	setShouldClose(bool shouldClose);
 
-		void	createNewRequest(void);
+		void	createNewRequest(std::string leftoverMessage);
 		void	deleteRequest(void);
 
 };

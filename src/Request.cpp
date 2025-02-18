@@ -1,13 +1,21 @@
 #include "Request.hpp"
 
 Request::Request(void)
-	: _stage(SEEKING_STATUS_LINE), _uri(""), _fields(std::map< std::string, std::vector<std::string> >()), _bodyLength(0), _body("") {}
+	: _stage(SEEKING_STATUS_LINE), _untreatedMessage("") , _uri(""), _fields(std::map< std::string, std::vector<std::string> >()), _bodyLength(0), _body("") {}
+
+Request::Request(std::string leftoverMessage)
+	: _stage(SEEKING_STATUS_LINE), _untreatedMessage(leftoverMessage), _uri(""), _fields(std::map< std::string, std::vector<std::string> >()), _bodyLength(0), _body("") {}
 
 Request::~Request(void) {}
 
 Response	&Request::getResponse(void)
 {
 	return _response;
+}
+
+std::string	Request::getUntreatedMessage(void)
+{
+	return _untreatedMessage;
 }
 
 void	Request::parse(std::string buffer)

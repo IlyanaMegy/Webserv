@@ -24,9 +24,11 @@ class Request
 		};
 
 		Request(void);
+		Request(std::string leftoverMessage);
 		~Request(void);
 
 		Response					&getResponse(void);
+		std::string					getUntreatedMessage(void);
 
 		void						parse(std::string buffer);
 
