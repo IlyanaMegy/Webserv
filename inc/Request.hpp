@@ -4,6 +4,8 @@
 # include <string>
 # include <map>
 # include <vector>
+# include <cctype>
+# include <iostream>
 
 # include "Response.hpp"
 
@@ -33,8 +35,8 @@ class Request
 		enum STAGE {
 			SEEKING_STATUS_LINE,
 			SEEKING_HEADER,
-			PROCESSING,
 			SEEKING_BODY,
+			PROCESSING,
 			DONE
 		};
 
@@ -47,6 +49,8 @@ class Request
 		Method												_method;
 		std::string											_uri;
 		std::map< std::string, std::vector<std::string> >	_fields;
+		unsigned int										_bodyLength;
+		std::string											_body;
 
 		void						_parseStartLine(void);
 		std::string					_findStartLine(void);
@@ -61,6 +65,9 @@ class Request
 		int							_parseFieldLine(std::string fieldLine);
 		int							_parseFieldName(std::string fieldName);
 		int							_parseFieldValue(std::string fieldValue);
+		int							_parseCompletedFields(void);
+		int							_findBodySize(void);
+		int							_parseContentLength(std::string contentLength);
 
 		void						_treat(void);
 
@@ -68,6 +75,7 @@ class Request
 		static bool					_isDelimiter(unsigned char c);
 		static bool					_isVChar(unsigned char c);
 		static bool					_isObsText(unsigned char c);
+		static unsigned int			_stoi(std::string value);
 
 };
 

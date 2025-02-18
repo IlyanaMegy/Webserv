@@ -1,7 +1,7 @@
 #include "Request.hpp"
 
 Request::Request(void)
-	: _stage(SEEKING_STATUS_LINE), _uri(""), _fields(std::map< std::string, std::vector<std::string> >()) {}
+	: _stage(SEEKING_STATUS_LINE), _uri(""), _fields(std::map< std::string, std::vector<std::string> >()), _bodyLength(0), _body("") {}
 
 Request::~Request(void) {}
 
@@ -43,7 +43,7 @@ void	Request::_parseHeader(void)
 		return ;
 	if (_parseHeaderFields(header))
 		return ;
-	_stage = PROCESSING;
+	_stage = SEEKING_BODY;
 }
 
 std::string	Request::_findHeader(void)
@@ -82,6 +82,52 @@ int	Request::_parseHeaderFields(std::string header)
 			return 1;
 		header = header.substr(crlfPos + 2, header.length() - (crlfPos + 2));
 		crlfPos = header.find("\r\n");
+	}
+	if (_parseCompletedFields())
+		return 1;
+	return 0;
+}
+
+int	Request::_parseCompletedFields(void)
+{
+	if (_findBodySize())
+		return 1;
+	return 0;
+}
+
+int	Request::_findBodySize(void)
+{
+	if (_fields[_toLower("Content-Length")].empty()) {
+		if (_method == GET || _method == DELETE) {
+			_bodyLength = 0;
+			return 0;
+		}
+		_response.fillError("411", "Length Required");
+		_stage = DONE;
+		return 1;
+	}
+	if (_fields[_toLower("Content-Length")].size() != 1
+			|| _parseContentLength(_fields[_toLower("Content-Length")][0])) {
+		_response.fillError("400", "Bad Request");
+		_stage = DONE;
+		return 1;
+	}
+	_bodyLength = _stoi(_fields[_toLower("Content-Length")][0]);
+	if (_bodyLength > MAXBODYOCTETS) {
+		_response.fillError("413", "Content Too Large");
+		_stage = DONE;
+		return 1;
+	}
+	return 0;
+}
+
+int	Request::_parseContentLength(std::string contentLength)
+{
+	if (contentLength.empty())
+		return 1;
+	for (std::string::iterator it = contentLength.begin(); it != contentLength.end(); it++) {
+		if (!std::isdigit(*it))
+			return 1;
 	}
 	return 0;
 }
@@ -276,5 +322,14 @@ bool	Request::_isVChar(unsigned char c)
 bool	Request::_isObsText(unsigned char c)
 {
 	return (127 < c);
+}
+
+unsigned int	Request::_stoi(std::string value)
+{
+	unsigned int		res;
+	std::istringstream	stream(value);
+
+	stream >> res;
+	return res;
 }
 
