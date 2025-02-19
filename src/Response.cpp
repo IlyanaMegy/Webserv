@@ -83,6 +83,27 @@ void	Response::fillDELETE(std::string path)
 	_isComplete = true;
 }
 
+void	Response::fillPOST(std::string path, std::string body)
+{
+	if (_createTarget(path, body)) {
+		fillError("500", "Internal Server Error");
+		return ;
+	}
+	_fillStatusLine("201", "Created");
+	_fillHeader();
+	_isComplete = true;
+}
+
+int	Response::_createTarget(std::string path, std::string body)
+{
+	std::ofstream	ofs(path.c_str());
+
+	if (ofs.fail())
+		return 1;
+	ofs << body;
+	return 0;
+}
+
 int	Response::_deleteTarget(std::string path)
 {
 	if (access(path.c_str(), F_OK)) {

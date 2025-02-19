@@ -39,7 +39,7 @@ void	Request::_treat(void)
 	else if (_method == DELETE)
 		_response.fillDELETE(_uri);
 	else
-		_response.fillPOST(_uri);
+		_response.fillPOST(_uri, _body);
 	_stage = DONE;
 }
 

@@ -32,7 +32,7 @@ class Response
 		void		fillError(std::string statusCode, std::string reasonMessage);
 		void		fillGET(std::string path);
 		void		fillDELETE(std::string path);
-		void		fillPOST(std::string path);
+		void		fillPOST(std::string path, std::string body);
 
 	private:
 		std::string	_message;
@@ -57,6 +57,8 @@ class Response
 		int		_fillContent(std::string path);
 
 		int		_deleteTarget(std::string path);
+
+		int		_createTarget(std::string path, std::string body);
 
 		static std::string	_itos(int value);
 
