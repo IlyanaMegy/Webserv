@@ -119,7 +119,6 @@ int	Response::_fillContent(std::string path)
 	std::string		line;
 	std::ifstream	ifs(path.c_str());
 
-	std::cerr << "path: " << GOLD << path << RESET << std::endl;
 	if (ifs.fail()) {
 		fillError("404", "Not found");
 		return 1;
