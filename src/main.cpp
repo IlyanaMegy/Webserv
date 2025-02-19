@@ -51,6 +51,7 @@ int main(int ac, char** av) {
 	} catch (std::exception& e) {
 		return (std::cout << e.what() << std::endl, 1);
 	}
+	close(3);
 
 
 	return 0;

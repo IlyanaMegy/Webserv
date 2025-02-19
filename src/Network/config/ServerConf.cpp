@@ -5,7 +5,7 @@ ServerConf::ServerConf() {
 	_host = 0;
 	_server_name = "";
 	_root = "";
-	_client_max_body_size = MAX_CONTENT_LENGTH;
+	_max_body_size = MAX_CONTENT_LENGTH;
 	_index = "";
 	_autoindex = false;
 }
@@ -70,7 +70,7 @@ void ServerConf::setClientMaxBodySize(std::string params) {checkToken(params);
 
 	if (!ft_stoi(params))
 		throw std::runtime_error("Wrong syntax: client_max_body_size");
-	_client_max_body_size = ft_stoi(params);
+	_max_body_size = ft_stoi(params);
 }
 
 void ServerConf::setIndex(std::string index) {checkToken(index);
@@ -208,7 +208,7 @@ void ServerConf::setLocation(std::string path, std::vector<std::string> params)
 	if (new_loca.getPath() != "/cgi-bin" && new_loca.getIndexLocation().empty())
 		new_loca.setIndexLocation(_index);
 	if (!flag_max_size)
-		new_loca.setMaxBodySize(_client_max_body_size);
+		new_loca.setMaxBodySize(_max_body_size);
 	valid = isValidLocation(new_loca);
 	if (valid == 1)
 		throw std::runtime_error("Failed CGI validation");
@@ -290,14 +290,36 @@ bool ServerConf::checkLocations() const
 const std::string &ServerConf::getServerName() {return (_server_name); }
 const uint16_t &ServerConf::getPort() {return (_port); }
 const in_addr_t &ServerConf::getHost() {return (_host); }
-const size_t &ServerConf::getClientMaxBodySize() {return (_client_max_body_size); }
+unsigned int ServerConf::getMaxBodySize() const {return (_max_body_size); }
 const std::vector<Location> &ServerConf::getLocations() {return (_locations); }
 const std::string &ServerConf::getRoot() {return (_root); }
 const std::string &ServerConf::getIndex() {return (_index); }
 const bool &ServerConf::getAutoindex() {return (_autoindex); }
-int	ServerConf::getSocketFd() {return (_socket.getFd()); }
+int	ServerConf::getSocketFd() {return (_socketFd); }
 Socket &ServerConf::getSocket() {return (_socket); }
-void	ServerConf::setSocketServer(void) { _socket = Socket(_port); }
+
+void	ServerConf::setSocketServer()
+{
+	// if (!dub)
+	// {
+	// 	_socket =  Socket(_port);
+	// 	_socketFd = _socket.getFd();
+	// }
+	// else
+	// 	{
+	// 		_socket = new Socket();
+	// 		_socketFd = copyFd;}
+
+	_socket = Socket(_port);
+	_socketFd = _socket.getFd();
+}
+
+// bool isValidMethod(std::string uri, Method method)
+// {
+// 	Location	&location = getLocationFromUri(uri); // find by uriin _locations
+
+// 	return(location->isValidMethod(method));
+// }
 
 // const std::string &ServerConfig::getPathErrorPage(short key)
 // {

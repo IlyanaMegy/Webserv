@@ -8,9 +8,6 @@ Location::Location(void) {
 	_return = "";
 	_alias = "";
 	_clientMBS = MAX_CONTENT_LENGTH;
-	_methods.reserve(5);
-	_methods.push_back(1);
-	for (size_t i = 0; i < 5; i++) _methods.push_back(0);
 }
 
 Location::~Location() {}
@@ -35,18 +32,15 @@ void Location::setAutoindex(std::string param) {
 }
 
 void Location::setMethods(std::vector<std::string> methods) {
-	std::fill(_methods.begin(), _methods.end(), 0);
 	
-	std::map<std::string, int> methodMap;
-    methodMap["GET"] = 0;
-    methodMap["POST"] = 1;
-    methodMap["DELETE"] = 2;
-    methodMap["PUT"] = 3;
-    methodMap["HEAD"] = 4;
+	std::map<std::string, Method> methodMap;
+    methodMap["GET"] = GET;
+    methodMap["POST"] = POST;
+    methodMap["DELETE"] = DELETE;
 
 	for (size_t i = 0; i < methods.size(); i++) {
 		if (methodMap.find(methods[i]) != methodMap.end())
-			_methods[methodMap.at(methods[i])] = 1;
+			_methods.push_back(methodMap[methods[i]]);
 		else
 			throw std::runtime_error("Method not supported: " + methods[i]);
 	}
@@ -73,7 +67,6 @@ void Location::setMaxBodySize(unsigned long param) { _clientMBS = param; }
 
 const std::string &Location::getPath() const {return _path; }
 const std::string &Location::getRootLocation() const {return _root; }
-const std::vector<short> &Location::getMethods() const {return _methods; }
 const bool &Location::getAutoindex() const {return _autoindex; }
 const std::string &Location::getIndexLocation() const {return _index; }
 const std::string &Location::getReturn() const {return _return; }
@@ -82,3 +75,9 @@ const std::vector<std::string> &Location::getCgiPath() const {return _cgiPath; }
 const std::vector<std::string> &Location::getCgiExtension() const {return _cgiExt; }
 const std::map<std::string, std::string> &Location::getExtensionPath() const {return _extPath; }
 const unsigned long &Location::getClientMBS() const {return _clientMBS; }
+
+
+// bool isValidMethod(Method method)
+// {
+// 	//
+// }

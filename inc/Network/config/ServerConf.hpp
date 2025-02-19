@@ -17,12 +17,13 @@ class ServerConf {
 	in_addr_t _host;
 	std::string _server_name;
 	std::string _root;
-	unsigned long _client_max_body_size;
+	unsigned int _max_body_size;
 	std::string _index;
 	bool _autoindex;
 	// std::map<short, std::string> _error_pages;
 	std::vector<Location> _locations;
 	Socket _socket;
+	int _socketFd;
 
    public:
 	ServerConf(void);
@@ -37,15 +38,18 @@ class ServerConf {
 	void setIndex(std::string index);
 	void setLocation(std::string path, std::vector<std::string> params);
 	void setAutoindex(std::string autoindex);
+	void setSocketServer(void);
 
 	// bool isValidErrorPages(void);
 	int isValidLocation(Location &location) const;
 	bool checkLocations() const;
 
+
+	// ! \ remove & from return type
 	const std::string &getServerName(void);
 	const uint16_t &getPort(void);
 	const in_addr_t &getHost(void);
-	const size_t &getClientMaxBodySize(void);
+	unsigned int getMaxBodySize(void) const;
 	const std::vector<Location> &getLocations(void);
 	const std::string &getRoot(void);
 	// const std::map<short, std::string> &getErrorPages(void);
@@ -53,7 +57,7 @@ class ServerConf {
 	const bool &getAutoindex(void);
 	int getSocketFd(void);
 	Socket &getSocket(void);
-	void setSocketServer(void);
+
 	// const std::string &getPathErrorPage(short key);
 	// const std::vector<Location>::iterator getLocationKey(std::string key);
 };

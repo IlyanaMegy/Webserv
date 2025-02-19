@@ -1,12 +1,14 @@
 #include "../../inc/Network/Socket.hpp"
 
-Socket::Socket(void) : _opt (1), _fd(-1) {}
+Socket::Socket(void) : _opt(1), _fd(-1) {}
 
 Socket::Socket(int port) : _opt(1) {
 	if ((_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 		throw std::runtime_error("Failed to create socket");
+	std::cout << "fd setted = " << _fd << std::endl;
 	_setOpt();
 
+	memset(&_addr, 0, sizeof(_addr));
 	_addr.sin_family = AF_INET;
 	_addr.sin_port = htons(port);
 	_addr.sin_addr.s_addr = INADDR_ANY;
@@ -42,14 +44,12 @@ void	Socket::_setOpt(void)
 		throw std::runtime_error("Failed to set socket to non-blocking");
 }
 
-void	Socket::fill(int fd, struct sockaddr_in addr)
+void	Socket::setFd(int fd) { _fd = fd; }
+int		Socket::getFd(void) { return _fd; }
+
+void	Socket::fill(int fd, sockaddr_in addr)
 {
 	_fd = fd;
 	_addr = addr;
 	_setOpt();
-}
-
-int Socket::getFd(void)
-{
-	return _fd;
 }

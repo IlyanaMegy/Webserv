@@ -20,9 +20,10 @@ class Socket
 
 		Socket	&operator=(const Socket &ref);
 
+		void	setFd(int fd);
 		int	getFd(void);
 
-		void	fill(int fd, struct sockaddr_in addr);
+		void	fill(int fd, sockaddr_in addr);
 };
 
 #endif

@@ -4,19 +4,14 @@
 #include "../../Webserv.hpp"
 
 class Location {
-   private:
-	std::string _path;
-	std::string _root;
-	std::string _index;
-	std::string _return;
-	std::string _alias;
-	bool _autoindex;
-	std::vector<short> _methods;
-	std::vector<std::string> _cgiPath;
-	std::vector<std::string> _cgiExt;
-	unsigned long _clientMBS;
+  
 
    public:
+   enum Method {
+		GET,
+		POST,
+		DELETE
+   };
 	std::map<std::string, std::string> _extPath;
 	Location(void);
 	~Location();
@@ -44,6 +39,18 @@ class Location {
 	const std::vector<std::string> &getCgiExtension() const;
 	const std::map<std::string, std::string> &getExtensionPath() const;
 	const unsigned long &getClientMBS() const;
+
+	private:
+	std::string _path;
+	std::string _root;
+	std::string _index;
+	std::string _return;
+	std::string _alias;
+	bool _autoindex;
+	std::vector<Method> _methods;
+	std::vector<std::string> _cgiPath;
+	std::vector<std::string> _cgiExt;
+	unsigned long _clientMBS;
 };
 
 #endif
