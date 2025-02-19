@@ -24,6 +24,7 @@ Socket::Socket(Socket const& ref)
 
 Socket::~Socket()
 {
+	std::cout << "Socket " << _fd << " will be detroyed" << std::endl;
 	if (_fd >= 0)
 		close(_fd);
 }

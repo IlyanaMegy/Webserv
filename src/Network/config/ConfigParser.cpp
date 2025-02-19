@@ -1,5 +1,15 @@
 #include "../../../inc/Network/config/ConfigParser.hpp"
 
+ConfigParser::~ConfigParser()
+{
+	for (std::vector<ServerConf*>::iterator it = _servers.begin(); it != _servers.end(); it++)
+	{
+		delete *it;
+
+	}
+	
+}
+
 /**
  * @brief  Read file
  * @note   it reads a file..
@@ -65,7 +75,10 @@ int ConfigParser::createCluster(const std::string &config_file) {
 	
 	for (size_t i = 0; i < this->_nb_server; i++)
 	{
-		ServerConf server;
+		ServerConf *server = new ServerConf();
+
+		if (!server)
+			throw std::runtime_error("Error: Couldn't create server");
 		createServer(this->_servers_config[i], server);
 		this->_servers.push_back(server);
 	}
@@ -103,7 +116,7 @@ std::vector<std::string> splitParametrs(std::string line, std::string sep)
  * @param  `server`
  * @retval None
  */
-void ConfigParser::createServer(std::string &config, ServerConf &server)
+void ConfigParser::createServer(std::string &config, ServerConf *server)
 {
 	std::vector<std::string>	params;
 	std::vector<std::string>	error_codes;
@@ -118,9 +131,9 @@ void ConfigParser::createServer(std::string &config, ServerConf &server)
 	{
 		if (params[i] == "listen" && (i + 1) < params.size())
 		{
-			if (server.getPort())
+			if (server->getPort())
 				throw std::runtime_error("Port is duplicated");
-			server.setPort(params[++i]);
+			server->setPort(params[++i]);
 		}
 		else if (params[i] == "location" && (i + 1) < params.size())
 		{
@@ -135,21 +148,21 @@ void ConfigParser::createServer(std::string &config, ServerConf &server)
 			i++;
 			while (i < params.size() && params[i] != "}")
 				codes.push_back(params[i++]);
-			server.setLocation(path, codes);
+			server->setLocation(path, codes);
 			if (i < params.size() && params[i] != "}")
 				throw std::runtime_error("Wrong character in server scope{}");
 		}
 		else if (params[i] == "host" && (i + 1) < params.size())
 		{
-			if (server.getHost())
+			if (server->getHost())
 				throw std::runtime_error("Host is duplicated");
-			server.setHost(params[++i]);
+			server->setHost(params[++i]);
 		}
 		else if (params[i] == "root" && (i + 1) < params.size())
 		{
-			if (!server.getRoot().empty())
+			if (!server->getRoot().empty())
 				throw std::runtime_error("Root is duplicated");
-			server.setRoot(params[++i]);
+			server->setRoot(params[++i]);
 		}
 		else if (params[i] == "error_page" && (i + 1) < params.size())
 		{
@@ -166,26 +179,26 @@ void ConfigParser::createServer(std::string &config, ServerConf &server)
 		{
 			if (flag_max_size)
 				throw std::runtime_error("Client_max_body_size is duplicated");
-			server.setClientMaxBodySize(params[++i]);
+			server->setClientMaxBodySize(params[++i]);
 			flag_max_size = true;
 		}
 		else if (params[i] == "server_name" && (i + 1) < params.size())
 		{
-			if (!server.getServerName().empty())
+			if (!server->getServerName().empty())
 				throw std::runtime_error("Server_name is duplicated");
-			server.setServerName(params[++i]);
+			server->setServerName(params[++i]);
 		}
 		else if (params[i] == "index" && (i + 1) < params.size())
 		{
-			if (!server.getIndex().empty())
+			if (!server->getIndex().empty())
 				throw std::runtime_error("Index is duplicated");
-			server.setIndex(params[++i]);
+			server->setIndex(params[++i]);
 		}
 		else if (params[i] == "autoindex" && (i + 1) < params.size())
 		{
 			if (flag_autoindex)
 				throw std::runtime_error("Autoindex of server is duplicated");
-			server.setAutoindex(params[++i]);
+			server->setAutoindex(params[++i]);
 			flag_autoindex = true;
 		}
 		else if (params[i] != "}" && params[i] != "{")
@@ -196,34 +209,34 @@ void ConfigParser::createServer(std::string &config, ServerConf &server)
 			throw std::runtime_error("Unsupported directive");
 		}
 	}
-	if (!server.getPort())
+	if (!server->getPort())
 		throw std::runtime_error("Port not found");
-	if (server.getRoot().empty())
-		server.setRoot("/;");
-	if (server.getHost() == 0)
-		server.setHost("localhost;");
-	if (server.getIndex().empty())
-		server.setIndex("index.html;");
-	if (isFileExistAndReadable(server.getRoot(), server.getIndex()))
+	if (server->getRoot().empty())
+		server->setRoot("/;");
+	if (server->getHost() == 0)
+		server->setHost("localhost;");
+	if (server->getIndex().empty())
+		server->setIndex("index.html;");
+	if (isFileExistAndReadable(server->getRoot(), server->getIndex()))
 		throw std::runtime_error("Index from config file not found or unreadable");
-	if (server.checkLocations())
+	if (server->checkLocations())
 		throw std::runtime_error("Location is duplicated");
 
-	// server.setErrorPages(error_codes);
-	// if (!server.isValidErrorPages())
+	// server->setErrorPages(error_codes);
+	// if (!server->isValidErrorPages())
 	// 	throw std::runtime_error("Incorrect path for error page or number of error");
 }
 
 int	ConfigParser::getServerFd(int serveurId) {
-	return _servers[serveurId].getSocketFd();
+	return _servers[serveurId]->getSocketFd();
 }
 
 uint16_t	ConfigParser::getServerPort(int serveurId) {
-	return _servers[serveurId].getPort();
+	return _servers[serveurId]->getPort();
 }
 
 size_t	ConfigParser::getNbServer() const {
 	return _nb_server;
 }
 
-ServerConf	&ConfigParser::getServerConfig(int serverId){ return _servers[serverId]; }
+ServerConf	&ConfigParser::getServerConfig(int serverId){ return *_servers[serverId]; }

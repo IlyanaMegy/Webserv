@@ -1,6 +1,6 @@
 #include "../../../inc/Network/config/ServerConf.hpp"
 
-ServerConf::ServerConf() {
+ServerConf::ServerConf() : _socket(){
 	_port = 0;
 	_host = 0;
 	_server_name = "";
@@ -20,8 +20,6 @@ void ServerConf::setHost(std::string params) {
 	if (params == "localhost")
 		params = "127.0.0.1";
 	struct sockaddr_in hostBinary;
-	if (!inet_pton(AF_INET, params.c_str(), &(hostBinary.sin_addr)))
-		throw std::runtime_error("Error: Invalid IP address format for host");
 	_host = hostBinary.sin_addr.s_addr;
 }
 
