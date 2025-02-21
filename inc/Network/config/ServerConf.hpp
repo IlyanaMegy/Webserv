@@ -29,7 +29,6 @@ class ServerConf : public Socket {
 	void setRoot(std::string root);
 	void setPort(std::string params);
 	void setClientMaxBodySize(std::string params);
-
 	void setIndex(std::string index);
 	void setLocation(std::string path, std::vector<std::string> params);
 	void setAutoindex(std::string autoindex);
@@ -48,6 +47,10 @@ class ServerConf : public Socket {
 	bool getAutoindex(void) const;
 	int getSocketFd(void) const;
 	Socket getSocket(void) const;
+	const std::vector<Location>::iterator getLocationFromUri(std::string uri);
+	
+	bool isValidMethod(std::string uri, Method method);
+	void listMethods() const;
 
 	// !TODO: Implement these functions
 	// void setErrorPages(std::vector<std::string> &params);

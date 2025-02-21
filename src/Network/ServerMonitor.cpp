@@ -30,13 +30,16 @@ void ServerMonitor::runServers(void)
 {
 	for(std::vector<ServerConf*>::iterator server = _servers.begin(); server != _servers.end(); ++server)
     {
-		if (listen((*server)->getSocketFd(), MAXCONNECT) < 0)
-		{
-			std::cout << "err =" << strerror(errno) << std::endl;
-			throw std::runtime_error("Failed to listen on socket");
-		}
+		// std::cout << "test :\n" << std::endl;
+		// (*server)->listMethods();
+		// if ((*server)->isValidMethod("/drafts/", GET))
+		// 	std::cout << "valid location" << std::endl;
+		// else
+		// 	std::cout << "invalid location" << std::endl;
 
-		fcntl((*server)->getSocketFd(), F_SETFL, O_NONBLOCK);
+		if (listen((*server)->getSocketFd(), MAXCONNECT) < 0)
+			throw std::runtime_error("Failed to listen on socket");
+
 		std::cout << MAGENTA << "\n[CONFIG] server's socket listening..." << std::endl;
 		std::cout << "[CONFIG] Server is running on port " << (*server)->getPort() << "..." << RESET << std::endl;
 	}

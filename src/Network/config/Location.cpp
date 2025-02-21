@@ -65,19 +65,15 @@ void Location::setMaxBodySize(std::string param) {
 
 void Location::setMaxBodySize(unsigned long param) { _clientMBS = param; }
 
-const std::string &Location::getPath() const {return _path; }
-const std::string &Location::getRootLocation() const {return _root; }
-const bool &Location::getAutoindex() const {return _autoindex; }
-const std::string &Location::getIndexLocation() const {return _index; }
-const std::string &Location::getReturn() const {return _return; }
-const std::string &Location::getAlias() const {return _alias; }
-const std::vector<std::string> &Location::getCgiPath() const {return _cgiPath; }
-const std::vector<std::string> &Location::getCgiExtension() const {return _cgiExt; }
-const std::map<std::string, std::string> &Location::getExtensionPath() const {return _extPath; }
-const unsigned long &Location::getClientMBS() const {return _clientMBS; }
+std::string Location::getPath() const {return _path; }
+std::string Location::getRootLocation() const {return _root; }
+bool Location::getAutoindex() const {return _autoindex; }
+std::string Location::getIndexLocation() const {return _index; }
+std::string Location::getReturn() const {return _return; }
+std::string Location::getAlias() const {return _alias; }
+std::vector<std::string> Location::getCgiPath() const {return _cgiPath; }
+std::vector<std::string> Location::getCgiExtension() const {return _cgiExt; }
+std::map<std::string, std::string> Location::getExtensionPath() const {return _extPath; }
+std::vector<Method> Location::getMethods() const {return _methods; }
+unsigned long Location::getClientMBS() const {return _clientMBS; }
 
-
-// bool isValidMethod(Method method)
-// {
-// 	//
-// }

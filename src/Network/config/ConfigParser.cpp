@@ -3,11 +3,7 @@
 ConfigParser::~ConfigParser()
 {
 	for (std::vector<ServerConf*>::iterator it = _servers.begin(); it != _servers.end(); it++)
-	{
 		delete *it;
-
-	}
-	
 }
 
 /**
@@ -42,8 +38,8 @@ void ConfigParser::splitBlocks(std::string &content) {
 		end = findEndServer(start, content);
 		if (start == end || !(content[start] == '{' && content[end] == '}'))
 			throw std::runtime_error("Error: Wrong server scope{}");
-		this->_servers_config.push_back(content.substr(start, end - start + 1));
-		this->_nb_server++;
+		_servers_config.push_back(content.substr(start, end - start + 1));
+		_nb_server++;
 		start = end + 1;
 	}
 }
@@ -69,19 +65,18 @@ int ConfigParser::createCluster(const std::string &config_file) {
 	std::cout << MAGENTA << "[CONFIG] Comments and whitespaces removed" << RESET << std::endl;
 
 	splitBlocks(content);
-	if (this->_servers_config.size() != this->_nb_server)
+	if (_servers_config.size() != _nb_server)
 		throw std::runtime_error("Error: Coudn't split config file");
 	std::cout << MAGENTA << "[CONFIG] Success spliting config file" << RESET << std::endl;
 	
-	for (size_t i = 0; i < this->_nb_server; i++)
+	for (size_t i = 0; i < _nb_server; i++)
 	{
 		ServerConf *server = new ServerConf();
-		
-
 		if (!server)
 			throw std::runtime_error("Error: Couldn't create server");
-		createServer(this->_servers_config[i], server);
-		this->_servers.push_back(server);
+		
+		createServer(_servers_config[i], server);
+		_servers.push_back(server);
 	}
 	if (_nb_server > 1)
 		std::cout << MAGENTA << "[CONFIG] " << _nb_server << " servers detected" << RESET << std::endl;
@@ -124,6 +119,7 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 	Location loca;
 	bool	flag_autoindex = false;
 	bool	flag_max_size = false;
+
 	params = splitParametrs(config += ' ', std::string(" \n\t;"));
 	if (params.size() < 3)
 		throw std::runtime_error("Failed server validation");

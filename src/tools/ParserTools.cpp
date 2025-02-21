@@ -8,7 +8,12 @@
  */
 int getTypePath(std::string const path) {
 	struct stat buff;
-	int res = stat(path.c_str(), &buff);
+	std::string modified_path = path;
+
+    if (!modified_path.empty() && modified_path[modified_path.size() - 1] == ';') {
+		modified_path.erase(modified_path.size() - 1);
+    }
+	int res = stat(modified_path.c_str(), &buff);
 	if (!res) {
 		if (buff.st_mode & S_IFREG)
 			return 1;
@@ -96,13 +101,21 @@ void removeWhiteSpace(std::string &content) {
 	content = content.substr(0, i + 1);
 }
 
+int findChar(const std::string &str, char ch)
+{
+    for (size_t i = 0; i < str.size(); ++i)
+        if (str[i] == ch) 
+            return i;
+    return -1;
+}
+
 void checkToken(std::string &param)
 {
-	size_t pos = param.find(';');
-	if (pos != std::string::npos && pos != param.size() - 1)
+	int pos = findChar(param, ';');
+	if (pos != -1 && pos != (int)param.size() - 1)
 		throw std::runtime_error("Token is invalid : " + param);
-	if (pos != std::string::npos)
-		param.erase(pos);
+	// if (pos != -1)
+	// 	param.erase(pos);
 }
 
 int ft_stoi(std::string str)

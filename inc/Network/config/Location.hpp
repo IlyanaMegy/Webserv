@@ -5,7 +5,7 @@
 
 class Location {
    public:
-	enum Method { GET, POST, DELETE };
+	
 	std::map<std::string, std::string> _extPath;
 	Location(void);
 	~Location();
@@ -22,17 +22,17 @@ class Location {
 	void setMaxBodySize(std::string param);
 	void setMaxBodySize(unsigned long param);
 
-	const std::string &getPath() const;
-	const std::string &getRootLocation() const;
-	const std::vector<short> &getMethods() const;
-	const bool &getAutoindex() const;
-	const std::string &getIndexLocation() const;
-	const std::string &getReturn() const;
-	const std::string &getAlias() const;
-	const std::vector<std::string> &getCgiPath() const;
-	const std::vector<std::string> &getCgiExtension() const;
-	const std::map<std::string, std::string> &getExtensionPath() const;
-	const unsigned long &getClientMBS() const;
+	std::string getPath() const;
+	std::string getRootLocation() const;
+	std::vector<Method> getMethods() const;
+	bool getAutoindex() const;
+	std::string getIndexLocation() const;
+	std::string getReturn() const;
+	std::string getAlias() const;
+	std::vector<std::string> getCgiPath() const;
+	std::vector<std::string> getCgiExtension() const;
+	std::map<std::string, std::string> getExtensionPath() const;
+	unsigned long getClientMBS() const;
 
    private:
 	std::string _path;

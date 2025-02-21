@@ -5,6 +5,8 @@
 #define MAXCONNECT 30
 #define MAX_CONTENT_LENGTH 30000000
 
+enum Method { GET, POST, DELETE };
+
 #include <arpa/inet.h>
 #include <fcntl.h>
 #include <netinet/in.h>

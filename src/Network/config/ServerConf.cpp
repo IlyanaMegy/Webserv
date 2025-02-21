@@ -17,14 +17,14 @@ void ServerConf::setServerName(std::string server_name) {
 
 void ServerConf::setHost(std::string param) {
 	checkToken(param);
-	if (param == "localhost")
+	if (param == "localhost" || param == "localhost;")
 		param = "127.0.0.1";
 
 	struct sockaddr_in hostBinary;
-
 	if (!(inet_pton(AF_INET, param.c_str(), &(hostBinary.sin_addr))))
 		throw std::runtime_error("Wrong syntax: host");
 	_host = inet_addr(param.data());
+	std::cout << LIME << "ok host" << RESET << std::endl;
 }
 
 /**
@@ -43,10 +43,10 @@ void ServerConf::setRoot(std::string root) {
 	char dir[1024];
 	getcwd(dir, 1024);
 	std::string complete_root = dir + root;
-	std::cout << "-> full root = " << complete_root << std::endl;
 	if (getTypePath(complete_root) != 2)
 		throw std::runtime_error("Error: Wrong syntax: root");
 	_root = complete_root;
+	std::cout << LIME << "ok root" << RESET << std::endl;
 }
 
 void ServerConf::setPort(std::string params) {unsigned int port;
@@ -115,7 +115,9 @@ void ServerConf::setLocation(std::string path, std::vector<std::string> params)
 			std::vector<std::string> methods;
 			while (++i < params.size())
 			{
-				if (params[i].find(';') != std::string::npos)
+				std::cout << SLVR << "methods\tparams[" << i << "] = " << params[i] << RESET << std::endl;
+				std::cout << "res = " << findChar(params[i], ';') << std::endl;
+				if (findChar(params[i], ';') != -1)
 				{
 					checkToken(params[i]);
 					methods.push_back(params[i]);
@@ -282,12 +284,12 @@ int ServerConf::isValidLocation(Location &location) const
 
 bool ServerConf::checkLocations() const
 {
-	if (this->_locations.size() < 2)
+	if (_locations.size() < 2)
 		return (false);
 	std::vector<Location>::const_iterator first;
 	std::vector<Location>::const_iterator second;
-	for (first = this->_locations.begin(); first != this->_locations.end() - 1; first++)
-		for (second = first + 1; second != this->_locations.end(); second++)
+	for (first = _locations.begin(); first != _locations.end() - 1; first++)
+		for (second = first + 1; second != _locations.end(); second++)
 			if (first->getPath() == second->getPath())
 				return (true);
 	return (false);
@@ -310,13 +312,39 @@ void	ServerConf::setSocketServer()
 	_socketFd = _socket.getFd();
 }
 
-// bool isValidMethod(std::string uri, Method method)
-// {
-// 	Location	&location = getLocationFromUri(uri); // find by uriin _locations
 
-// 	return(location->isValidMethod(method));
-// }
+const std::vector<Location>::iterator ServerConf::getLocationFromUri(std::string uri)
+{
+	std::vector<Location>::iterator it;
+	for (it = _locations.begin(); it != _locations.end(); it++)
+	{
+		if (it->getPath() == uri)
+			return (it);
+	}
+	throw std::runtime_error("Error: path to location not found");
+}
 
+bool ServerConf::isValidMethod(std::string uri, Method method)
+{
+	std::vector<Method> locationMethods = getLocationFromUri(uri)->getMethods();
+	
+	
+	if (std::find(locationMethods.begin(), locationMethods.end(), method) != locationMethods.end())
+		return (true);
+	return (false);
+}
+
+void ServerConf::listMethods() const {
+    for (std::vector<Location>::const_iterator it = _locations.begin(); it != _locations.end(); ++it) {
+        std::cout << LIME "\nLocation: " << it->getPath() << std::endl;
+        std::vector<Method> methods = it->getMethods();
+        std::cout << "Available methods: ";
+        for (std::vector<Method>::const_iterator method_it = methods.begin(); method_it != methods.end(); ++method_it) {
+            std::cout << *method_it << " ";
+        }
+        std::cout << RESET << std::endl;
+    }
+}
 // const std::string &ServerConfig::getPathErrorPage(short key)
 // {
 // 	std::map<short, std::string>::iterator it = _error_pages.find(key);
