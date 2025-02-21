@@ -291,16 +291,16 @@ bool ServerConf::checkLocations() const
 	return (false);
 }
 
-const std::string &ServerConf::getServerName() {return (_server_name); }
-const uint16_t &ServerConf::getPort() {return (_port); }
-const in_addr_t &ServerConf::getHost() {return (_host); }
+std::string ServerConf::getServerName() const {return (_server_name); }
+uint16_t ServerConf::getPort() const {return (_port); }
+in_addr_t ServerConf::getHost() const {return (_host); }
 unsigned int ServerConf::getMaxBodySize() const {return (_max_body_size); }
-const std::vector<Location> &ServerConf::getLocations() {return (_locations); }
-const std::string &ServerConf::getRoot() {return (_root); }
-const std::string &ServerConf::getIndex() {return (_index); }
-const bool &ServerConf::getAutoindex() {return (_autoindex); }
-int	ServerConf::getSocketFd() {return (_socketFd); }
-Socket &ServerConf::getSocket() {return (_socket); }
+std::vector<Location> ServerConf::getLocations() const {return (_locations); }
+std::string ServerConf::getRoot() const {return (_root); }
+std::string ServerConf::getIndex() const {return (_index); }
+bool ServerConf::getAutoindex() const {return (_autoindex); }
+int	ServerConf::getSocketFd() const {return (_socketFd); }
+Socket ServerConf::getSocket() const {return (_socket); }
 
 void	ServerConf::setSocketServer()
 {

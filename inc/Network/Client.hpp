@@ -1,30 +1,27 @@
 #ifndef CLIENT_HPP
-# define CLIENT_HPP
+#define CLIENT_HPP
 
-# include "Socket.hpp"
-# include "../Webserv.hpp"
-
+#include "../Webserv.hpp"
+#include "Socket.hpp"
 
 class Client {
+   private:
+	char _buffer[BUFFER_SIZE];
+	// HTTPReq request;
+	// HTTPRep reponse;
+	Socket _socket;
 
-	private:
-		char	_buffer[BUFFER_SIZE];
-		// HTTPReq request;
-		// HTTPRep reponse;
-		Socket	_socket;
+   public:
+	Client(void);
+	Client(int serverFd);
+	Client(Client const &ref);
+	~Client(void);
 
-	public:
-		Client(void);
-		Client(int serverFd);
-		Client(Client const &ref);
-		~Client(void);
+	Client &operator=(Client const &ref);
 
-		Client	&operator=(Client const &ref);
+	Socket &getSocket(void);
 
-		Socket	&getSocket(void);
-
-		void	read(void);
-
+	void read(void);
 };
 
 #endif

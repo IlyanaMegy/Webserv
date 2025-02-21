@@ -4,14 +4,8 @@
 #include "../../Webserv.hpp"
 
 class Location {
-  
-
    public:
-   enum Method {
-		GET,
-		POST,
-		DELETE
-   };
+	enum Method { GET, POST, DELETE };
 	std::map<std::string, std::string> _extPath;
 	Location(void);
 	~Location();
@@ -40,7 +34,7 @@ class Location {
 	const std::map<std::string, std::string> &getExtensionPath() const;
 	const unsigned long &getClientMBS() const;
 
-	private:
+   private:
 	std::string _path;
 	std::string _root;
 	std::string _index;

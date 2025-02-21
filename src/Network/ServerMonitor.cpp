@@ -41,3 +41,32 @@ void ServerMonitor::runServers(void)
 		std::cout << "[CONFIG] Server is running on port " << (*server)->getPort() << "..." << RESET << std::endl;
 	}
 }
+
+
+// Client &Server::getClient(int i)
+// {
+// 	return _clients[i];
+// }
+
+// void Server::acceptClient(void)
+// {
+// 	int		clientSocket;
+// 	Client	client(_socket.getFd());
+
+// 	clientSocket = client.getSocket().getFd();
+// 	_clients[clientSocket] = client;
+// }
+
+// void Server::readFrom(int clientFd)
+// {
+// 	(void) clientFd;
+// }
+
+// void Server::sendTo(int clientFd)
+// {
+// 	(void) clientFd;
+// }
+
+// const char *Server::SocketCreationErrException::what() const throw() {
+// 	std::cerr << "Erreur lors de la création du socket" << std::endl;
+// }

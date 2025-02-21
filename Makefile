@@ -5,7 +5,6 @@ CONFIG		:=	Network/config/ServerConf.cpp \
 				Network/config/ConfigParser.cpp
 
 NETWORK		:=	Network/ServerMonitor.cpp \
-				Network/Server.cpp \
 				Network/Client.cpp \
 				Network/Epoll.cpp \
 				Network/Socket.cpp
