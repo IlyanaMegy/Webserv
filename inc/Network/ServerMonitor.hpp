@@ -15,6 +15,7 @@ class ServerMonitor {
 
 	void setupServers(std::vector<ServerConf*> serverConfig);
 	void runServers(void);
+	std::vector<ServerConf*> &getServers() { return _servers; }
 };
 
 #endif

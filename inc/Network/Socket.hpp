@@ -24,6 +24,7 @@ class Socket
 		int	getFd(void);
 
 		void	fill(int fd, sockaddr_in addr);
+		void	initSocket(int port);
 };
 
 #endif

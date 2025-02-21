@@ -15,12 +15,16 @@ void ServerConf::setServerName(std::string server_name) {
 	_server_name = server_name;
 }
 
-void ServerConf::setHost(std::string params) {
-	checkToken(params);
-	if (params == "localhost")
-		params = "127.0.0.1";
+void ServerConf::setHost(std::string param) {
+	checkToken(param);
+	if (param == "localhost")
+		param = "127.0.0.1";
+
 	struct sockaddr_in hostBinary;
-	_host = hostBinary.sin_addr.s_addr;
+
+	if (!(inet_pton(AF_INET, param.c_str(), &(hostBinary.sin_addr))))
+		throw std::runtime_error("Wrong syntax: host");
+	_host = inet_addr(param.data());
 }
 
 /**
@@ -86,7 +90,9 @@ void ServerConf::setLocation(std::string path, std::vector<std::string> params)
 {
 	Location new_loca;
 	std::vector<std::string> methods;
-	bool flag_methods, flag_autoindex, flag_max_size = false;
+	bool flag_methods = false;
+	bool flag_autoindex = false;
+	bool flag_max_size = false;
 	int valid;
 
 	new_loca.setPath(path);
@@ -298,17 +304,7 @@ Socket &ServerConf::getSocket() {return (_socket); }
 
 void	ServerConf::setSocketServer()
 {
-	// if (!dub)
-	// {
-	// 	_socket =  Socket(_port);
-	// 	_socketFd = _socket.getFd();
-	// }
-	// else
-	// 	{
-	// 		_socket = new Socket();
-	// 		_socketFd = copyFd;}
-
-	_socket = Socket(_port);
+	_socket.initSocket(_port);
 	_socketFd = _socket.getFd();
 }
 

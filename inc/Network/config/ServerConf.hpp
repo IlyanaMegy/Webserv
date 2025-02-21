@@ -10,7 +10,7 @@ class Location;
  * @brief  Charge, check and valide the configuration file's data
  * @note   this class must read and extract data then store them
  */
-class ServerConf {
+class ServerConf : public Socket{
    private:
 	std::string _configFile;
 	uint16_t _port;
@@ -30,7 +30,7 @@ class ServerConf {
 	~ServerConf(void) {};
 
 	void setServerName(std::string server_name);
-	void setHost(std::string params);
+	void setHost(std::string param);
 	void setRoot(std::string root);
 	void setPort(std::string params);
 	void setClientMaxBodySize(std::string params);

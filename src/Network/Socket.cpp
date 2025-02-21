@@ -3,18 +3,7 @@
 Socket::Socket(void) : _opt(1), _fd(-1) {}
 
 Socket::Socket(int port) : _opt(1) {
-	if ((_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
-		throw std::runtime_error("Failed to create socket");
-	std::cout << "fd setted = " << _fd << std::endl;
-	_setOpt();
-
-	memset(&_addr, 0, sizeof(_addr));
-	_addr.sin_family = AF_INET;
-	_addr.sin_port = htons(port);
-	_addr.sin_addr.s_addr = INADDR_ANY;
-	
-	if (bind(_fd, (struct sockaddr *)&_addr, sizeof(_addr)) == -1)
-		throw std::runtime_error("Failed to bind socket");
+	initSocket(port);	
 }
 
 Socket::Socket(Socket const& ref)
@@ -24,7 +13,6 @@ Socket::Socket(Socket const& ref)
 
 Socket::~Socket()
 {
-	std::cout << "Socket " << _fd << " will be detroyed" << std::endl;
 	if (_fd >= 0)
 		close(_fd);
 }
@@ -53,4 +41,19 @@ void	Socket::fill(int fd, sockaddr_in addr)
 	_fd = fd;
 	_addr = addr;
 	_setOpt();
+}
+
+void Socket::initSocket(int port)
+{
+	if ((_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+		throw std::runtime_error("Failed to create socket");
+	_setOpt();
+
+	memset(&_addr, 0, sizeof(_addr));
+	_addr.sin_family = AF_INET;
+	_addr.sin_port = htons(port);
+	_addr.sin_addr.s_addr = INADDR_ANY;
+	
+	if (bind(_fd, (struct sockaddr *)&_addr, sizeof(_addr)) == -1)
+		throw std::runtime_error("Failed to bind socket");
 }

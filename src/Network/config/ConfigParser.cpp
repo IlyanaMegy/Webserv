@@ -76,6 +76,7 @@ int ConfigParser::createCluster(const std::string &config_file) {
 	for (size_t i = 0; i < this->_nb_server; i++)
 	{
 		ServerConf *server = new ServerConf();
+		
 
 		if (!server)
 			throw std::runtime_error("Error: Couldn't create server");
