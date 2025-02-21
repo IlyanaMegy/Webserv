@@ -21,7 +21,7 @@ class Epoll {
 	int getFd(int i) const;
 
 	void addFd(int fd, int flags);
-	void wait(void);
+	int wait(void);
 };
 
 #endif
