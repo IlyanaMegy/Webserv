@@ -222,6 +222,8 @@ void ServerConf::setLocation(std::string path, std::vector<std::string> params)
 		throw std::runtime_error("Failed redirection file in locaition validation");
 	else if (valid == 4)
 		throw std::runtime_error("Failed alias file in locaition validation");
+	if (checkLocations())
+		throw std::runtime_error("Location is duplicated");
 	_locations.push_back(new_loca);
 }
 
