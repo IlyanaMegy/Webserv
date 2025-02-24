@@ -117,15 +117,31 @@ int	Request::_parseHeaderFields(std::string header)
 
 int	Request::_parseCompletedFields(void)
 {
+	if (_findTransferEncoding())
+		return 1;
 	if (_findContentLength())
 		return 1;
+	return 0;
+}
+
+int	Request::_findTransferEncoding(void)
+{
+	if (_fields.find(_toLower("Transfer-Encoding")) == _fields.end())
+		return 0;
+	if (_fields[_toLower("Transfer-Encoding")].size() != 1
+		|| _toLower(_fields[_toLower("Transfer-Encoding")][0]) != "chunked") {
+		_response.fillError("400", "Bad Request");
+		_stage = DONE;
+		return 1;
+	}
+	_isBodyChunked = true;
 	return 0;
 }
 
 int	Request::_findContentLength(void)
 {
 	if (_fields.find(_toLower("Content-Length")) == _fields.end()) {
-		if (_method == GET || _method == DELETE) {
+		if (_method == GET || _method == DELETE || _isBodyChunked) {
 			_bodyLength = 0;
 			return 0;
 		}
@@ -139,6 +155,8 @@ int	Request::_findContentLength(void)
 		_stage = DONE;
 		return 1;
 	}
+	if (_isBodyChunked)
+		return 0;
 	_bodyLength = _stoi(_fields[_toLower("Content-Length")][0]);
 	if (_bodyLength > MAXBODYOCTETS) {
 		_response.fillError("413", "Content Too Large");

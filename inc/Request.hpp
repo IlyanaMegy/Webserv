@@ -57,6 +57,7 @@ class Request
 		Method												_method;
 		std::string											_uri;
 		std::map< std::string, std::vector<std::string> >	_fields;
+		bool												_isBodyChunked;
 		unsigned int										_bodyLength;
 		std::string											_body;
 
@@ -74,6 +75,7 @@ class Request
 		int							_parseFieldName(std::string fieldName);
 		int							_parseFieldValue(std::string fieldValue);
 		int							_parseCompletedFields(void);
+		int							_findTransferEncoding(void);
 		int							_findContentLength(void);
 		int							_parseContentLength(std::string contentLength);
 
