@@ -2,6 +2,8 @@
 #define SERVERMONITOR_HPP
 
 #include "config/ConfigParser.hpp"
+#include "Server.hpp"
+#include "../Webserv.hpp"
 
 class ServerConf;
 class Server;
@@ -20,7 +22,7 @@ class ServerMonitor {
 	std::vector<ServerConf *> &getServers() { return _servers; }
 
 	Server*		findServer(int port);
-	std::map<int port, Server*>	servers;
+	std::map<int, Server*>	servers;
 	//returns NULL when didnt find server
 
 	// Client &getClient(int i);

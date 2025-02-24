@@ -1,5 +1,4 @@
 #include "../../inc/Network/ServerMonitor.hpp"
-#include <iostream>
 
 ServerMonitor::ServerMonitor(std::string configFile)
 {
@@ -8,9 +7,9 @@ ServerMonitor::ServerMonitor(std::string configFile)
 	data.createCluster(configFile);
 	_confs = data.getServers();
 
-	for (std::vector<ServerConf*>::iterator it = serversConfig.begin(); it != serversConfig.end(); ++it)
+	for (std::vector<ServerConf*>::iterator it = _confs.begin(); it != _confs.end(); ++it)
 	{
-		Server*	server((*it)->getPort());
+		Server *server;
 
 		server = findServer((*it)->getPort());
 		if (server == NULL) {
@@ -19,8 +18,9 @@ ServerMonitor::ServerMonitor(std::string configFile)
 				throw std::exception();
 			servers[(*it)->getPort()] = server;
 		}
-		if (server.isConfigKnown((*it)->getServerName()))
+		if (server->isConfigKnown((*it)->getServerName()))
 			continue;
+		std::cout << OLIV << "[CONFIG] Adding new server " << (*it)->getServerName() << " to _servers map of ServerMonitor" << std::endl;
 		server[(*it)->getServerName()] = *it;
 	}
 
