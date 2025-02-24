@@ -114,8 +114,6 @@ void checkToken(std::string &param)
 	int pos = findChar(param, ';');
 	if (pos != -1 && pos != (int)param.size() - 1)
 		throw std::runtime_error("Token is invalid : " + param);
-	// if (pos != -1)
-	// 	param.erase(pos);
 }
 
 int ft_stoi(std::string str)

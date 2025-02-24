@@ -17,15 +17,25 @@ void Location::setPath(std::string param) { _path = param; }
 void Location::setRootLocation(std::string param) {
 	if (getTypePath(param) != 2)
 		throw std::runtime_error("Error: Invalid IP address format for host");
+	if (!param.empty() && param[param.size() - 1] == ';')
+        param.erase(param.size() - 1);
+	if (!param.empty() && param[param.size() - 1] == '/')
+        param.erase(param.size() - 1);
 	_root = param;
 }
 
-void Location::setIndexLocation(std::string param) { _index = param; }
+void Location::setIndexLocation(std::string param)
+{
+	if (!param.empty() && param[param.size() - 1] == ';')
+        param.erase(param.size() - 1);
+	_index = param;
+}
+
 void Location::setReturn(std::string param) { _return = param; }
 void Location::setAlias(std::string param) { _alias = param; }
 
 void Location::setAutoindex(std::string param) {
-	if (param == "on" || param == "off")
+	if (param == "on;" || param == "off;")
 		_autoindex = (param == "on");
 	else
 		throw std::runtime_error("Wrong autoindex");

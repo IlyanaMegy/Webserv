@@ -117,12 +117,13 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 	bool	flag_autoindex = false;
 	bool	flag_max_size = false;
 
-	params = splitParametrs(config += ' ', std::string(" \n\t;"));
+	params = splitParametrs(config += ' ', std::string(" \n\t"));
 	if (params.size() < 3)
 		throw std::runtime_error("Failed server validation");
 
 	for (size_t i = 0; i < params.size(); i++)
 	{
+		std::cout << GOLD << "dealing with param : " << params[i] << RESET << std::endl;
 		if (params[i] == "listen" && (i + 1) < params.size())
 		{
 			if (server->getPort())

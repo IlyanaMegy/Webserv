@@ -24,7 +24,6 @@ void ServerConf::setHost(std::string param) {
 	if (!(inet_pton(AF_INET, param.c_str(), &(hostBinary.sin_addr))))
 		throw std::runtime_error("Wrong syntax: host");
 	_host = inet_addr(param.data());
-	std::cout << LIME << "ok host" << RESET << std::endl;
 }
 
 /**
@@ -32,6 +31,8 @@ void ServerConf::setHost(std::string param) {
  */
 void ServerConf::setRoot(std::string root) {
 	checkToken(root);
+	if (!root.empty() && root[root.size() - 1] == ';')
+        root.erase(root.size() - 1);
 	if (getTypePath(root) == 2) {
 		_root = root;
 		return;
@@ -46,12 +47,11 @@ void ServerConf::setRoot(std::string root) {
 	if (getTypePath(complete_root) != 2)
 		throw std::runtime_error("Error: Wrong syntax: root");
 	_root = complete_root;
-	std::cout << LIME << "ok root" << RESET << std::endl;
 }
 
-void ServerConf::setPort(std::string params) {unsigned int port;
-	
-	port = 0;
+void ServerConf::setPort(std::string params) {
+	int port = 0;
+
 	checkToken(params);
 	for (size_t i = 0; i < params.length(); i++)
 		if (!std::isdigit(params[i]))
@@ -62,9 +62,6 @@ void ServerConf::setPort(std::string params) {unsigned int port;
 	_port = (uint16_t) port;
 }
 
-/**
- * @brief  set max size of clients' body request
- */
 void ServerConf::setClientMaxBodySize(std::string params) {checkToken(params);
 	for (size_t i = 0; i < params.length(); i++)
 		if (params[i] < '0' || params[i] > '9')
@@ -98,6 +95,7 @@ void ServerConf::setLocation(std::string path, std::vector<std::string> params)
 	new_loca.setPath(path);
 	for (size_t i = 0; i < params.size(); i++)
 	{
+		std::cout << ORANGE << "\tdealing with param : " << params[i] << RESET << std::endl;
 		if (params[i] == "root" && (i + 1) < params.size())
 		{
 			if (!new_loca.getRootLocation().empty())
@@ -107,6 +105,7 @@ void ServerConf::setLocation(std::string path, std::vector<std::string> params)
 				new_loca.setRootLocation(params[i]);
 			else
 				new_loca.setRootLocation(_root + params[i]);
+			
 		}
 		else if ((params[i] == "allow_methods" || params[i] == "methods") && (i + 1) < params.size())
 		{
@@ -135,12 +134,12 @@ void ServerConf::setLocation(std::string path, std::vector<std::string> params)
 		else if (params[i] == "autoindex" && (i + 1) < params.size())
 		{
 			if (path == "/cgi-bin")
-					throw std::runtime_error("params autoindex not allow for CGI");
-				if (flag_autoindex)
-					throw std::runtime_error("Autoindex of location is duplicated");
-				checkToken(params[++i]);
-				new_loca.setAutoindex(params[i]);
-				flag_autoindex = true;
+				throw std::runtime_error("params autoindex not allow for CGI");
+			if (flag_autoindex)
+				throw std::runtime_error("Autoindex of location is duplicated");
+			checkToken(params[++i]);
+			new_loca.setAutoindex(params[i]);
+			flag_autoindex = true;
 			}
 		else if (params[i] == "index" && (i + 1) < params.size())
 		{
@@ -274,7 +273,7 @@ int ServerConf::isValidLocation(Location &location) const
 	{
 		if (location.getPath()[0] != '/') return (2);
 		if (location.getRootLocation().empty()) location.setRootLocation(_root);
-		if (isFileExistAndReadable(location.getRootLocation() + location.getPath() + "/", location.getIndexLocation())) return (5);
+		if (isFileExistAndReadable(location.getRootLocation() + location.getPath(), location.getIndexLocation())) return (5);
 		if (!location.getReturn().empty())
 			if (isFileExistAndReadable(location.getRootLocation(), location.getReturn())) return (3);
 		if (!location.getAlias().empty()) if (isFileExistAndReadable(location.getRootLocation(), location.getAlias())) return (4);
