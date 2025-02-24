@@ -42,7 +42,13 @@ class Request
 			DONE
 		};
 
+		enum STATE {
+			AWAITING_MESSAGE,
+			TREATING_MESSAGE
+		};
+
 		STAGE												_stage;
+		STATE												_state;
 
 		Response											_response;
 

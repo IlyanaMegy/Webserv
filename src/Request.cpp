@@ -1,10 +1,10 @@
 #include "Request.hpp"
 
 Request::Request(void)
-	: _stage(SEEKING_STATUS_LINE), _untreatedMessage("") , _uri(""), _fields(std::map< std::string, std::vector<std::string> >()), _bodyLength(0), _body("") {}
+	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _untreatedMessage("") , _uri(""), _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
 
 Request::Request(std::string leftoverMessage)
-	: _stage(SEEKING_STATUS_LINE), _untreatedMessage(leftoverMessage), _uri(""), _fields(std::map< std::string, std::vector<std::string> >()), _bodyLength(0), _body("") {}
+	: _stage(SEEKING_STATUS_LINE), _untreatedMessage(leftoverMessage), _uri(""), _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
 
 Request::~Request(void) {}
 
@@ -22,6 +22,7 @@ void	Request::parse(std::string buffer)
 {
 
 	_untreatedMessage = _untreatedMessage+buffer;
+	_state = TREATING_MESSAGE;
 	if (_stage == SEEKING_STATUS_LINE)
 		_parseStartLine();
 	if (_stage == SEEKING_HEADER)
@@ -49,8 +50,10 @@ void	Request::_parseBody(void)
 		_stage = PROCESSING;
 		return ;
 	}
-	if (_untreatedMessage.length() < _bodyLength)
+	if (_untreatedMessage.length() < _bodyLength) {
+		_state = AWAITING_MESSAGE;
 		return ;
+	}
 	_body = _untreatedMessage.substr(0, _bodyLength);
 	_untreatedMessage = _untreatedMessage.substr(_bodyLength, _untreatedMessage.length() - _bodyLength);
 	_stage = PROCESSING;
@@ -61,7 +64,7 @@ void	Request::_parseHeader(void)
 	std::string	header;
 
 	header = _findHeader();
-	if (header.empty())
+	if (_stage == DONE || _state == AWAITING_MESSAGE)
 		return ;
 	if (_parseHeaderFields(header))
 		return ;
@@ -80,8 +83,10 @@ std::string	Request::_findHeader(void)
 		return "";
 	}
 	crlfCrlfPos = _untreatedMessage.find("\r\n\r\n");
-	if (crlfCrlfPos == std::string::npos)
+	if (crlfCrlfPos == std::string::npos) {
+		_state = AWAITING_MESSAGE;
 		return "";
+	}
 	header = _untreatedMessage.substr(0, crlfCrlfPos + 2);
 	if (header.length() > MAXHEADEROCTETS) {
 		_response.fillError("400", "Bad Request");
@@ -220,7 +225,7 @@ void	Request::_parseStartLine(void)
 	std::string	startLine;
 
 	startLine = _findStartLine();
-	if (startLine.empty())
+	if (_stage == DONE || _state == AWAITING_MESSAGE)
 		return ;
 	if (_parseRequestLine(startLine))
 		return ;
@@ -238,8 +243,10 @@ std::string	Request::_findStartLine(void)
 		return "";
 	}
 	crlfPos = _untreatedMessage.find("\r\n");
-	if (crlfPos == std::string::npos)
+	if (crlfPos == std::string::npos) {
+		_state = AWAITING_MESSAGE;
 		return "";
+	}
 	startLine = _untreatedMessage.substr(0, crlfPos);
 	if (startLine.length() > MAXSTATUSLINEOCTETS) {
 		_response.fillError("400", "Bad Request");
