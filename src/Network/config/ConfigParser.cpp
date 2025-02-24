@@ -1,10 +1,7 @@
 #include "../../../inc/Network/config/ConfigParser.hpp"
 
 ConfigParser::~ConfigParser()
-{
-	for (std::vector<ServerConf*>::iterator it = _servers.begin(); it != _servers.end(); it++)
-		delete *it;
-}
+{}
 
 /**
  * @brief  Read file

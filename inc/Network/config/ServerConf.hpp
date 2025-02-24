@@ -2,10 +2,9 @@
 #define SERVERCONF_HPP
 
 #include "../../Webserv.hpp"
-#include "../Socket.hpp"
 #include "Location.hpp"
 
-class ServerConf : public Socket {
+class ServerConf {
    private:
 	std::string _configFile;
 	uint16_t _port;
@@ -16,8 +15,6 @@ class ServerConf : public Socket {
 	std::string _index;
 	bool _autoindex;
 	std::vector<Location> _locations;
-	Socket _socket;
-	int _socketFd;
 	// std::map<short, std::string> _error_pages;
 
    public:
@@ -32,7 +29,6 @@ class ServerConf : public Socket {
 	void setIndex(std::string index);
 	void setLocation(std::string path, std::vector<std::string> params);
 	void setAutoindex(std::string autoindex);
-	void setSocketServer(void);
 
 	int isValidLocation(Location &location) const;
 	bool checkLocations() const;
@@ -45,8 +41,6 @@ class ServerConf : public Socket {
 	std::string getRoot(void) const;
 	std::string getIndex(void) const;
 	bool getAutoindex(void) const;
-	int getSocketFd(void) const;
-	Socket getSocket(void) const;
 	const std::vector<Location>::iterator getLocationFromUri(std::string uri);
 	
 	bool isValidMethod(std::string uri, Method method);

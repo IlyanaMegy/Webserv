@@ -26,15 +26,13 @@ int main(int ac, char** av) {
 	if (ac != 1 && ac != 2)
 		return (std::cout << "Error: wrong number of arguments." << std::endl, 1);
 
+
+
 	ConfigParser data;
 	ServerMonitor servers;
 
 	
 	try {
-		//	Parse Config
-		data.createCluster(ac == 1 ? "config/webserv.conf" : av[1]);
-
-		//	Init Servers
 		servers.setupServers(data.getServers());
 
 		// 	Run Servers
@@ -54,5 +52,63 @@ int main(int ac, char** av) {
 		}
 	}
 
+	return 0;
+}
+
+void	runServer(std::string configFile)
+{
+	ServerMonitor serverMonitor(configFile);
+	// Epoll	epoll(server.getSocket().getFd());
+
+	// while (true) {
+	// 	try {
+	// 		epoll.wait();
+	// 	} catch (std::exception &e) {
+	// 		std::cout << e.what() << std::endl;
+	// 	}
+
+	// 	for (int i = 0; i < epoll.getReadyFdsNb(); i++) {
+	// 		if (epoll.getFd(i) == server.getSocket().getFd()) {
+	// 			try {
+	// 				server.acceptClient(epoll);
+	// 			} catch (std::exception &e) {
+	// 				std::cout << e.what() << std::endl;
+	// 			}
+	// 		}
+
+	// 		else {
+	// 			if (epoll.getEvent(i) == (EPOLLIN | EPOLLOUT)
+	// 			|| epoll.getEvent(i) == EPOLLIN)
+	// 				server.readFrom(epoll.getFd(i));
+	// 			if (epoll.getEvent(i) == (EPOLLIN | EPOLLOUT)
+	// 			|| epoll.getEvent(i) == EPOLLOUT)
+	// 				server.sendTo(epoll.getFd(i));
+
+	// 			if (server.getClient(epoll.getFd(i))->getShouldClose()) {
+	// 				epoll.deleteFd(epoll.getFd(i));
+	// 				server.closeConnection(epoll.getFd(i));
+	// 			}
+	// 		}
+	// 	}
+	// }
+}
+
+
+int	main(int ac, char** av)
+{
+	std::string configFile = "config/webserv.conf";
+
+	if (ac != 1 && ac != 2)
+		return (std::cout << "Error: wrong number of arguments." << std::endl, 1);
+	if (ac == 1)
+		configFile = av[1];
+
+	try {
+		runServer(configFile);
+	}
+	catch (std::exception &e) {
+		std::cout << e.what() << std::endl;
+		return 1;
+	}
 	return 0;
 }
