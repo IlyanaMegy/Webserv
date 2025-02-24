@@ -50,8 +50,8 @@ void	Server::acceptClient(Epoll &epoll)
 
 void	Server::readFrom(int clientFd)
 {
-	char	buffer[BUFFER_SIZE] = "";
-	ssize_t	res;
+	char		buffer[BUFFER_SIZE] = "";
+	ssize_t		res;
 
 	res = recv(_clients[clientFd]->getSocket().getFd(), buffer, BUFFER_SIZE - 1, 0);
 	if (res == 0) {
@@ -60,7 +60,7 @@ void	Server::readFrom(int clientFd)
 	}
 	if (!_clients[clientFd]->getRequest())
 		_clients[clientFd]->createNewRequest(_clients[clientFd]->leftoverMessage);
-	_clients[clientFd]->getRequest()->parse(std::string(buffer));
+	_clients[clientFd]->getRequest()->parse(std::string(buffer, res));
 	std::cout << "End of reading!" << std::endl;
 }
 
