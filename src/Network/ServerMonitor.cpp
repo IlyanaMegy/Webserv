@@ -41,11 +41,6 @@ ServerMonitor::~ServerMonitor()
 	}
 }
 
-void ServerMonitor::setupServers(std::vector<ServerConf*> serversConfig)
-{
-	_confs = serversConfig;
-	
-}
 
 void ServerMonitor::runServers(void)
 {
