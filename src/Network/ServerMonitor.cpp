@@ -15,53 +15,60 @@ ServerMonitor::ServerMonitor(std::string configFile)
 		if (server == NULL) {
 			server = new Server((*it)->getPort());
 			if (!server)
-				throw std::exception();
-			servers[(*it)->getPort()] = server;
+				throw std::runtime_error("Failed to create Server object");
+			addServerToList(server);
 		}
 		if (server->isConfigKnown((*it)->getServerName()))
 			continue;
-		std::cout << OLIV << "[CONFIG] Adding new server " << (*it)->getServerName() << " to _servers map of ServerMonitor" << std::endl;
-		server[(*it)->getServerName()] = *it;
+		std::cout << MAGENTA << "[CONFIG] Adding new server " << (*it)->getServerName() << " to _servers map of ServerMonitor" << RESET << std::endl;
+		server->addConfig(*it);
+		std::cout << MAGENTA << "[CONFIG] Server '" << (*it)->getServerName() << "' created." << RESET << std::endl;
 	}
-
-		std::cout << MAGENTA << "[CONFIG] Server '" << (*server_it)->getServerName() << "' created." << RESET << std::endl;
-
-
 }
 
 ServerMonitor::~ServerMonitor()
 {
-	for (std::map<int, Server*>::iterator it = servers.begin(); it != servers.end(); it++) {
+	for (std::map<int, Server*>::iterator it = _servers.begin(); it != _servers.end(); it++)
 		if (it->second)
 			delete it->second;
-	}
-	for (std::vector<ServerConf*>::iterator it = _confs.begin(); it != _confs.end(); it++) {
+
+	for (std::vector<ServerConf*>::iterator it = _confs.begin(); it != _confs.end(); it++)
 		if (*it)
 			delete *it;
-	}
 }
 
 
-void ServerMonitor::runServers(void)
+// void ServerMonitor::runServers(void)
+// {
+// 	// for(std::vector<ServerConf*>::iterator server = _servers.begin(); server != _servers.end(); ++server)
+//     // {
+// 	// 	// std::cout << "test :\n" << std::endl;
+// 	// 	// (*server)->listMethods();
+// 	// 	// if ((*server)->isValidMethod("/drafts/", GET))
+// 	// 	// 	std::cout << "valid location" << std::endl;
+// 	// 	// else
+// 	// 	// 	std::cout << "invalid location" << std::endl;
+
+// 	// 	if (listen((*server)->getSocketFd(), MAXCONNECT) < 0)
+// 	// 		throw std::runtime_error("Failed to listen on socket");
+
+// 	// 	std::cout << MAGENTA << "\n[CONFIG] server's socket listening..." << std::endl;
+// 	// 	std::cout << "[CONFIG] Server is running on port " << (*server)->getPort() << "..." << RESET << std::endl;
+// 	// }
+// }
+
+Server *ServerMonitor::findServer(uint16_t port)
 {
-	// for(std::vector<ServerConf*>::iterator server = _servers.begin(); server != _servers.end(); ++server)
-    // {
-	// 	// std::cout << "test :\n" << std::endl;
-	// 	// (*server)->listMethods();
-	// 	// if ((*server)->isValidMethod("/drafts/", GET))
-	// 	// 	std::cout << "valid location" << std::endl;
-	// 	// else
-	// 	// 	std::cout << "invalid location" << std::endl;
-
-	// 	if (listen((*server)->getSocketFd(), MAXCONNECT) < 0)
-	// 		throw std::runtime_error("Failed to listen on socket");
-
-	// 	std::cout << MAGENTA << "\n[CONFIG] server's socket listening..." << std::endl;
-	// 	std::cout << "[CONFIG] Server is running on port " << (*server)->getPort() << "..." << RESET << std::endl;
-	// }
+	for (std::map<int, Server*>::iterator it = _servers.begin(); it != _servers.end(); ++it)
+        if (it->second->getPort() == port)
+            return it->second;
+    return NULL;
 }
 
-
+void ServerMonitor::addServerToList(Server *server)
+{
+	_servers[server->getPort()] = server;
+}
 // Client &Server::getClient(int i)
 // {
 // 	return _clients[i];

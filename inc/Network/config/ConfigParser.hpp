@@ -17,10 +17,7 @@ class ConfigParser {
 	void splitBlocks(std::string &content);
 	void createServer(std::string &config, ServerConf *server);
 
-	int getServerFd(int serverId);
 	std::vector<ServerConf *> &getServers() { return _servers; }
-	ServerConf &getServerConfig(int serverId);
-	uint16_t getServerPort(int serveurId);
 	size_t getNbServer() const;
 };
 

@@ -71,7 +71,7 @@ int ConfigParser::createCluster(const std::string &config_file) {
 		ServerConf *server = new ServerConf();
 		if (!server)
 			throw std::runtime_error("Error: Couldn't create server");
-		
+
 		createServer(_servers_config[i], server);
 		_servers.push_back(server);
 	}
@@ -221,16 +221,6 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 	// 	throw std::runtime_error("Incorrect path for error page or number of error");
 }
 
-int	ConfigParser::getServerFd(int serveurId) {
-	return _servers[serveurId]->getSocketFd();
-}
-
-uint16_t	ConfigParser::getServerPort(int serveurId) {
-	return _servers[serveurId]->getPort();
-}
-
 size_t	ConfigParser::getNbServer() const {
 	return _nb_server;
 }
-
-ServerConf	&ConfigParser::getServerConfig(int serverId){ return *_servers[serverId]; }

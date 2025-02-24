@@ -6,6 +6,7 @@ CONFIG		:=	Network/config/ServerConf.cpp \
 
 NETWORK		:=	Network/ServerMonitor.cpp \
 				Network/Client.cpp \
+				Network/Server.cpp \
 				Network/Epoll.cpp \
 				Network/Socket.cpp
 

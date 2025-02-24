@@ -47,9 +47,7 @@ void Location::setMethods(std::vector<std::string> methods) {
 }
 
 void Location::setCgiPath(std::vector<std::string> path) { _cgiPath = path; }
-void Location::setCgiExtension(std::vector<std::string> extension) {
-	_cgiExt = extension;
-}
+void Location::setCgiExtension(std::vector<std::string> extension) { _cgiExt = extension; }
 
 void Location::setMaxBodySize(std::string param) {
 	unsigned long body_size = 0;

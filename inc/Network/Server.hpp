@@ -20,20 +20,17 @@ class Server {
 	Server(uint16_t port);
 	~Server(void);
 
-	Socket &getSocket(void);
-	Client *getClient(int clientFd);
+	// Socket &getSocket(void);
+	// Client *getClient(int clientFd);
 
-	void acceptClient(Epoll &epoll);
-	void readFrom(int clientFd);
-	void sendTo(int clientFd);
-	void closeConnection(int clientFd);
+	// void acceptClient(Epoll &epoll);
+	// void readFrom(int clientFd);
+	// void sendTo(int clientFd);
+	// void closeConnection(int clientFd);
 
 	bool isConfigKnown(std::string serverName);
-
-	// class SocketCreationErrException : public std::exception {
-	// 	public:
-	// 		virtual const char *what() const throw();
-	// };
+	void addConfig(ServerConf *conf);
+	uint16_t getPort() const;
 };
 
 #endif

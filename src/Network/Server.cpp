@@ -82,9 +82,19 @@ Server::~Server(void)
 // 	std::cout << "Sent to client " << CYAN << clientFd << RESET << std::endl;
 // }
 
+uint16_t Server::getPort() const
+{
+	return _port;
+}
+
 bool Server::isConfigKnown(std::string serverName)
 {
-	return confs.find(serverName) != confs.end();
+	return _confs.find(serverName) != _confs.end();
+}
+
+void Server::addConfig(ServerConf *conf)
+{
+	_confs[conf->getServerName()] = conf;
 }
 
 // const char *Server::SocketCreationErrException::what() const throw() {

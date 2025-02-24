@@ -1,6 +1,6 @@
 #include "../../../inc/Network/config/ServerConf.hpp"
 
-ServerConf::ServerConf() : _socket(){
+ServerConf::ServerConf() {
 	_port = 0;
 	_host = 0;
 	_server_name = "";
@@ -303,15 +303,6 @@ std::vector<Location> ServerConf::getLocations() const {return (_locations); }
 std::string ServerConf::getRoot() const {return (_root); }
 std::string ServerConf::getIndex() const {return (_index); }
 bool ServerConf::getAutoindex() const {return (_autoindex); }
-int	ServerConf::getSocketFd() const {return (_socketFd); }
-Socket ServerConf::getSocket() const {return (_socket); }
-
-void	ServerConf::setSocketServer()
-{
-	_socket.initSocket(_port);
-	_socketFd = _socket.getFd();
-}
-
 
 const std::vector<Location>::iterator ServerConf::getLocationFromUri(std::string uri)
 {
