@@ -80,6 +80,11 @@ class Request
 		int							_parseContentLength(std::string contentLength);
 
 		void						_parseBody(void);
+		void						_parseFullBody(void);
+		int							_parseChunkedBody(void);
+		unsigned int				_findChunkLength(void);
+		std::string					_findChunk(unsigned int chunkLength);
+
 
 		void						_treat(void);
 
@@ -87,7 +92,9 @@ class Request
 		static bool					_isDelimiter(unsigned char c);
 		static bool					_isVChar(unsigned char c);
 		static bool					_isObsText(unsigned char c);
+		static bool					_isHex(unsigned char c);
 		static unsigned int			_stoi(std::string value);
+		static unsigned int			_stoh(std::string value);
 
 };
 

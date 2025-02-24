@@ -46,6 +46,14 @@ void	Request::_treat(void)
 
 void	Request::_parseBody(void)
 {
+	if (_isBodyChunked)
+		_parseChunkedBody();
+	else
+		_parseFullBody();
+}
+
+void	Request::_parseFullBody(void)
+{
 	if (_bodyLength == 0) {
 		_stage = PROCESSING;
 		return ;
@@ -57,6 +65,84 @@ void	Request::_parseBody(void)
 	_body = _untreatedMessage.substr(0, _bodyLength);
 	_untreatedMessage = _untreatedMessage.substr(_bodyLength, _untreatedMessage.length() - _bodyLength);
 	_stage = PROCESSING;
+}
+
+int	Request::_parseChunkedBody(void)
+{
+	static unsigned int		chunkLength;
+	std::string				chunk;
+
+	if (chunkLength == 0) {
+		chunkLength = _findChunkLength();
+		if (_stage == DONE || _state == AWAITING_MESSAGE)
+			return 1;
+		if (chunkLength == 0) {
+			_stage = PROCESSING;
+			return 0;
+		}
+		_bodyLength+=chunkLength;
+	}
+	else {
+		chunk = _findChunk(chunkLength);
+		if (_stage == DONE || _state == AWAITING_MESSAGE)
+			return 1;
+		_body+=chunk;
+		chunkLength = 0;
+	}
+	return 0;
+}
+
+std::string	Request::_findChunk(unsigned int chunkLength)
+{
+	std::string	chunk;
+
+	if (_untreatedMessage.length() < chunkLength + 2) {
+		_state = AWAITING_MESSAGE;
+		return "";
+	}
+	if (_untreatedMessage.substr(chunkLength, 2) != "\r\n") {
+		_response.fillError("400", "Bad Request");
+		_stage = DONE;
+		return "";
+	}
+	chunk = _untreatedMessage.substr(0, chunkLength);
+	_untreatedMessage = _untreatedMessage.substr(chunkLength + 2, _untreatedMessage.length() - (chunkLength + 2));
+	return chunk;
+}
+
+unsigned int	Request::_findChunkLength(void)
+{
+	std::string::size_type	crlfPos;
+	std::string				line;
+	unsigned int			chunkLength;
+
+	crlfPos = _untreatedMessage.find("\r\n");
+	if (crlfPos == std::string::npos) {
+		_state = AWAITING_MESSAGE;
+		return 0;
+	}
+	line = _untreatedMessage.substr(0, crlfPos);
+	if (line.empty()) {
+		_response.fillError("400", "Bad Request");
+		_stage = DONE;
+		return 0;
+	}
+
+	for (std::string::iterator it = line.begin(); it != line.end(); it++) {
+		if (!_isHex(*it)) {
+			_response.fillError("400", "Bad Request");
+			_stage = DONE;
+			return 0;
+		}
+	}
+	chunkLength = _stoh(line);
+	if (chunkLength + _bodyLength > MAXBODYOCTETS) {
+		_response.fillError("413", "Content Too Large");
+		_stage = DONE;
+		return 0;
+	}
+	_untreatedMessage = _untreatedMessage.substr(crlfPos + 2, _untreatedMessage.length() - (crlfPos + 2));
+	return chunkLength;
 }
 
 void	Request::_parseHeader(void)
@@ -370,11 +456,26 @@ bool	Request::_isObsText(unsigned char c)
 	return (127 < c);
 }
 
+bool	Request::_isHex(unsigned char c)
+{
+	return (std::isdigit(c) || c == 'A' || c == 'B' || c == 'C' || c == 'D' || c == 'E' || c == 'F');
+}
+
 unsigned int	Request::_stoi(std::string value)
 {
 	unsigned int		res;
 	std::istringstream	stream(value);
 
+	stream >> res;
+	return res;
+}
+
+unsigned int	Request::_stoh(std::string value)
+{
+	unsigned int		res;
+	std::stringstream	stream;
+
+	stream << std::hex << value;
 	stream >> res;
 	return res;
 }
