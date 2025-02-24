@@ -293,7 +293,7 @@ int	Request::_parseFieldLine(std::string fieldLine)
 		_stage = DONE;
 		return 1;
 	}
-	_fields[_toLower(fieldName)].push_back(_toLower(fieldValue));//
+	_fields[_toLower(fieldName)].push_back(_toLower(fieldValue));
 	return 0;
 }
 
