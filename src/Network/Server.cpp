@@ -1,7 +1,5 @@
 #include "../../inc/Network/Server.hpp"
 
-#include <iostream>
-
 Server::Server(uint16_t port) : _port(port), _socket(port)
 {
 	if (listen(_socket.getFd(), MAXCONNECT) < 0)
