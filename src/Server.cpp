@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-Server::Server(int port) : _port(port), _socket(port)
+Server::Server(unsigned int port) : _port(port), _socket(port)
 {
 	(void) _port;
 	if (listen(_socket.getFd(), MAXCONNECT) < 0)

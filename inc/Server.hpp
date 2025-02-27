@@ -15,13 +15,13 @@
 class Server
 {
 	private:
-		int						_port;
+		unsigned int			_port;
 		Socket					_socket;
 		std::map<int, Client*>	_clients;
 
 
 	public:
-		Server(int port);
+		Server(unsigned int port);
 		~Server(void);
 
 		Socket	&getSocket(void);
