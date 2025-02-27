@@ -55,7 +55,6 @@ class Request
 		std::string											_untreatedMessage;
 	
 		Method												_method;
-		std::string											_uri;
 		std::string											_host;
 		std::string											_path;
 		std::map<std::string, std::string>					_arguments;
@@ -69,15 +68,15 @@ class Request
 		void						_parseStartLine(void);
 		std::string					_findStartLine(void);
 		int							_parseRequestLine(std::string startLine);
-		int							_parseMethod(std::string startLine, std::string::size_type sp1Pos);
+		int							_parseMethod(std::string methodString);
 
-		int							_parseUri(std::string startLine, std::string::size_type sp1Pos, std::string::size_type sp2Pos);
+		int							_parseUri(std::string uri);
 		int							_parseScheme(std::string scheme);
 		int							_parseAuthority(std::string Authorityority);
 		int							_parsePath(std::string path);
 		int							_parseQuery(std::string query);
 		
-		int							_parseHTTPVer(std::string startLine, std::string::size_type sp2Pos);
+		int							_parseHTTPVer(std::string HTTPVerString);
 
 		void						_parseHeader(void);
 		std::string					_findHeader(void);

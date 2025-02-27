@@ -1,10 +1,10 @@
 #include "Request.hpp"
 
 Request::Request(void)
-	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _untreatedMessage("") , _uri(""), _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
+	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _untreatedMessage("") , _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
 
 Request::Request(std::string leftoverMessage)
-	: _stage(SEEKING_STATUS_LINE), _untreatedMessage(leftoverMessage), _uri(""), _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
+	: _stage(SEEKING_STATUS_LINE), _untreatedMessage(leftoverMessage), _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
 
 Request::~Request(void) {}
 
@@ -29,18 +29,19 @@ void	Request::parse(std::string buffer)
 		_parseHeader();
 	if (_stage == SEEKING_BODY)
 		_parseBody();
+	printInfo();
 	if (_stage == PROCESSING)
 		_treat();
-}
+	}
 
 void	Request::_treat(void)
 {
 	if (_method == GET)
-		_response.fillGET(_uri);
+		_response.fillGET(_path);
 	else if (_method == DELETE)
-		_response.fillDELETE(_uri);
+		_response.fillDELETE(_path);
 	else
-		_response.fillPOST(_uri, _body);
+		_response.fillPOST(_path, _body);
 	_stage = DONE;
 }
 
@@ -375,20 +376,17 @@ int	Request::_parseRequestLine(std::string startLine)
 		return 1;
 	}
 
-	if (_parseMethod(startLine, sp1Pos))
+	if (_parseMethod(startLine.substr(0, sp1Pos)))
 		return 1;
-	if (_parseUri(startLine, sp1Pos, sp2Pos))
+	if (_parseUri(startLine.substr(sp1Pos + 1, sp2Pos - (sp1Pos + 1))))
 		return 1;
-	if (_parseHTTPVer(startLine, sp2Pos))
+	if (_parseHTTPVer(startLine.substr(sp2Pos + 1, startLine.length() - (sp2Pos + 1))))
 		return 1;
 	return 0;
 }
 
-int	Request::_parseMethod(std::string startLine, std::string::size_type sp1Pos)
+int	Request::_parseMethod(std::string methodString)
 {
-	std::string	methodString;
-
-	methodString = startLine.substr(0, sp1Pos);
 	if (methodString == "GET")
 		_method = GET;
 	else if (methodString == "POST")
@@ -403,31 +401,30 @@ int	Request::_parseMethod(std::string startLine, std::string::size_type sp1Pos)
 	return 0;
 }
 
-int	Request::_parseUri(std::string startLine, std::string::size_type sp1Pos, std::string::size_type sp2Pos)
+int	Request::_parseUri(std::string uri)
 {
 	std::string::size_type	schemeEndPos;
 	std::string::size_type	pathStartPos;
 	std::string::size_type	queryStartPos;
 
-	_uri = startLine.substr(sp1Pos + 1, sp2Pos - (sp1Pos + 1));
-	schemeEndPos = _uri.find("://");
+	schemeEndPos = uri.find("://");
 	if (schemeEndPos != std::string::npos) {
-		if (_parseScheme(_uri.substr(0, schemeEndPos))) {
+		if (_parseScheme(uri.substr(0, schemeEndPos))) {
 			_response.fillError("400", "Bad Request");
 			_stage = DONE;
 			return 1;
 		}
 	}
-	pathStartPos = _uri.find('/', schemeEndPos == std::string::npos ? 0 : schemeEndPos + 3);
+	pathStartPos = uri.find('/', schemeEndPos == std::string::npos ? 0 : schemeEndPos + 3);
 	if (pathStartPos == std::string::npos || (schemeEndPos != std::string::npos && pathStartPos == schemeEndPos + 3)
-			|| _parseAuthority(schemeEndPos == std::string::npos ? _uri.substr(0, pathStartPos) : _uri.substr(schemeEndPos + 3, pathStartPos - (schemeEndPos + 3)))) {
+			|| _parseAuthority(schemeEndPos == std::string::npos ? uri.substr(0, pathStartPos) : uri.substr(schemeEndPos + 3, pathStartPos - (schemeEndPos + 3)))) {
 		_response.fillError("400", "Bad Request");
 		_stage = DONE;
 		return 1;
 	}
-	queryStartPos = _uri.find('?', pathStartPos + 1);
-	_path = _uri.substr(pathStartPos, queryStartPos == std::string::npos ? _uri.length() - pathStartPos : queryStartPos - pathStartPos);
-	if (queryStartPos != std::string::npos && _parseQuery(_uri.substr(queryStartPos + 1, _uri.length() - (queryStartPos + 1)))) {
+	queryStartPos = uri.find('?', pathStartPos + 1);
+	_path = uri.substr(pathStartPos, queryStartPos == std::string::npos ? uri.length() - pathStartPos : queryStartPos - pathStartPos);
+	if (queryStartPos != std::string::npos && _parseQuery(uri.substr(queryStartPos + 1, uri.length() - (queryStartPos + 1)))) {
 		_response.fillError("400", "Bad Request");
 		_stage = DONE;
 		return 1;
@@ -464,7 +461,6 @@ int	Request::_parseQuery(std::string query)
 	return 0;
 }
 
-
 int	Request::_parseAuthority(std::string authority)
 {
 	std::string::size_type	portStartPos;
@@ -483,11 +479,8 @@ int	Request::_parseScheme(std::string scheme)
 	return scheme != "http";
 }
 
-int	Request::_parseHTTPVer(std::string startLine, std::string::size_type sp2Pos)
+int	Request::_parseHTTPVer(std::string HTTPVerString)
 {
-	std::string	HTTPVerString;
-
-	HTTPVerString = startLine.substr(sp2Pos + 1, startLine.length() - (sp2Pos + 1));
 	if (HTTPVerString.length() != 8 || HTTPVerString.substr(0, 5) != "HTTP/"
 		|| HTTPVerString[6] != '.' || !std::isdigit(HTTPVerString[5]) || !std::isdigit(HTTPVerString[7])) {
 		_response.fillError("400", "Bad Request");
