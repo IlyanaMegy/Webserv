@@ -13,17 +13,16 @@ class Client
 {
 
 	private:
-		Request	*_request;
+		Request*_request;
 		Socket	_socket;
 		bool	_shouldClose;
+		Server*	_server;
 
-		Server*		_server;
 
 	public:
 		Client(void);
-		Client(Server* _server, std::string leftoverMessage);
+		Client(Server* _server);
 		~Client(void);
-
 
 		std::string	leftoverMessage;
 

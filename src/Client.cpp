@@ -4,7 +4,7 @@
 
 Client::Client(void) : _request(NULL), _shouldClose(false), _server(NULL), leftoverMessage("") {}
 
-Client::Client(Server* server, std::string leftoverMessage) : _request(NULL), _shouldClose(false), _server(server), leftoverMessage(leftoverMessage)
+Client::Client(Server* server) : _request(NULL), _shouldClose(false), _server(server), leftoverMessage("")
 {
 	int	clientFd;
 	struct sockaddr_in addr;
