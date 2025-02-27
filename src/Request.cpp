@@ -405,8 +405,82 @@ int	Request::_parseMethod(std::string startLine, std::string::size_type sp1Pos)
 
 int	Request::_parseUri(std::string startLine, std::string::size_type sp1Pos, std::string::size_type sp2Pos)
 {
+	std::string::size_type	schemeEndPos;
+	std::string::size_type	pathStartPos;
+	std::string::size_type	queryStartPos;
+
 	_uri = startLine.substr(sp1Pos + 1, sp2Pos - (sp1Pos + 1));
+	schemeEndPos = _uri.find("://");
+	if (schemeEndPos != std::string::npos) {
+		if (_parseScheme(_uri.substr(0, schemeEndPos))) {
+			_response.fillError("400", "Bad Request");
+			_stage = DONE;
+			return 1;
+		}
+	}
+	pathStartPos = _uri.find('/', schemeEndPos == std::string::npos ? 0 : schemeEndPos + 3);
+	if (pathStartPos == std::string::npos || (schemeEndPos != std::string::npos && pathStartPos == schemeEndPos + 3)
+			|| _parseAuthority(schemeEndPos == std::string::npos ? _uri.substr(0, pathStartPos) : _uri.substr(schemeEndPos + 3, pathStartPos - (schemeEndPos + 3)))) {
+		_response.fillError("400", "Bad Request");
+		_stage = DONE;
+		return 1;
+	}
+	queryStartPos = _uri.find('?', pathStartPos + 1);
+	_path = _uri.substr(pathStartPos, queryStartPos == std::string::npos ? _uri.length() - pathStartPos : queryStartPos - pathStartPos);
+	if (queryStartPos != std::string::npos && _parseQuery(_uri.substr(queryStartPos + 1, _uri.length() - (queryStartPos + 1)))) {
+		_response.fillError("400", "Bad Request");
+		_stage = DONE;
+		return 1;
+	}
 	return 0;
+}
+
+int	Request::_parseQuery(std::string query)
+{
+	std::string::size_type	sepPos;
+	std::string::size_type	affectPos;
+	std::string::size_type	pairStart = 0;
+	std::string				pair;
+
+	if (query.empty())
+		return 0;
+	sepPos = query.find('&');
+	while (sepPos != std::string::npos) {
+		pair = query.substr(pairStart, sepPos - pairStart);
+		affectPos = pair.find('=');
+		if (affectPos == 0)
+			return 1;
+		_arguments[pair.substr(0, affectPos == std::string::npos ? pair.length() : affectPos)]
+			= affectPos == std::string::npos ? "" : pair.substr(affectPos + 1, pair.length() - (affectPos + 1));
+		pairStart = sepPos + 1;
+		sepPos = query.find('&', pairStart);
+	}
+	pair = query.substr(pairStart, query.length() - pairStart);
+	affectPos = pair.find('=');
+	if (affectPos == 0)
+		return 1;
+	_arguments[pair.substr(0, affectPos == std::string::npos ? pair.length() : affectPos)]
+		= affectPos == std::string::npos ? "" : pair.substr(affectPos + 1, pair.length() - (affectPos + 1));
+	return 0;
+}
+
+
+int	Request::_parseAuthority(std::string authority)
+{
+	std::string::size_type	portStartPos;
+
+	if (authority.empty())
+		return 0;
+	portStartPos = authority.find(':');
+	if (portStartPos == 0)
+		return 1;
+	_host = authority.substr(0, portStartPos == std::string::npos ? authority.length() : portStartPos);
+	return 0;
+}
+
+int	Request::_parseScheme(std::string scheme)
+{
+	return scheme != "http";
 }
 
 int	Request::_parseHTTPVer(std::string startLine, std::string::size_type sp2Pos)
