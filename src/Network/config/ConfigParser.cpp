@@ -123,7 +123,6 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 
 	for (size_t i = 0; i < params.size(); i++)
 	{
-		std::cout << GOLD << "dealing with param : " << params[i] << RESET << std::endl;
 		if (params[i] == "listen" && (i + 1) < params.size())
 		{
 			if (server->getPort())
@@ -204,6 +203,8 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 			throw std::runtime_error("Unsupported directive");
 		}
 	}
+	if(!server->is_setted_loca_root && !server->getRoot().empty())
+		server->addRootToLocations(server->getRoot());
 	if (!server->getPort())
 		throw std::runtime_error("Port not found");
 	if (server->getRoot().empty())

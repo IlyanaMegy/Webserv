@@ -46,6 +46,9 @@ class ServerConf {
 	bool isValidMethod(std::string uri, Method method);
 	void listMethods() const;
 
+	bool is_setted_loca_root;
+	void addRootToLocations(std::string root);
+
 	// !TODO: Implement these functions
 	// void setErrorPages(std::vector<std::string> &params);
 	// bool isValidErrorPages(void);
