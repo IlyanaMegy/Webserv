@@ -1,5 +1,7 @@
 #include "Request.hpp"
 
+#include "Server.hpp"
+
 Request::Request(void)
 	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _server(NULL), _untreatedMessage("") , _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
 
@@ -469,6 +471,9 @@ int	Request::_parseAuthority(std::string authority)
 		return 0;
 	portStartPos = authority.find(':');
 	if (portStartPos == 0)
+		return 1;
+	if (portStartPos != std::string::npos
+			&& _stoi(authority.substr(portStartPos + 1, authority.length() - (portStartPos + 1))) != _server->getPort())
 		return 1;
 	_host = authority.substr(0, portStartPos == std::string::npos ? authority.length() : portStartPos);
 	return 0;

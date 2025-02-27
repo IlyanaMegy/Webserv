@@ -25,6 +25,11 @@ void	Server::closeConnection(int clientFd)
 	_clients.erase(clientFd);
 }
 
+unsigned int	Server::getPort(void)
+{
+	return _port;
+}
+
 Socket	&Server::getSocket(void)
 {
 	return _socket;

@@ -24,13 +24,14 @@ class Server
 		Server(unsigned int port);
 		~Server(void);
 
-		Socket	&getSocket(void);
-		Client	*getClient(int clientFd);
+		unsigned int	getPort(void);
+		Socket			&getSocket(void);
+		Client			*getClient(int clientFd);
 
-		void	acceptClient(Epoll &epoll);
-		void	readFrom(int clientFd);
-		void	sendTo(int clientFd);
-		void	closeConnection(int clientFd);
+		void			acceptClient(Epoll &epoll);
+		void			readFrom(int clientFd);
+		void			sendTo(int clientFd);
+		void			closeConnection(int clientFd);
 		
 		// class SocketCreationErrException : public std::exception {
 		// 	public:
