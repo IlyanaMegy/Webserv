@@ -38,7 +38,7 @@ Client	*Server::getClient(int clientFd)
 void	Server::acceptClient(Epoll &epoll)
 {
 	int		clientSocket;
-	Client	*client = new Client(_socket.getFd(), "");
+	Client	*client = new Client(this, "");
 
 	if (!client)
 		throw std::exception();

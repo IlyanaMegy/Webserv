@@ -7,6 +7,7 @@
 # include "Request.hpp"
 
 # define BUFFER_SIZE 42
+class	Server;
 
 class Client
 {
@@ -16,10 +17,13 @@ class Client
 		Socket	_socket;
 		bool	_shouldClose;
 
+		Server*		_server;
+
 	public:
 		Client(void);
-		Client(int serverFd, std::string leftoverMessage);
+		Client(Server* _server, std::string leftoverMessage);
 		~Client(void);
+
 
 		std::string	leftoverMessage;
 

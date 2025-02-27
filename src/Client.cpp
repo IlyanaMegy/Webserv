@@ -1,14 +1,16 @@
 #include "Client.hpp"
 
-Client::Client(void) : _request(NULL), _shouldClose(false), leftoverMessage("") {}
+#include "Server.hpp"
 
-Client::Client(int serverFd, std::string leftoverMessage) : _request(NULL), _shouldClose(false), leftoverMessage(leftoverMessage)
+Client::Client(void) : _request(NULL), _shouldClose(false), _server(NULL), leftoverMessage("") {}
+
+Client::Client(Server* server, std::string leftoverMessage) : _request(NULL), _shouldClose(false), _server(server), leftoverMessage(leftoverMessage)
 {
 	int	clientFd;
 	struct sockaddr_in addr;
 	socklen_t	addrLen = sizeof(struct sockaddr_in);
 
-	clientFd = accept(serverFd, (struct sockaddr *)&addr, &addrLen);
+	clientFd = accept(server->getSocket().getFd(), (struct sockaddr *)&addr, &addrLen);
 	if (clientFd == -1)
 		throw std::runtime_error("Failed to accept client");
 	_socket.fill(clientFd, addr);
@@ -38,7 +40,7 @@ void	Client::setShouldClose(bool shouldClose)
 
 void	Client::createNewRequest(std::string leftoverMessage)
 {
-	_request = new Request(leftoverMessage);
+	_request = new Request(_server, leftoverMessage);
 	if (!_request)
 		throw std::exception();
 }

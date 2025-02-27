@@ -1,10 +1,10 @@
 #include "Request.hpp"
 
 Request::Request(void)
-	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _untreatedMessage("") , _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
+	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _server(NULL), _untreatedMessage("") , _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
 
-Request::Request(std::string leftoverMessage)
-	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _untreatedMessage(leftoverMessage), _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
+Request::Request(Server* server, std::string leftoverMessage)
+	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _server(server), _untreatedMessage(leftoverMessage), _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
 
 Request::~Request(void) {}
 

@@ -13,6 +13,8 @@
 # define MAXHEADEROCTETS 4000
 # define MAXBODYOCTETS 2000000000
 
+class	Server;
+
 class Request
 {
 
@@ -24,7 +26,7 @@ class Request
 		};
 
 		Request(void);
-		Request(std::string leftoverMessage);
+		Request(Server* server, std::string leftoverMessage);
 		~Request(void);
 
 		Response					&getResponse(void);
@@ -51,6 +53,8 @@ class Request
 		STATE												_state;
 
 		Response											_response;
+
+		Server*												_server;
 
 		std::string											_untreatedMessage;
 	
