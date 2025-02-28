@@ -1,5 +1,5 @@
-#include "../inc/Network/Epoll.hpp"
-#include "../inc/Network/ServerMonitor.hpp"
+#include "Epoll.hpp"
+#include "ServerMonitor.hpp"
 
 void	runServer(std::string configFile)
 {
@@ -14,7 +14,7 @@ void	runServer(std::string configFile)
 		}
 
 		for (int i = 0; i < epoll.getReadyFdsNb(); i++) {
-			for (std::map<unsigned int, Server*>::iterator it = serverMonitor.getServers().begin(); it != serverMonitor.getServers().end(); it++) {
+			for (std::map<int, Server*>::iterator it = serverMonitor.getServers().begin(); it != serverMonitor.getServers().end(); it++) {
 				if (epoll.getFd(i) == it->first) {
 					try {
 						it->second->acceptClient(epoll);

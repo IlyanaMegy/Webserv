@@ -1,4 +1,4 @@
-#include "../../../inc/Network/config/ConfigParser.hpp"
+#include "ConfigParser.hpp"
 
 ConfigParser::~ConfigParser()
 {}

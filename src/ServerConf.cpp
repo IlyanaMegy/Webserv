@@ -1,4 +1,4 @@
-#include "../../../inc/Network/config/ServerConf.hpp"
+#include "ServerConf.hpp"
 
 ServerConf::ServerConf() {
 	_port = 0;

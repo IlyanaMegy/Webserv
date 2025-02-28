@@ -1,4 +1,4 @@
-#include "../../inc/Webserv.hpp"
+#include "Webserv.hpp"
 
 int getTypePath(std::string const path) {
 	struct stat buff;

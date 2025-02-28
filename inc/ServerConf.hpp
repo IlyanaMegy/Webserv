@@ -1,7 +1,7 @@
 #ifndef SERVERCONF_HPP
 #define SERVERCONF_HPP
 
-#include "../../Webserv.hpp"
+#include "Webserv.hpp"
 #include "Location.hpp"
 
 class ServerConf {

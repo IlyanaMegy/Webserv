@@ -44,7 +44,6 @@ void	Request::parse(void)
 		_parseHeader();
 	if (_stage == SEEKING_BODY)
 		_parseBody();
-	printInfo();
 	if (_stage == PROCESSING)
 		_treat();
 	}

@@ -2,14 +2,14 @@
 
 #include "Server.hpp"
 
-Epoll::Epoll(std::map<unsigned int, Server*>& servers)
+Epoll::Epoll(std::map<int, Server*>& servers)
 {
 	_epollFd = epoll_create(1);
 	if (_epollFd == -1)
 		throw std::exception();
 
 	try {
-		for (std::map<unsigned int, Server*>::iterator it = servers.begin(); it != servers.end(); it++) {
+		for (std::map<int, Server*>::iterator it = servers.begin(); it != servers.end(); it++) {
 			addFd(it->second->getSocket().getFd(), EPOLLIN);
 		}
 	}
@@ -60,7 +60,7 @@ void	Epoll::deleteFd(int fd)
 
 void	Epoll::wait(void)
 {
-	_ReadyFdsNb = epoll_wait(_epollFd, _events, MAX_EVENTS, TIMEOUT);
+	_ReadyFdsNb = epoll_wait(_epollFd, _events, MAX_EVENTS, -1);
 	if (_ReadyFdsNb == -1)
 		throw std::exception();
 }

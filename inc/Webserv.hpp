@@ -29,9 +29,9 @@ enum Method { GET, POST, DELETE };
 #include <stdexcept>
 #include <vector>
 
-#include "tools/Debugger.hpp"
-#include "tools/ParserTools.hpp"
-#include "tools/Singletons.hpp"
-#include "tools/style.hpp"
+#include "Debugger.hpp"
+#include "ParserTools.hpp"
+#include "Singletons.hpp"
+#include "style.hpp"
 
 #endif

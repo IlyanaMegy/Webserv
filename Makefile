@@ -9,6 +9,11 @@ SRCS		:=	Server.cpp \
 				Socket.cpp \
 				Request.cpp \
 				Response.cpp \
+				ServerMonitor.cpp \
+				ConfigParser.cpp \
+				ParserTools.cpp \
+				Location.cpp \
+				ServerConf.cpp \
 				main.cpp
 
 SRCS		:=	${SRCS:%=${SRCS_DIR}/%}

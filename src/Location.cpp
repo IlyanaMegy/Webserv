@@ -1,4 +1,4 @@
-#include "../../../inc/Network/config/Location.hpp"
+#include "Location.hpp"
 
 Location::Location(void) {
 	_path = "";

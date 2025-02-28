@@ -5,6 +5,7 @@
 # include <sys/epoll.h>
 # include <exception>
 # include <iostream>
+# include <map>
 
 # define MAX_EVENTS 100
 
@@ -18,7 +19,7 @@ class Epoll
 		struct epoll_event	_events[MAX_EVENTS];
 
 	public:
-		Epoll(std::map<unsigned int, Server*>& servers);
+		Epoll(std::map<int, Server*>& servers);
 		~Epoll(void);
 
 		int	getEpollFd(void) const;
