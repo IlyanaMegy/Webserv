@@ -1,5 +1,3 @@
-#include "../../inc/Network/Server.hpp"
-
 #include "Server.hpp"
 
 #include "Request.hpp"
@@ -118,6 +116,7 @@ void Server::addConfig(ServerConf *conf)
 {
 	_confs[conf->getServerName()] = conf;
 }
+
 
 // const char *Server::SocketCreationErrException::what() const throw() {
 // 	std::cerr << "Erreur lors de la création du socket" << std::endl;

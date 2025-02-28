@@ -1,27 +1,40 @@
 #ifndef CLIENT_HPP
 #define CLIENT_HPP
 
-#include "../Webserv.hpp"
-#include "Socket.hpp"
+# include <stdexcept>
 
-class Client {
-   private:
-	char _buffer[BUFFER_SIZE];
-	// HTTPReq request;
-	// HTTPRep reponse;
-	Socket _socket;
+# include "Socket.hpp"
+# include "Request.hpp"
 
-   public:
-	Client(void);
-	Client(int serverFd);
-	Client(Client const &ref);
-	~Client(void);
+# define BUFFER_SIZE 42
+class	Server;
 
-	Client &operator=(Client const &ref);
+class Client
+{
 
-	Socket &getSocket(void);
+	private:
+		Request*_request;
+		Socket	_socket;
+		bool	_shouldClose;
+		Server*	_server;
 
-	void read(void);
+
+	public:
+		Client(void);
+		Client(Server* _server);
+		~Client(void);
+
+		std::string	leftoverMessage;
+
+		Request	*getRequest(void);
+		Socket	&getSocket(void);
+		bool	getShouldClose(void) const;
+
+		void	setShouldClose(bool shouldClose);
+
+		void	createNewRequest(std::string leftoverMessage);
+		void	deleteRequest(void);
+
 };
 
 #endif

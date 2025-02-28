@@ -1,7 +1,9 @@
 #ifndef SOCKET_HPP
 #define SOCKET_HPP
 
-#include "../Webserv.hpp"
+# include <sys/socket.h>
+# include <netinet/in.h>
+# include <fcntl.h>
 
 class Socket {
    private:
@@ -11,16 +13,12 @@ class Socket {
 
 	void _setOpt(void);
 
-   public:
-	Socket(void);
-	Socket(int port);
-	Socket(Socket const &ref);
-	~Socket(void);
+	public:
+		Socket(void);
+		Socket(int port);
+		~Socket(void);
 
-	Socket &operator=(const Socket &ref);
-
-	void setFd(int fd);
-	int getFd(void);
+		int	getFd(void) const;
 
 	void fill(int fd, sockaddr_in addr);
 	void initSocket(int port);

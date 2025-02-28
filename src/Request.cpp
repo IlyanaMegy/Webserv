@@ -1,0 +1,613 @@
+#include "Request.hpp"
+
+#include "Server.hpp"
+
+Request::Request(void)
+	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _server(NULL), _untreatedMessage("") , _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
+
+Request::Request(Server* server, std::string leftoverMessage)
+	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _server(server), _untreatedMessage(leftoverMessage), _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
+
+Request::~Request(void) {}
+
+Response	&Request::getResponse(void)
+{
+	return _response;
+}
+
+std::string	Request::getUntreatedMessage(void)
+{
+	return _untreatedMessage;
+}
+
+Request::Stage	Request::getStage(void)
+{
+	return _stage;
+}
+
+Request::State	Request::getState(void)
+{
+	return _state;
+}
+
+void	Request::add(std::string buffer)
+{
+	_untreatedMessage = _untreatedMessage+buffer;
+	_state = TREATING_MESSAGE;
+}
+
+void	Request::parse(void)
+{
+	if (_stage == SEEKING_STATUS_LINE)
+		_parseStartLine();
+	if (_stage == SEEKING_HEADER)
+		_parseHeader();
+	if (_stage == SEEKING_BODY)
+		_parseBody();
+	printInfo();
+	if (_stage == PROCESSING)
+		_treat();
+	}
+
+void	Request::_treat(void)
+{
+	if (_method == GET)
+		_response.fillGET(_path);
+	else if (_method == DELETE)
+		_response.fillDELETE(_path);
+	else
+		_response.fillPOST(_path, _body);
+	_stage = DONE;
+}
+
+void	Request::_parseBody(void)
+{
+	if (_isBodyChunked)
+		_parseChunkedBody();
+	else
+		_parseFullBody();
+}
+
+void	Request::_parseFullBody(void)
+{
+	if (_bodyLength == 0) {
+		_stage = PROCESSING;
+		return ;
+	}
+	if (_untreatedMessage.length() < _bodyLength) {
+		_state = AWAITING_MESSAGE;
+		return ;
+	}
+	_body = _untreatedMessage.substr(0, _bodyLength);
+	_untreatedMessage = _untreatedMessage.substr(_bodyLength, _untreatedMessage.length() - _bodyLength);
+	_stage = PROCESSING;
+}
+
+int	Request::_parseChunkedBody(void)
+{
+	static unsigned int		chunkLength;
+	std::string				chunk;
+
+	if (chunkLength == 0) {
+		chunkLength = _findChunkLength();
+		if (_stage == DONE || _state == AWAITING_MESSAGE)
+			return 1;
+		if (chunkLength == 0) {
+			_stage = PROCESSING;
+			return 0;
+		}
+		_bodyLength+=chunkLength;
+	}
+	else {
+		chunk = _findChunk(chunkLength);
+		if (_stage == DONE || _state == AWAITING_MESSAGE)
+			return 1;
+		_body+=chunk;
+		chunkLength = 0;
+	}
+	return 0;
+}
+
+std::string	Request::_findChunk(unsigned int chunkLength)
+{
+	std::string	chunk;
+
+	if (_untreatedMessage.length() < chunkLength + 2) {
+		_state = AWAITING_MESSAGE;
+		return "";
+	}
+	if (_untreatedMessage.substr(chunkLength, 2) != "\r\n") {
+		_response.fillError("400", "Bad Request");
+		_stage = DONE;
+		return "";
+	}
+	chunk = _untreatedMessage.substr(0, chunkLength);
+	_untreatedMessage = _untreatedMessage.substr(chunkLength + 2, _untreatedMessage.length() - (chunkLength + 2));
+	return chunk;
+}
+
+unsigned int	Request::_findChunkLength(void)
+{
+	std::string::size_type	crlfPos;
+	std::string				line;
+	unsigned int			chunkLength;
+
+	crlfPos = _untreatedMessage.find("\r\n");
+	if (crlfPos == std::string::npos) {
+		_state = AWAITING_MESSAGE;
+		return 0;
+	}
+	line = _untreatedMessage.substr(0, crlfPos);
+	if (line.empty()) {
+		_response.fillError("400", "Bad Request");
+		_stage = DONE;
+		return 0;
+	}
+
+	for (std::string::iterator it = line.begin(); it != line.end(); it++) {
+		if (!_isHex(*it)) {
+			_response.fillError("400", "Bad Request");
+			_stage = DONE;
+			return 0;
+		}
+	}
+	chunkLength = _stoh(line);
+	if (chunkLength + _bodyLength > MAXBODYOCTETS) {
+		_response.fillError("413", "Content Too Large");
+		_stage = DONE;
+		return 0;
+	}
+	_untreatedMessage = _untreatedMessage.substr(crlfPos + 2, _untreatedMessage.length() - (crlfPos + 2));
+	return chunkLength;
+}
+
+void	Request::_parseHeader(void)
+{
+	std::string	header;
+
+	header = _findHeader();
+	if (_stage == DONE || _state == AWAITING_MESSAGE)
+		return ;
+	if (_parseHeaderFields(header))
+		return ;
+	_stage = SEEKING_BODY;
+}
+
+std::string	Request::_findHeader(void)
+{
+	std::string::size_type	crlfCrlfPos;
+	std::string				header;
+
+	if (_untreatedMessage.length() > MAXHEADEROCTETS
+		|| (_untreatedMessage.length() > 1 && _untreatedMessage.substr(0, 2) == "\r\n")) {
+		_response.fillError("400", "Bad Request");
+		_stage = DONE;
+		return "";
+	}
+	crlfCrlfPos = _untreatedMessage.find("\r\n\r\n");
+	if (crlfCrlfPos == std::string::npos) {
+		_state = AWAITING_MESSAGE;
+		return "";
+	}
+	header = _untreatedMessage.substr(0, crlfCrlfPos + 2);
+	if (header.length() > MAXHEADEROCTETS) {
+		_response.fillError("400", "Bad Request");
+		_stage = DONE;
+		return "";
+	}
+	_untreatedMessage = _untreatedMessage.substr(crlfCrlfPos + 4, _untreatedMessage.length() - (crlfCrlfPos + 4));
+	return header;
+}
+
+int	Request::_parseHeaderFields(std::string header)
+{
+	std::string::size_type	crlfPos;
+	std::string				fieldLine;
+
+	crlfPos = header.find("\r\n");
+	while (!header.empty() && crlfPos != std::string::npos) {
+		fieldLine = header.substr(0, crlfPos);
+		if (_parseFieldLine(fieldLine))
+			return 1;
+		header = header.substr(crlfPos + 2, header.length() - (crlfPos + 2));
+		crlfPos = header.find("\r\n");
+	}
+	if (_parseCompletedFields())
+		return 1;
+	return 0;
+}
+
+int	Request::_parseCompletedFields(void)
+{
+	if (_findTransferEncoding())
+		return 1;
+	if (_findContentLength())
+		return 1;
+	if (_findHost())
+		return 1;
+	_findConnection();
+	return 0;
+}
+
+int	Request::_findHost(void)
+{
+	if (_fields.find("host") == _fields.end()
+			|| _fields["host"].size() != 1
+			|| _parseAuthority(_fields["host"][0])) {
+		_response.fillError("400", "Bad Request");
+		_stage = DONE;
+		return 1;
+	}
+	return 0;
+}
+
+void	Request::_findConnection(void)
+{
+	if (_fields.find("connection") == _fields.end())
+		return ;
+	_split(_fields["connection"]);
+	for (std::vector<std::string>::iterator it = _fields["connection"].begin(); it != _fields["connection"].end(); it++) {
+		if (*it == "close")
+			_response.setShouldClose(true);
+	}
+}
+
+int	Request::_findTransferEncoding(void)
+{
+	if (_fields.find("transfer-encoding") == _fields.end())
+		return 0;
+	if (_fields["transfer-encoding"].size() != 1
+		|| _toLower(_fields["transfer-encoding"][0]) != "chunked") {
+		_response.fillError("400", "Bad Request");
+		_stage = DONE;
+		return 1;
+	}
+	_isBodyChunked = true;
+	return 0;
+}
+
+int	Request::_findContentLength(void)
+{
+	if (_fields.find("content-length") == _fields.end()) {
+		if (_method == GET || _method == DELETE || _isBodyChunked) {
+			_bodyLength = 0;
+			return 0;
+		}
+		_response.fillError("411", "Length Required");
+		_stage = DONE;
+		return 1;
+	}
+	if (_fields["content-length"].size() != 1
+			|| _parseContentLength(_fields["content-length"][0])) {
+		_response.fillError("400", "Bad Request");
+		_stage = DONE;
+		return 1;
+	}
+	if (_isBodyChunked)
+		return 0;
+	_bodyLength = _stoi(_fields["content-length"][0]);
+	if (_bodyLength > MAXBODYOCTETS) {
+		_response.fillError("413", "Content Too Large");
+		_stage = DONE;
+		return 1;
+	}
+	return 0;
+}
+
+int	Request::_parseContentLength(std::string contentLength)
+{
+	if (contentLength.empty())
+		return 1;
+	for (std::string::iterator it = contentLength.begin(); it != contentLength.end(); it++) {
+		if (!std::isdigit(*it))
+			return 1;
+	}
+	return 0;
+}
+
+int	Request::_parseFieldLine(std::string fieldLine)
+{
+	std::string				fieldName;
+	std::string				fieldValue;
+	std::string::size_type	delimiterPos;
+
+	if (fieldLine.empty()) {
+		_response.fillError("400", "Bad Request");
+		_stage = DONE;
+		return 1;
+	}
+	delimiterPos = fieldLine.find(":");
+	if (delimiterPos == std::string::npos) {
+		_response.fillError("400", "Bad Request");
+		_stage = DONE;
+		return 1;
+	}
+
+	fieldName = fieldLine.substr(0, delimiterPos);
+	if (std::isspace(fieldLine[delimiterPos + 1]))
+		delimiterPos++;
+	if (std::isspace(fieldLine[fieldLine.length() - 1]))
+		fieldValue = fieldLine.substr(delimiterPos + 1, fieldLine.length() - (delimiterPos + 1) - 1);
+	else
+		fieldValue = fieldLine.substr(delimiterPos + 1, fieldLine.length() - (delimiterPos + 1));
+	if (_parseFieldName(fieldName) || _parseFieldValue(fieldValue)) {
+		_response.fillError("400", "Bad Request");
+		_stage = DONE;
+		return 1;
+	}
+	_fields[_toLower(fieldName)].push_back(_toLower(fieldValue));
+	return 0;
+}
+
+int	Request::_parseFieldName(std::string fieldName)
+{
+	for (std::string::iterator it = fieldName.begin(); it != fieldName.end(); it++) {
+		if (!_isVChar(*it) || _isDelimiter(*it))
+			return 1;
+	}
+	return 0;
+}
+
+int	Request::_parseFieldValue(std::string fieldValue)
+{
+	if (fieldValue.empty())
+		return 0;
+	if (!_isVChar(fieldValue[0]) && !_isObsText(fieldValue[0]))
+		return 1;
+	if (fieldValue.length() == 1)
+		return 0;
+	for (size_t i = 1; i < fieldValue.length() - 1; i++) {
+		if (!_isVChar(fieldValue[i]) && !_isObsText(fieldValue[i])
+			&& fieldValue[i] != ' ' && fieldValue[i] != '\t')
+			return 1;
+	}
+	if (!_isVChar(fieldValue[fieldValue.length() - 1]) && !_isObsText(fieldValue[fieldValue.length() - 1]))
+		return 1;
+	return 0;
+}
+
+void	Request::_parseStartLine(void)
+{
+	std::string	startLine;
+
+	startLine = _findStartLine();
+	if (_stage == DONE || _state == AWAITING_MESSAGE)
+		return ;
+	if (_parseRequestLine(startLine))
+		return ;
+	_stage = SEEKING_HEADER;
+}
+
+std::string	Request::_findStartLine(void)
+{
+	std::string::size_type	crlfPos;
+	std::string				startLine;
+
+	if (_untreatedMessage.length() > MAXSTATUSLINEOCTETS) {
+		_response.fillError("400", "Bad Request");
+		_stage = DONE;
+		return "";
+	}
+	crlfPos = _untreatedMessage.find("\r\n");
+	if (crlfPos == std::string::npos) {
+		_state = AWAITING_MESSAGE;
+		return "";
+	}
+	startLine = _untreatedMessage.substr(0, crlfPos);
+	if (startLine.length() > MAXSTATUSLINEOCTETS) {
+		_response.fillError("400", "Bad Request");
+		_stage = DONE;
+		return "";
+	}
+	_untreatedMessage = _untreatedMessage.substr(crlfPos + 2, _untreatedMessage.length() - (crlfPos + 2));
+	return startLine;
+}
+
+int	Request::_parseRequestLine(std::string startLine)
+{
+	std::string::size_type	sp1Pos;
+	std::string::size_type	sp2Pos;
+
+	sp1Pos = startLine.find(" ");
+	sp2Pos = startLine.find(" ", sp1Pos + 1);
+	if (sp1Pos == std::string::npos || sp2Pos == std::string::npos
+		|| startLine.find(" ", sp2Pos + 1) != std::string::npos) {
+		_response.fillError("400", "Bad Request");
+		_stage = DONE;
+		return 1;
+	}
+
+	if (_parseMethod(startLine.substr(0, sp1Pos)))
+		return 1;
+	if (_parseUri(startLine.substr(sp1Pos + 1, sp2Pos - (sp1Pos + 1))))
+		return 1;
+	if (_parseHTTPVer(startLine.substr(sp2Pos + 1, startLine.length() - (sp2Pos + 1))))
+		return 1;
+	return 0;
+}
+
+int	Request::_parseMethod(std::string methodString)
+{
+	if (methodString == "GET")
+		_method = GET;
+	else if (methodString == "POST")
+		_method = POST;
+	else if (methodString == "DELETE")
+		_method = DELETE;
+	else {
+		_response.fillError("501", "Not Implemented");
+		_stage = DONE;
+		return 1;
+	}
+	return 0;
+}
+
+int	Request::_parseUri(std::string uri)
+{
+	std::string::size_type	schemeEndPos;
+	std::string::size_type	pathStartPos;
+	std::string::size_type	queryStartPos;
+
+	schemeEndPos = uri.find("://");
+	if (schemeEndPos != std::string::npos) {
+		if (_parseScheme(uri.substr(0, schemeEndPos))) {
+			_response.fillError("400", "Bad Request");
+			_stage = DONE;
+			return 1;
+		}
+	}
+	pathStartPos = uri.find('/', schemeEndPos == std::string::npos ? 0 : schemeEndPos + 3);
+	if (pathStartPos == std::string::npos || (schemeEndPos != std::string::npos && pathStartPos == schemeEndPos + 3)
+			|| _parseAuthority(schemeEndPos == std::string::npos ? uri.substr(0, pathStartPos) : uri.substr(schemeEndPos + 3, pathStartPos - (schemeEndPos + 3)))) {
+		_response.fillError("400", "Bad Request");
+		_stage = DONE;
+		return 1;
+	}
+	queryStartPos = uri.find('?', pathStartPos + 1);
+	_path = uri.substr(pathStartPos, queryStartPos == std::string::npos ? uri.length() - pathStartPos : queryStartPos - pathStartPos);
+	if (queryStartPos != std::string::npos && _parseQuery(uri.substr(queryStartPos + 1, uri.length() - (queryStartPos + 1)))) {
+		_response.fillError("400", "Bad Request");
+		_stage = DONE;
+		return 1;
+	}
+	return 0;
+}
+
+int	Request::_parseQuery(std::string query)
+{
+	std::string::size_type	sepPos;
+	std::string::size_type	affectPos;
+	std::string::size_type	pairStart = 0;
+	std::string				pair;
+
+	if (query.empty())
+		return 0;
+	sepPos = query.find('&');
+	while (sepPos != std::string::npos) {
+		pair = query.substr(pairStart, sepPos - pairStart);
+		affectPos = pair.find('=');
+		if (affectPos == 0)
+			return 1;
+		_arguments[pair.substr(0, affectPos == std::string::npos ? pair.length() : affectPos)]
+			= affectPos == std::string::npos ? "" : pair.substr(affectPos + 1, pair.length() - (affectPos + 1));
+		pairStart = sepPos + 1;
+		sepPos = query.find('&', pairStart);
+	}
+	pair = query.substr(pairStart, query.length() - pairStart);
+	affectPos = pair.find('=');
+	if (affectPos == 0)
+		return 1;
+	_arguments[pair.substr(0, affectPos == std::string::npos ? pair.length() : affectPos)]
+		= affectPos == std::string::npos ? "" : pair.substr(affectPos + 1, pair.length() - (affectPos + 1));
+	return 0;
+}
+
+int	Request::_parseAuthority(std::string authority)
+{
+	std::string::size_type	portStartPos;
+	std::string				host;
+
+	if (authority.empty())
+		return 0;
+	portStartPos = authority.find(':');
+	if (portStartPos == 0)
+		return 1;
+	if (portStartPos != std::string::npos
+			&& _stoi(authority.substr(portStartPos + 1, authority.length() - (portStartPos + 1))) != _server->getPort())
+		return 1;
+	host = authority.substr(0, portStartPos == std::string::npos ? authority.length() : portStartPos);
+	if (!_host.empty() && host != _host)
+		return 1;
+	_host = host;
+	return 0;
+}
+
+int	Request::_parseScheme(std::string scheme)
+{
+	return scheme != "http";
+}
+
+int	Request::_parseHTTPVer(std::string HTTPVerString)
+{
+	if (HTTPVerString.length() != 8 || HTTPVerString.substr(0, 5) != "HTTP/"
+		|| HTTPVerString[6] != '.' || !std::isdigit(HTTPVerString[5]) || !std::isdigit(HTTPVerString[7])) {
+		_response.fillError("400", "Bad Request");
+		_stage = DONE;
+		return 1;
+	}
+	if (HTTPVerString[5] != '1') {
+		_response.fillError("505", "Not Implemented");
+		_stage = DONE;
+		return 1;
+	}
+	return 0;
+}
+
+std::string	Request::_toLower(std::string s)
+{
+	std::string	lowerS;
+
+	if (s.empty())
+		return "";
+	for (std::string::iterator it = s.begin(); it != s.end(); it++)
+		lowerS.push_back(std::tolower(*it));
+	return lowerS;
+}
+
+bool	Request::_isDelimiter(unsigned char c)
+{
+	static	std::string	delimiters("\"(),/:;<=>?@[\\]{}");
+
+	return (delimiters.find(c) != std::string::npos);
+}
+
+bool	Request::_isVChar(unsigned char c)
+{
+	return (32 < c && c < 127);
+}
+
+bool	Request::_isObsText(unsigned char c)
+{
+	return (127 < c);
+}
+
+bool	Request::_isHex(unsigned char c)
+{
+	return (std::isdigit(c) || c == 'A' || c == 'B' || c == 'C' || c == 'D' || c == 'E' || c == 'F');
+}
+
+unsigned int	Request::_stoi(std::string value)
+{
+	unsigned int		res;
+	std::istringstream	stream(value);
+
+	stream >> res;
+	return res;
+}
+
+unsigned int	Request::_stoh(std::string value)
+{
+	unsigned int		res;
+	std::stringstream	stream;
+
+	stream << std::hex << value;
+	stream >> res;
+	return res;
+}
+
+void	Request::_split(std::vector<std::string>& vector)
+{
+	std::vector<std::string>	copy = vector;
+
+	vector = std::vector<std::string>();
+	for (std::vector<std::string>::iterator it = copy.begin(); it!= copy.end(); it++) {
+		std::stringstream	value(*it);
+		std::string			splitValue;
+
+		while (std::getline(value, splitValue, ',')) {
+			splitValue.erase(remove_if(splitValue.begin(), splitValue.end(), isspace), splitValue.end());
+			vector.push_back(splitValue);
+		}
+	}
+}
+
