@@ -6,6 +6,7 @@
 # include <vector>
 # include <cctype>
 # include <iostream>
+# include <algorithm>
 
 # include "Response.hpp"
 
@@ -96,6 +97,7 @@ class Request
 		int							_parseCompletedFields(void);
 		int							_findTransferEncoding(void);
 		int							_findContentLength(void);
+		void						_findConnection(void);
 		int							_parseContentLength(std::string contentLength);
 
 		void						_parseBody(void);
@@ -114,6 +116,7 @@ class Request
 		static bool					_isHex(unsigned char c);
 		static unsigned int			_stoi(std::string value);
 		static unsigned int			_stoh(std::string value);
+		static void					_split(std::vector<std::string>& vector);
 
 };
 

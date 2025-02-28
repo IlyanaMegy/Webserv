@@ -223,7 +223,19 @@ int	Request::_parseCompletedFields(void)
 		return 1;
 	if (_findContentLength())
 		return 1;
+	_findConnection();
 	return 0;
+}
+
+void	Request::_findConnection(void)
+{
+	if (_fields.find("connection") == _fields.end())
+		return ;
+	_split(_fields["connection"]);
+	for (std::vector<std::string>::iterator it = _fields["connection"].begin(); it != _fields["connection"].end(); it++) {
+		if (*it == "close")
+			_response.setShouldClose(true);
+	}
 }
 
 int	Request::_findTransferEncoding(void)
@@ -563,5 +575,21 @@ unsigned int	Request::_stoh(std::string value)
 	stream << std::hex << value;
 	stream >> res;
 	return res;
+}
+
+void	Request::_split(std::vector<std::string>& vector)
+{
+	std::vector<std::string>	copy = vector;
+
+	vector = std::vector<std::string>();
+	for (std::vector<std::string>::iterator it = copy.begin(); it!= copy.end(); it++) {
+		std::stringstream	value(*it);
+		std::string			splitValue;
+
+		while (std::getline(value, splitValue, ',')) {
+			splitValue.erase(remove_if(splitValue.begin(), splitValue.end(), isspace), splitValue.end());
+			vector.push_back(splitValue);
+		}
+	}
 }
 

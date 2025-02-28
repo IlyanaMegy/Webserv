@@ -14,6 +14,11 @@ void	Response::setReasonMessage(std::string reasonMessage)
 	_reasonMessage = reasonMessage;
 }
 
+void	Response::setShouldClose(bool shouldClose)
+{
+	_shouldClose = shouldClose;
+}
+
 std::string	Response::getMessage(void) const
 {
 	return _message;
