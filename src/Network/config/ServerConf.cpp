@@ -27,9 +27,6 @@ void ServerConf::setHost(std::string param) {
 	_host = inet_addr(param.data());
 }
 
-/**
- * @brief  set root's absolute path
- */
 void ServerConf::setRoot(std::string root) {
 	checkToken(root);
 	if (!root.empty() && root[root.size() - 1] == ';')
@@ -328,6 +325,7 @@ void ServerConf::addRootToLocations(std::string root) {
 			it->setRootLocation(root);
 	is_setted_loca_root = 1;
 }
+
 // const std::string &ServerConfig::getPathErrorPage(short key)
 // {
 // 	std::map<short, std::string>::iterator it = _error_pages.find(key);

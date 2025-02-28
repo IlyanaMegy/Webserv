@@ -3,12 +3,6 @@
 ConfigParser::~ConfigParser()
 {}
 
-/**
- * @brief  Read file
- * @note   it reads a file..
- * @param  `path`
- * @retval file's content
- */
 static std::string readFile(std::string path) {
 	if (path.empty() || path.length() == 0) return (NULL);
 	std::ifstream file(path.c_str());
@@ -18,12 +12,6 @@ static std::string readFile(std::string path) {
 	return (stream_binding.str());
 }
 
-/**
- * @brief  Split content of each servers' block
- * @note	Each block start with a big 'server' loop
- * @param  `content`= config file
- * @retval None
- */
 void ConfigParser::splitBlocks(std::string &content) {
 	size_t start = 0;
 	size_t end = 1;
@@ -41,12 +29,6 @@ void ConfigParser::splitBlocks(std::string &content) {
 	}
 }
 
-/**
- * @brief  Check config file and then split servers into clusters,
- * @note   then create ServerConf objs
- * @param  `config_file`
- * @retval 0=all's good
- */
 void ConfigParser::createCluster(const std::string &config_file) {
 	if (getTypePath(config_file) != 1)
 		throw std::runtime_error("Error: Invalid configuration file");
@@ -93,13 +75,6 @@ std::vector<std::string> splitParametrs(std::string line, std::string sep)
 	return (str);
 }
 
-/**
- * @brief  Split the block into parameters, check each parameter,
- * @note   set server's data
- * @param  `config`= config file
- * @param  `server`
- * @retval None
- */
 void ConfigParser::createServer(std::string &config, ServerConf *server)
 {
 	std::vector<std::string>	params;
