@@ -1,42 +1,48 @@
-NAME		:=	webserv
+NAME			:=	webserv
 
 
-SRCS_DIR	:=	src
+SRCS_DIR		:=	src
 
-SRCS		:=	Server.cpp \
-				Client.cpp \
-				Epoll.cpp \
-				Socket.cpp \
-				Request.cpp \
-				Response.cpp \
-				ServerMonitor.cpp \
-				ConfigParser.cpp \
-				ParserTools.cpp \
-				Location.cpp \
-				ServerConf.cpp \
-				main.cpp
+SRCS_CONFIG		:=	ConfigParser.cpp \
+					Location.cpp \
+					ParserTools.cpp \
+					ServerConf.cpp
 
-SRCS		:=	${SRCS:%=${SRCS_DIR}/%}
+SRCS_MESSAGES	:=	Request.cpp \
+					Response.cpp
+
+SRCS_NETWORK	:=	Client.cpp \
+					Epoll.cpp \
+					Server.cpp \
+					Socket.cpp
+
+SRCS			:=	${addprefix config/, ${SRCS_CONFIG}} \
+					${addprefix network/, ${SRCS_NETWORK}} \
+					${addprefix messages/, ${SRCS_MESSAGES}} \
+					ServerMonitor.cpp \
+					main.cpp
+
+SRCS			:=	${SRCS:%=${SRCS_DIR}/%}
 
 
-OBJS_DIR	:=	obj
+OBJS_DIR		:=	obj
 
-OBJS		:=	${SRCS:${SRCS_DIR}/%.cpp=${OBJS_DIR}/%.o}
+OBJS			:=	${SRCS:${SRCS_DIR}/%.cpp=${OBJS_DIR}/%.o}
 
 
-CC			:=	c++
-CFLAGS		:=	-Wall -Wextra -Werror -std=c++98
-CPPFLAGS	:=	-I inc
+CC				:=	c++
+CFLAGS			:=	-Wall -Wextra -Werror -std=c++98 -g3
+CPPFLAGS		:=	-I inc -I inc/config -I inc/network -I inc/messages
 
-RM			:=	${RM} -rf
-DIR_DUP		=	mkdir -p ${@D}
+RM				:=	${RM} -rf
+DIR_DUP			=	mkdir -p ${@D}
 
 
 
 all: ${NAME}
 
 ${NAME}: ${OBJS}
-	${CC} $^ -o $@
+	${CC} $^ -lreadline -o $@
 
 ${OBJS_DIR}/%.o: ${SRCS_DIR}/%.cpp
 	${DIR_DUP}
