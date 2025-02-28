@@ -228,10 +228,10 @@ int	Request::_parseCompletedFields(void)
 
 int	Request::_findTransferEncoding(void)
 {
-	if (_fields.find(_toLower("Transfer-Encoding")) == _fields.end())
+	if (_fields.find("transfer-encoding") == _fields.end())
 		return 0;
-	if (_fields[_toLower("Transfer-Encoding")].size() != 1
-		|| _toLower(_fields[_toLower("Transfer-Encoding")][0]) != "chunked") {
+	if (_fields["transfer-encoding"].size() != 1
+		|| _toLower(_fields["transfer-encoding"][0]) != "chunked") {
 		_response.fillError("400", "Bad Request");
 		_stage = DONE;
 		return 1;
@@ -242,7 +242,7 @@ int	Request::_findTransferEncoding(void)
 
 int	Request::_findContentLength(void)
 {
-	if (_fields.find(_toLower("Content-Length")) == _fields.end()) {
+	if (_fields.find("content-length") == _fields.end()) {
 		if (_method == GET || _method == DELETE || _isBodyChunked) {
 			_bodyLength = 0;
 			return 0;
@@ -251,15 +251,15 @@ int	Request::_findContentLength(void)
 		_stage = DONE;
 		return 1;
 	}
-	if (_fields[_toLower("Content-Length")].size() != 1
-			|| _parseContentLength(_fields[_toLower("Content-Length")][0])) {
+	if (_fields["content-length"].size() != 1
+			|| _parseContentLength(_fields["content-length"][0])) {
 		_response.fillError("400", "Bad Request");
 		_stage = DONE;
 		return 1;
 	}
 	if (_isBodyChunked)
 		return 0;
-	_bodyLength = _stoi(_fields[_toLower("Content-Length")][0]);
+	_bodyLength = _stoi(_fields["content-length"][0]);
 	if (_bodyLength > MAXBODYOCTETS) {
 		_response.fillError("413", "Content Too Large");
 		_stage = DONE;
