@@ -6,7 +6,8 @@
 # include "Socket.hpp"
 # include "Request.hpp"
 
-# define BUFFER_SIZE 42
+# define BUFFER_SIZE 1024
+
 class	Server;
 
 class Client

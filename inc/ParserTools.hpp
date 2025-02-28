@@ -1,7 +1,12 @@
 #ifndef PARSERTOOLS_HPP
 #define PARSERTOOLS_HPP
 
-#include "Webserv.hpp"
+#include <string>
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <stdexcept>
+#include <sstream>
 
 int findChar(const std::string &str, char ch);
 int getTypePath(std::string const path);

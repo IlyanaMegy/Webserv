@@ -1,7 +1,9 @@
 #ifndef SERVERCONF_HPP
 #define SERVERCONF_HPP
 
-#include "Webserv.hpp"
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
 #include "Location.hpp"
 
 class ServerConf {
@@ -43,7 +45,7 @@ class ServerConf {
 	bool getAutoindex(void) const;
 	const std::vector<Location>::iterator getLocationFromUri(std::string uri);
 	
-	bool isValidMethod(std::string uri, Method method);
+	bool isValidMethod(std::string uri, Request::Method method);
 	void listMethods(void) const;
 
 	bool is_setted_loca_root;

@@ -1,4 +1,4 @@
-#include "Webserv.hpp"
+#include "ParserTools.hpp"
 
 int getTypePath(std::string const path) {
 	struct stat buff;

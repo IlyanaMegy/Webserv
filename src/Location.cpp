@@ -1,5 +1,8 @@
 #include "Location.hpp"
 
+#include "ParserTools.hpp"
+#include "Request.hpp"
+
 Location::Location(void) {
 	_path = "";
 	_root = "";
@@ -7,7 +10,7 @@ Location::Location(void) {
 	_index = "";
 	_return = "";
 	_alias = "";
-	_clientMBS = MAX_CONTENT_LENGTH;
+	_clientMBS = MAXBODYOCTETS;
 }
 
 Location::~Location() {}
@@ -43,10 +46,10 @@ void Location::setAutoindex(std::string param) {
 
 void Location::setMethods(std::vector<std::string> methods) {
 	
-	std::map<std::string, Method> methodMap;
-    methodMap["GET"] = GET;
-    methodMap["POST"] = POST;
-    methodMap["DELETE"] = DELETE;
+	std::map<std::string, Request::Method> methodMap;
+    methodMap["GET"] = Request::GET;
+    methodMap["POST"] = Request::POST;
+    methodMap["DELETE"] = Request::DELETE;
 
 	for (size_t i = 0; i < methods.size(); i++) {
 		if (methodMap.find(methods[i]) != methodMap.end())
@@ -82,6 +85,6 @@ std::string Location::getAlias() const {return _alias; }
 std::vector<std::string> Location::getCgiPath() const {return _cgiPath; }
 std::vector<std::string> Location::getCgiExtension() const {return _cgiExt; }
 std::map<std::string, std::string> Location::getExtensionPath() const {return _extPath; }
-std::vector<Method> Location::getMethods() const {return _methods; }
+std::vector<Request::Method> Location::getMethods() const {return _methods; }
 unsigned long Location::getClientMBS() const {return _clientMBS; }
 

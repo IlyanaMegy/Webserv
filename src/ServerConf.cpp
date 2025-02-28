@@ -1,11 +1,14 @@
 #include "ServerConf.hpp"
 
+#include "Request.hpp"
+#include "ParserTools.hpp"
+
 ServerConf::ServerConf() {
 	_port = 0;
 	_host = 0;
 	_server_name = "";
 	_root = "";
-	_max_body_size = MAX_CONTENT_LENGTH;
+	_max_body_size = MAXBODYOCTETS;
 	_index = "";
 	_autoindex = false;
 }
@@ -298,8 +301,8 @@ const std::vector<Location>::iterator ServerConf::getLocationFromUri(
 	throw std::runtime_error("Error: path to location not found");
 }
 
-bool ServerConf::isValidMethod(std::string uri, Method method) {
-	std::vector<Method> locationMethods = getLocationFromUri(uri)->getMethods();
+bool ServerConf::isValidMethod(std::string uri, Request::Method method) {
+	std::vector<Request::Method> locationMethods = getLocationFromUri(uri)->getMethods();
 
 	if (std::find(locationMethods.begin(), locationMethods.end(), method) !=
 		locationMethods.end())
@@ -310,9 +313,9 @@ bool ServerConf::isValidMethod(std::string uri, Method method) {
 void ServerConf::listMethods() const {
 	for (std::vector<Location>::const_iterator it = _locations.begin(); it != _locations.end(); ++it) {
 		std::cout << LIME "\nLocation: " << it->getPath() << std::endl;
-		std::vector<Method> methods = it->getMethods();
+		std::vector<Request::Method> methods = it->getMethods();
 		std::cout << "Available methods: ";
-		for (std::vector<Method>::const_iterator method_it = methods.begin(); method_it != methods.end(); ++method_it)
+		for (std::vector<Request::Method>::const_iterator method_it = methods.begin(); method_it != methods.end(); ++method_it)
 			std::cout << *method_it << " ";
 		std::cout << RESET << std::endl;
 	}

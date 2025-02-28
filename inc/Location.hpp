@@ -1,7 +1,9 @@
 #ifndef LOCATION_HPP
 #define LOCATION_HPP
 
-#include "Webserv.hpp"
+#include <netinet/in.h>
+
+#include "Request.hpp"
 
 class Location {
    public:
@@ -24,7 +26,7 @@ class Location {
 
 	std::string getPath() const;
 	std::string getRootLocation() const;
-	std::vector<Method> getMethods() const;
+	std::vector<Request::Method> getMethods() const;
 	bool getAutoindex() const;
 	std::string getIndexLocation() const;
 	std::string getReturn() const;
@@ -42,7 +44,7 @@ class Location {
 	std::string _return;
 	std::string _alias;
 	bool _autoindex;
-	std::vector<Method> _methods;
+	std::vector<Request::Method> _methods;
 	std::vector<std::string> _cgiPath;
 	std::vector<std::string> _cgiExt;
 	unsigned long _clientMBS;

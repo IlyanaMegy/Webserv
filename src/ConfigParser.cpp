@@ -1,5 +1,7 @@
 #include "ConfigParser.hpp"
 
+#include "ParserTools.hpp"
+
 ConfigParser::~ConfigParser()
 {}
 
