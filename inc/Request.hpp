@@ -99,6 +99,7 @@ class Request
 		int							_findContentLength(void);
 		void						_findConnection(void);
 		int							_parseContentLength(std::string contentLength);
+		int							_findHost(void);
 
 		void						_parseBody(void);
 		void						_parseFullBody(void);

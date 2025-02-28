@@ -223,7 +223,21 @@ int	Request::_parseCompletedFields(void)
 		return 1;
 	if (_findContentLength())
 		return 1;
+	if (_findHost())
+		return 1;
 	_findConnection();
+	return 0;
+}
+
+int	Request::_findHost(void)
+{
+	if (_fields.find("host") == _fields.end()
+			|| _fields["host"].size() != 1
+			|| _parseAuthority(_fields["host"][0])) {
+		_response.fillError("400", "Bad Request");
+		_stage = DONE;
+		return 1;
+	}
 	return 0;
 }
 
@@ -491,6 +505,7 @@ int	Request::_parseQuery(std::string query)
 int	Request::_parseAuthority(std::string authority)
 {
 	std::string::size_type	portStartPos;
+	std::string				host;
 
 	if (authority.empty())
 		return 0;
@@ -500,7 +515,10 @@ int	Request::_parseAuthority(std::string authority)
 	if (portStartPos != std::string::npos
 			&& _stoi(authority.substr(portStartPos + 1, authority.length() - (portStartPos + 1))) != _server->getPort())
 		return 1;
-	_host = authority.substr(0, portStartPos == std::string::npos ? authority.length() : portStartPos);
+	host = authority.substr(0, portStartPos == std::string::npos ? authority.length() : portStartPos);
+	if (!_host.empty() && host != _host)
+		return 1;
+	_host = host;
 	return 0;
 }
 
