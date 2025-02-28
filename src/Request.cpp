@@ -20,11 +20,24 @@ std::string	Request::getUntreatedMessage(void)
 	return _untreatedMessage;
 }
 
-void	Request::parse(std::string buffer)
+Request::Stage	Request::getStage(void)
 {
+	return _stage;
+}
 
+Request::State	Request::getState(void)
+{
+	return _state;
+}
+
+void	Request::add(std::string buffer)
+{
 	_untreatedMessage = _untreatedMessage+buffer;
 	_state = TREATING_MESSAGE;
+}
+
+void	Request::parse(void)
+{
 	if (_stage == SEEKING_STATUS_LINE)
 		_parseStartLine();
 	if (_stage == SEEKING_HEADER)

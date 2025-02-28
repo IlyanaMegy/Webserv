@@ -1,5 +1,7 @@
 #include "Server.hpp"
 
+#include "Request.hpp"
+
 #include <iostream>
 
 Server::Server(unsigned int port) : _port(port), _socket(port)
@@ -67,7 +69,10 @@ void	Server::readFrom(int clientFd)
 	}
 	if (!_clients[clientFd]->getRequest())
 		_clients[clientFd]->createNewRequest(_clients[clientFd]->leftoverMessage);
-	_clients[clientFd]->getRequest()->parse(std::string(buffer, res));
+	_clients[clientFd]->getRequest()->add(std::string(buffer, res));
+	while (_clients[clientFd]->getRequest()->getStage() != Request::DONE
+			&& _clients[clientFd]->getRequest()->getState() == Request::TREATING_MESSAGE)
+		_clients[clientFd]->getRequest()->parse();
 	std::cout << "End of reading!" << std::endl;
 }
 

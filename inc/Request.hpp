@@ -25,18 +25,7 @@ class Request
 			DELETE
 		};
 
-		Request(void);
-		Request(Server* server, std::string leftoverMessage);
-		~Request(void);
-
-		Response					&getResponse(void);
-		std::string					getUntreatedMessage(void);
-
-		void						parse(std::string buffer);
-
-	private:
-
-		enum STAGE {
+		enum Stage {
 			SEEKING_STATUS_LINE,
 			SEEKING_HEADER,
 			SEEKING_BODY,
@@ -44,13 +33,29 @@ class Request
 			DONE
 		};
 
-		enum STATE {
+		enum State {
 			AWAITING_MESSAGE,
 			TREATING_MESSAGE
 		};
 
-		STAGE												_stage;
-		STATE												_state;
+		Request(void);
+		Request(Server* server, std::string leftoverMessage);
+		~Request(void);
+
+		Response					&getResponse(void);
+		std::string					getUntreatedMessage(void);
+		Stage						getStage(void);
+		State						getState(void);
+
+
+		void						add(std::string buffer);
+		void						parse(void);
+
+	private:
+
+
+		Stage												_stage;
+		State												_state;
 
 		Response											_response;
 
