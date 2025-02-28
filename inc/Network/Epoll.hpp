@@ -1,27 +1,34 @@
 #ifndef EPOLL_HPP
-#define EPOLL_HPP
+# define EPOLL_HPP
 
-#include "../Webserv.hpp"
+# include <unistd.h>
+# include <sys/epoll.h>
+# include <exception>
+# include <iostream>
 
-#define MAX_EVENTS 100
+# define MAX_EVENTS 100
 
-class Epoll {
-   private:
-	int _epollFd;
-	int _ReadyFdsNb;
-	struct epoll_event _events[MAX_EVENTS];
+class	Server;
 
-   public:
-	Epoll(int serverFd);
-	~Epoll(void);
+class Epoll
+{
+	private:
+		int					_epollFd;
+		int					_ReadyFdsNb;
+		struct epoll_event	_events[MAX_EVENTS];
 
-	int getEpollFd(void) const;
-	int getEvent(int i) const;
-	int getReadyFd(void) const;
-	int getFd(int i) const;
+	public:
+		Epoll(std::map<unsigned int, Server*>& servers);
+		~Epoll(void);
 
-	void addFd(int fd, int flags);
-	int wait(void);
+		int	getEpollFd(void) const;
+		int	getEvent(int i) const;
+		int	getReadyFdsNb(void) const;
+		int	getFd(int i) const;
+
+		void	addFd(int fd, int flags);
+		void	deleteFd(int fd);
+		void	wait(void);
 };
 
 #endif

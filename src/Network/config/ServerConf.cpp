@@ -48,7 +48,7 @@ void ServerConf::setRoot(std::string root) {
 }
 
 void ServerConf::setPort(std::string params) {
-	int port = 0;
+	unsigned int port = 0;
 
 	checkToken(params);
 	for (size_t i = 0; i < params.length(); i++)
@@ -57,7 +57,7 @@ void ServerConf::setPort(std::string params) {
 	port = ft_stoi((params));
 	if (port < 1 || port > 65636)
 		throw std::runtime_error("Wrong syntax: port");
-	_port = (uint16_t)port;
+	_port = port;
 }
 
 void ServerConf::setClientMaxBodySize(std::string params) {
@@ -281,7 +281,7 @@ bool ServerConf::checkLocations() const {
 }
 
 std::string ServerConf::getServerName() const { return (_server_name); }
-uint16_t ServerConf::getPort() const { return (_port); }
+unsigned int ServerConf::getPort() const { return (_port); }
 in_addr_t ServerConf::getHost() const { return (_host); }
 unsigned int ServerConf::getMaxBodySize() const { return (_max_body_size); }
 std::vector<Location> ServerConf::getLocations() const { return (_locations); }

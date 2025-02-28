@@ -1,36 +1,50 @@
 #ifndef SERVER_HPP
-#define SERVER_HPP
+# define SERVER_HPP
 
-#include "../Webserv.hpp"
-#include "Client.hpp"
-#include "Epoll.hpp"
-#include "Socket.hpp"
-#include "config/ServerConf.hpp"
+# include <map>
+# include <sys/socket.h>
+# include <netinet/in.h>
+# include <exception>
 
-#define MAXCONNECT 30
+# include "Socket.hpp"
+# include "Client.hpp"
+# include "Epoll.hpp"
 
-class Server {
-   private:
-	uint16_t _port;
-	Socket _socket;
-	std::map<int, Client *> _clients;
-	std::map<std::string, ServerConf *> _confs;
+# define MAXCONNECT 30
 
-   public:
-	Server(uint16_t port);
-	~Server(void);
+class ServerConf;
 
-	// Socket &getSocket(void);
-	// Client *getClient(int clientFd);
+class Server
+{
+	private:
+		unsigned int						_port;
+		Socket								_socket;
+		std::map<int, Client*>				_clients;
+		std::map<std::string, ServerConf *> _confs;
 
-	// void acceptClient(Epoll &epoll);
-	// void readFrom(int clientFd);
-	// void sendTo(int clientFd);
-	// void closeConnection(int clientFd);
-	void printinfos(void);
-	bool isConfigKnown(std::string serverName);
-	void addConfig(ServerConf *conf);
-	uint16_t getPort() const;
+
+	public:
+		Server(unsigned int port);
+		~Server(void);
+
+		unsigned int	getPort(void);
+		Socket			&getSocket(void);
+		Client			*getClient(int clientFd);
+
+		void			acceptClient(Epoll &epoll);
+		void			readFrom(int clientFd);
+		void			sendTo(int clientFd);
+		void			closeConnection(int clientFd);
+
+		bool 			isConfigKnown(std::string serverName);
+		bool			isClientKnown(int clientFd);
+		void 			addConfig(ServerConf *conf);
+	
+		
+		// class SocketCreationErrException : public std::exception {
+		// 	public:
+		// 		virtual const char *what() const throw();
+		// };
 };
 
 #endif

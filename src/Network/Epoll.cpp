@@ -1,16 +1,19 @@
-#include "../../inc/Network/Epoll.hpp"
+#include "Epoll.hpp"
 
-Epoll::Epoll(int serverFd)
+#include "Server.hpp"
+
+Epoll::Epoll(std::map<unsigned int, Server*>& servers)
 {
 	_epollFd = epoll_create(1);
 	if (_epollFd == -1)
 		throw std::exception();
 
 	try {
-		addFd(serverFd, EPOLLIN);
+		for (std::map<unsigned int, Server*>::iterator it = servers.begin(); it != servers.end(); it++) {
+			addFd(it->second->getSocket().getFd(), EPOLLIN);
+		}
 	}
 	catch (std::exception &e) {
-		// epoll_ctl
 		std::cout << e.what() << std::endl;
 	}
 }
@@ -30,7 +33,7 @@ int Epoll::getEvent(int i) const
 	return _events[i].events;
 }
 
-int Epoll::getReadyFd(void) const
+int Epoll::getReadyFdsNb(void) const
 {
 	return _ReadyFdsNb;
 }
@@ -40,7 +43,7 @@ int	Epoll::getFd(int i) const
 	return _events[i].data.fd;
 }
 
-void Epoll::addFd(int fd, int flags)
+void	Epoll::addFd(int fd, int flags)
 {
 	struct epoll_event event;
 
@@ -50,10 +53,14 @@ void Epoll::addFd(int fd, int flags)
 		throw std::exception();
 }
 
-int Epoll::wait(void)
+void	Epoll::deleteFd(int fd)
 {
-	_ReadyFdsNb = epoll_wait(_epollFd, _events, MAX_EVENTS, -1);
+	epoll_ctl(_epollFd, EPOLL_CTL_DEL, fd, NULL);
+}
+
+void	Epoll::wait(void)
+{
+	_ReadyFdsNb = epoll_wait(_epollFd, _events, MAX_EVENTS, TIMEOUT);
 	if (_ReadyFdsNb == -1)
 		throw std::exception();
-	return _ReadyFdsNb;
 }

@@ -7,7 +7,7 @@
 class ServerConf {
    private:
 	std::string _configFile;
-	uint16_t _port;
+	unsigned int _port;
 	in_addr_t _host;
 	std::string _server_name;
 	std::string _root;
@@ -34,7 +34,7 @@ class ServerConf {
 	bool checkLocations() const;
 
 	std::string getServerName(void) const;
-	uint16_t getPort(void) const;
+	unsigned int getPort(void) const;
 	in_addr_t getHost(void) const;
 	unsigned int getMaxBodySize(void) const;
 	std::vector<Location> getLocations(void) const;

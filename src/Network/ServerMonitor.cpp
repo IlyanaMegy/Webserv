@@ -24,14 +24,14 @@ ServerMonitor::ServerMonitor(std::string configFile)
 		std::cout << MAGENTA << "[CONFIG] Server " << (*it)->getServerName() << " is listening on port " << (*it)->getPort() << RESET << std::endl;
 	}
 
-	for (std::map<int, Server*>::iterator it = _servers.begin(); it != _servers.end(); ++it) {
+	for (std::map<unsigned int, Server*>::iterator it = _servers.begin(); it != _servers.end(); ++it) {
         it->second->printinfos();
     }
 }
 
 ServerMonitor::~ServerMonitor()
 {
-	for (std::map<int, Server*>::iterator it = _servers.begin(); it != _servers.end(); it++)
+	for (std::map<unsigned int, Server*>::iterator it = _servers.begin(); it != _servers.end(); it++)
 		if (it->second)
 			delete it->second;
 
@@ -62,7 +62,7 @@ ServerMonitor::~ServerMonitor()
 
 Server *ServerMonitor::findServer(uint16_t port)
 {
-	for (std::map<int, Server*>::iterator it = _servers.begin(); it != _servers.end(); ++it)
+	for (std::map<unsigned int, Server*>::iterator it = _servers.begin(); it != _servers.end(); ++it)
         if (it->second->getPort() == port)
             return it->second;
     return NULL;
@@ -70,7 +70,7 @@ Server *ServerMonitor::findServer(uint16_t port)
 
 void ServerMonitor::addServerToList(Server *server)
 {
-	_servers[server->getPort()] = server;
+	_servers[server->getSocket().getFd()] = server;
 }
 // Client &Server::getClient(int i)
 // {
