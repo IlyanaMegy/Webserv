@@ -1,23 +1,14 @@
 NAME		:=	webserv
 
-CONFIG		:=	Network/config/ServerConf.cpp \
-				Network/config/Location.cpp \
-				Network/config/ConfigParser.cpp
-
-NETWORK		:=	Network/ServerMonitor.cpp \
-				Network/Client.cpp \
-				Network/Server.cpp \
-				Network/Epoll.cpp \
-				Network/Socket.cpp
-
-TOOLS		:=	tools/ParserTools.cpp \
-				tools/Debugger.cpp
 
 SRCS_DIR	:=	src
 
-SRCS		:=	$(CONFIG) \
-				$(NETWORK) \
-				$(TOOLS) \
+SRCS		:=	Server.cpp \
+				Client.cpp \
+				Epoll.cpp \
+				Socket.cpp \
+				Request.cpp \
+				Response.cpp \
 				main.cpp
 
 SRCS		:=	${SRCS:%=${SRCS_DIR}/%}
@@ -29,7 +20,7 @@ OBJS		:=	${SRCS:${SRCS_DIR}/%.cpp=${OBJS_DIR}/%.o}
 
 
 CC			:=	c++
-CFLAGS		:=	-Wall -Wextra -Werror -std=c++98 -g3
+CFLAGS		:=	-Wall -Wextra -Werror -std=c++98
 CPPFLAGS	:=	-I inc
 
 RM			:=	${RM} -rf
