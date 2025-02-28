@@ -20,10 +20,13 @@ ServerMonitor::ServerMonitor(std::string configFile)
 		}
 		if (server->isConfigKnown((*it)->getServerName()))
 			continue;
-		std::cout << MAGENTA << "[CONFIG] Adding new server " << (*it)->getServerName() << " to _servers map of ServerMonitor" << RESET << std::endl;
 		server->addConfig(*it);
-		std::cout << MAGENTA << "[CONFIG] Server '" << (*it)->getServerName() << "' created." << RESET << std::endl;
+		std::cout << MAGENTA << "[CONFIG] Server " << (*it)->getServerName() << " is listening on port " << (*it)->getPort() << RESET << std::endl;
 	}
+
+	for (std::map<int, Server*>::iterator it = _servers.begin(); it != _servers.end(); ++it) {
+        it->second->printinfos();
+    }
 }
 
 ServerMonitor::~ServerMonitor()

@@ -12,6 +12,8 @@ ServerConf::ServerConf() {
 
 void ServerConf::setServerName(std::string server_name) {
 	checkToken(server_name);
+	if (!server_name.empty() && server_name[server_name.size() - 1] == ';')
+		server_name.erase(server_name.size() - 1);
 	_server_name = server_name;
 }
 
@@ -81,13 +83,15 @@ void ServerConf::setIndex(std::string index) {
 
 void ServerConf::setAutoindex(std::string autoindex) {
 	checkToken(autoindex);
+	if (!autoindex.empty() && autoindex	[autoindex.size() - 1] == ';')
+		autoindex.erase(autoindex.size() - 1);
 	if (autoindex != "on" && autoindex != "off")
 		throw std::runtime_error("Wrong syntax: autoindex");
 	if (autoindex == "on") _autoindex = true;
 }
 
-void ServerConf::setLocation(std::string path,
-							 std::vector<std::string> params) {
+void ServerConf::setLocation(std::string path,  std::vector<std::string> params)
+{
 	Location new_loca;
 	std::vector<std::string> methods;
 	bool flag_methods = false;
@@ -256,8 +260,7 @@ int ServerConf::isValidLocation(Location &location) const {
 			location.setRootLocation(getcwd(NULL, 0));
 		if (location.getRootLocation().empty() && !_root.empty()) 
 			location.setRootLocation(_root);
-		if (isFileExistAndReadable(
-				location.getRootLocation() + location.getPath(), location.getIndexLocation()))
+		if (isFileExistAndReadable( location.getRootLocation() + location.getPath(), location.getIndexLocation()))
 			return (5);
 		if (!location.getReturn().empty())
 			if (isFileExistAndReadable(location.getRootLocation(), location.getReturn()))
@@ -275,7 +278,8 @@ bool ServerConf::checkLocations() const {
 	std::vector<Location>::const_iterator second;
 	for (first = _locations.begin(); first != _locations.end() - 1; first++)
 		for (second = first + 1; second != _locations.end(); second++)
-			if (first->getPath() == second->getPath()) return (true);
+			if (first->getPath() == second->getPath())
+				return (true);
 	return (false);
 }
 
@@ -307,15 +311,12 @@ bool ServerConf::isValidMethod(std::string uri, Method method) {
 }
 
 void ServerConf::listMethods() const {
-	for (std::vector<Location>::const_iterator it = _locations.begin();
-		 it != _locations.end(); ++it) {
+	for (std::vector<Location>::const_iterator it = _locations.begin(); it != _locations.end(); ++it) {
 		std::cout << LIME "\nLocation: " << it->getPath() << std::endl;
 		std::vector<Method> methods = it->getMethods();
 		std::cout << "Available methods: ";
-		for (std::vector<Method>::const_iterator method_it = methods.begin();
-			 method_it != methods.end(); ++method_it) {
+		for (std::vector<Method>::const_iterator method_it = methods.begin(); method_it != methods.end(); ++method_it)
 			std::cout << *method_it << " ";
-		}
 		std::cout << RESET << std::endl;
 	}
 }

@@ -17,7 +17,9 @@ enum Method { GET, POST, DELETE };
 
 #include <algorithm>
 #include <cstddef>
+#include <cstdlib>
 #include <cstring>
+#include <ctime>
 #include <exception>
 #include <fstream>
 #include <iostream>

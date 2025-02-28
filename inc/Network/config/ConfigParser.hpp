@@ -13,7 +13,7 @@ class ConfigParser {
 	ConfigParser() : _nb_server(0) { (void)_nb_server; };
 	~ConfigParser();
 
-	int createCluster(const std::string &config_file);
+	void createCluster(const std::string &config_file);
 	void splitBlocks(std::string &content);
 	void createServer(std::string &config, ServerConf *server);
 

@@ -27,3 +27,15 @@ void Debugger::printString(const std::string &msg, e_LogLevel lvl) {
 			std::cout << GRY1 << "[DEBUG]:" << RESET << msg << std::endl;
 	}
 }
+
+const char* rainbow(int i)
+{
+    static const char* colors[] = {
+        RED, GREEN, YELLOW, ORANGE, CYAN, WHITE,
+        GOLD, YLLW, GRNN, LIME, BLUE, INDI, PURP, MAGN, PINK,
+        BROW, IVRY, GRY1, GRY2, TURQ, CORL, SALM, PLUM, TEAL, OLIV, MINT,
+        NAVY, PEAC, LAVN, EMRD, RUBY
+    };
+	
+    return colors[i];
+}

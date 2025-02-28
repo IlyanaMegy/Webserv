@@ -26,4 +26,6 @@ class Debugger : public Singleton<Debugger>
 	// void error(const std::string &msg);
 };
 
+const char* rainbow(int i);
+
 #endif

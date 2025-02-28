@@ -44,7 +44,7 @@ class ServerConf {
 	const std::vector<Location>::iterator getLocationFromUri(std::string uri);
 	
 	bool isValidMethod(std::string uri, Method method);
-	void listMethods() const;
+	void listMethods(void) const;
 
 	bool is_setted_loca_root;
 	void addRootToLocations(std::string root);

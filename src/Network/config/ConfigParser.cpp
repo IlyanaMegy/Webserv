@@ -47,7 +47,7 @@ void ConfigParser::splitBlocks(std::string &content) {
  * @param  `config_file`
  * @retval 0=all's good
  */
-int ConfigParser::createCluster(const std::string &config_file) {
+void ConfigParser::createCluster(const std::string &config_file) {
 	if (getTypePath(config_file) != 1)
 		throw std::runtime_error("Error: Invalid configuration file");
 	if (checkFile(config_file, 4) == -1)
@@ -55,17 +55,13 @@ int ConfigParser::createCluster(const std::string &config_file) {
 	std::string content = readFile(config_file);
 	if (content.empty())
 		throw std::runtime_error("Error: Empty configuration file");
-	std::cout << MAGENTA << "[CONFIG] First checks passed !\n         Reading " << BOLD << config_file << RESET << std::endl;
+	std::cout << MAGENTA << "\n[CONFIG] Reading " << BOLD << config_file << RESET << std::endl;
 
 	removeComments(content);
 	removeWhiteSpace(content);
-	std::cout << MAGENTA << "[CONFIG] Comments and whitespaces removed" << RESET << std::endl;
-
 	splitBlocks(content);
 	if (_servers_config.size() != _nb_server)
 		throw std::runtime_error("Error: Coudn't split config file");
-	std::cout << MAGENTA << "[CONFIG] Success spliting config file" << RESET << std::endl;
-	
 	for (size_t i = 0; i < _nb_server; i++)
 	{
 		ServerConf *server = new ServerConf();
@@ -75,11 +71,6 @@ int ConfigParser::createCluster(const std::string &config_file) {
 		createServer(_servers_config[i], server);
 		_servers.push_back(server);
 	}
-	if (_nb_server > 1)
-		std::cout << MAGENTA << "[CONFIG] " << _nb_server << " servers detected" << RESET << std::endl;
-	else
-		std::cout << MAGENTA << "[CONFIG] " << _nb_server << " server detected" << RESET << std::endl;
-	return 0;
 }
 
 std::vector<std::string> splitParametrs(std::string line, std::string sep)

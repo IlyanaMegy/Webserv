@@ -27,7 +27,7 @@ class Server {
 	// void readFrom(int clientFd);
 	// void sendTo(int clientFd);
 	// void closeConnection(int clientFd);
-
+	void printinfos(void);
 	bool isConfigKnown(std::string serverName);
 	void addConfig(ServerConf *conf);
 	uint16_t getPort() const;
