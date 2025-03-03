@@ -45,7 +45,7 @@ void	Response::createMessage(void)
 
 void	Response::addCookies(std::vector<std::string>& cookies)
 {
-	_fields["cookie"] = cookies;
+	_fields["Set-Cookie"] = cookies;
 }
 
 void	Response::_createStatusLine(void)
