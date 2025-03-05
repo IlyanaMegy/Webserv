@@ -10,6 +10,7 @@ void	runServer(std::string configFile)
 	while (true) {
 		if (Signal::shouldStopServer)
 			return ;
+
 		try {
 			epoll.wait();
 		} catch (std::exception &e) {

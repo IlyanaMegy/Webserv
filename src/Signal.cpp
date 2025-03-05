@@ -1,6 +1,5 @@
 #include "Signal.hpp"
 
-
 bool	Signal::shouldStopServer = false;
 
 void	Signal::setHandler(void)
