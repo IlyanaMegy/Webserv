@@ -1,3 +1,4 @@
+#include "Signal.hpp"
 #include "Epoll.hpp"
 #include "ServerMonitor.hpp"
 
@@ -7,6 +8,8 @@ void	runServer(std::string configFile)
 	Epoll			epoll(serverMonitor.getServers());
 
 	while (true) {
+		if (Signal::shouldStopServer)
+			return ;
 		try {
 			epoll.wait();
 		} catch (std::exception &e) {
@@ -49,6 +52,7 @@ int	main(int ac, char** av)
 	configFile = (ac == 1) ? "config/webserv.conf" : av[1];
 	try
 	{
+		Signal::setHandler();
 		runServer(configFile);
 	}
 	catch (std::exception &e)

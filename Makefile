@@ -19,6 +19,7 @@ SRCS_NETWORK	:=	Client.cpp \
 SRCS			:=	${addprefix config/, ${SRCS_CONFIG}} \
 					${addprefix network/, ${SRCS_NETWORK}} \
 					${addprefix messages/, ${SRCS_MESSAGES}} \
+					Signal.cpp \
 					ServerMonitor.cpp \
 					main.cpp
 
