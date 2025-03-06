@@ -544,7 +544,7 @@ int	Request::_parseHTTPVer(std::string HTTPVerString)
 		return 1;
 	}
 	if (HTTPVerString[5] != '1') {
-		_response.fillError("505", "Not Implemented");
+		_response.fillError("505", "HTTP Version Not Supported");
 		_stage = DONE;
 		return 1;
 	}
