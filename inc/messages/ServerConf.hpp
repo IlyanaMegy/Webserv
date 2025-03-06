@@ -39,6 +39,7 @@ class ServerConf {
 	void setIndex(std::string index);
 	void setLocation(std::string path, std::vector<std::string> params);
 	void setAutoindex(std::string autoindex);
+	void setErrorPage(std::string err_code, std::string err_page);
 
 	int isValidLocation(Location& location) const;
 	bool checkLocations() const;
@@ -59,13 +60,11 @@ class ServerConf {
 
 	void addRootToLocations(std::string root);
 
-	size_t findMatchingLocation(const std::string& uri,
-								const Location*& bestMatch) const;
+	size_t findMatchingLocation(const std::string& uri, Location* bestMatch);
 	std::string getCompletePath(std::string uri);
 
 	// !TODO: Implement these functions
-	void setErrorPages(std::vector<std::string>& params);
-	bool isValidErrorPages(void);
+	// bool isValidErrorPages(void);
 	// const std::map<short, std::string> getErrorPages(void);
 	std::string getPathErrorPage(std::string key);
 };

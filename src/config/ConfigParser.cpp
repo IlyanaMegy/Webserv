@@ -93,6 +93,8 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 	{
 		if (params[i] == "listen" && (i + 1) < params.size())
 		{
+			if (findChar(params[i+1], ';') < 1)
+				break;
 			if (server->getPort())
 				throw std::runtime_error("Port is duplicated");
 			server->setPort(params[++i]);
@@ -116,29 +118,42 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 		}
 		else if (params[i] == "host" && (i + 1) < params.size())
 		{
+			if (findChar(params[i+1], ';') < 1)
+				break;
 			if (server->getHost())
 				throw std::runtime_error("Host is duplicated");
 			server->setHost(params[++i]);
 		}
 		else if (params[i] == "root" && (i + 1) < params.size())
 		{
+			if (findChar(params[i+1], ';') < 1)
+				break;
 			if (!server->getRoot().empty())
 				throw std::runtime_error("Root is duplicated");
 			server->setRoot(params[++i]);
 		}
 		else if (params[i] == "error_page" && (i + 1) < params.size())
 		{
-			while (++i < params.size())
+			int j = -1;
+            std::string error_path = "";
+			while (++j < 3)
 			{
-				error_codes.push_back(params[i]);
-				if (params[i].find(';') != std::string::npos)
-					break ;
-				if (i + 1 >= params.size())
-					throw std::runtime_error("Wrong character out of server scope{}");
+				if (findChar(params[i], ';') != -1)
+                {
+                    error_path = params[i];
+                    error_path.erase(error_path.find(';'));
+                    break;
+                }
+                error_codes.push_back(params[i++]);
 			}
+            if (error_path.empty())
+                throw std::runtime_error("Error page path must end with ';'");
+            for (size_t j = 0; j < error_codes.size(); j++)
+                server->setErrorPage(error_codes[j], error_path);
 		}
-		else if (params[i] == "client_max_body_size" && (i + 1) < params.size())
-		{
+		else if (params[i] == "client_max_body_size" && (i + 1) < params.size()) {
+			if (findChar(params[i+1], ';') < 1)
+				break;
 			if (flag_max_size)
 				throw std::runtime_error("Client_max_body_size is duplicated");
 			server->setClientMaxBodySize(params[++i]);
@@ -146,18 +161,24 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 		}
 		else if (params[i] == "server_name" && (i + 1) < params.size())
 		{
+			if (findChar(params[i+1], ';') < 1)
+				break;
 			if (!server->getServerName().empty())
 				throw std::runtime_error("Server_name is duplicated");
 			server->setServerName(params[++i]);
 		}
 		else if (params[i] == "index" && (i + 1) < params.size())
 		{
+			if (findChar(params[i+1], ';') < 1)
+				break;
 			if (!server->getIndex().empty())
 				throw std::runtime_error("Index is duplicated");
 			server->setIndex(params[++i]);
 		}
 		else if (params[i] == "autoindex" && (i + 1) < params.size())
 		{
+			if (findChar(params[i+1], ';') < 1)
+				break;
 			if (flag_autoindex)
 				throw std::runtime_error("Autoindex of server is duplicated");
 			server->setAutoindex(params[++i]);
@@ -171,22 +192,22 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 			throw std::runtime_error("Unsupported directive");
 		}
 	}
+	if (server->getServerName().empty())
+		server->setServerName("Server name from config file not found or unreadable");
+	if (server->getRoot().empty())
+		server->setRoot("/");
 	if(!server->is_setted_loca_root && !server->getRoot().empty())
 		server->addRootToLocations(server->getRoot());
 	if (!server->getPort())
-		throw std::runtime_error("Port not found");
-	if (server->getRoot().empty())
-		server->setRoot("/;");
+		throw std::runtime_error("Port from config file not found or unreadable");
 	if (server->getHost() == 0)
-		server->setHost("localhost;");
+		server->setHost("localhost");
 	if (server->getIndex().empty())
-		server->setIndex("index.html;");
+		server->setIndex("index.html");
 	if (isFileExistAndReadable(server->getRoot(), server->getIndex()))
 		throw std::runtime_error("Index from config file not found or unreadable");
 	if (server->checkLocations())
 		throw std::runtime_error("Location is duplicated");
-
-	// server->setErrorPages(error_codes);
 	// if (!server->isValidErrorPages())
 	// 	throw std::runtime_error("Incorrect path for error page or number of error");
 }

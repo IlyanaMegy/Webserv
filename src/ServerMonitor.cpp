@@ -23,19 +23,6 @@ ServerMonitor::ServerMonitor(std::string configFile)
 		server->addConfig(*it);
 		std::cout << MAGENTA << "[CONFIG] Server " << (*it)->getServerName() << " is listening on port " << (*it)->getPort() << RESET << std::endl;
 		std::cout << std::endl;
-
-		std::cout << GOLD << "Error pages: " << std::endl;
-		std::cout << "400: " << (*it)->getPathErrorPage("400") << std::endl;
-		std::cout << "404: " << (*it)->getPathErrorPage("404") << std::endl;
-		std::cout << "405: " << (*it)->getPathErrorPage("405") << std::endl;
-		std::cout << "408: " << (*it)->getPathErrorPage("408") << std::endl;
-		std::cout << "411: " << (*it)->getPathErrorPage("411") << std::endl;
-		std::cout << "413: " << (*it)->getPathErrorPage("413") << std::endl;
-		std::cout << "500: " << (*it)->getPathErrorPage("500") << std::endl;
-		std::cout << "501: " << (*it)->getPathErrorPage("501") << std::endl;
-		std::cout << "502: " << (*it)->getPathErrorPage("502") << std::endl;
-		std::cout << "505: " << (*it)->getPathErrorPage("505") << RESET << std::endl;
-		std::cout << std::endl;
 	}
 }
 
