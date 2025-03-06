@@ -294,30 +294,18 @@ bool ServerConf::getAutoindex() const { return (_autoindex); }
 
 const std::vector<Location>::iterator ServerConf::getLocationFromUri(std::string uri) {
 	std::vector<Location>::iterator it;
-	for (it = _locations.begin(); it != _locations.end(); it++) {
+
+	for (it = _locations.begin(); it != _locations.end(); it++)
 		if (it->getPath() == uri) return (it);
-	}
 	throw std::runtime_error("Error: path to location not found");
 }
 
 bool ServerConf::isValidMethod(std::string uri, Request::Method method) {
 	std::vector<Request::Method> locationMethods = getLocationFromUri(uri)->getMethods();
 
-	if (std::find(locationMethods.begin(), locationMethods.end(), method) !=
-		locationMethods.end())
+	if (std::find(locationMethods.begin(), locationMethods.end(), method) != locationMethods.end())
 		return (true);
 	return (false);
-}
-
-void ServerConf::listMethods() const {
-	for (std::vector<Location>::const_iterator it = _locations.begin(); it != _locations.end(); ++it) {
-		std::cout << LIME "\nLocation: " << it->getPath() << std::endl;
-		std::vector<Request::Method> methods = it->getMethods();
-		std::cout << "Available methods: ";
-		for (std::vector<Request::Method>::const_iterator method_it = methods.begin(); method_it != methods.end(); ++method_it)
-			std::cout << *method_it << " ";
-		std::cout << RESET << std::endl;
-	}
 }
 
 void ServerConf::addRootToLocations(std::string root) {
