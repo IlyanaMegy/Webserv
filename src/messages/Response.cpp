@@ -43,6 +43,11 @@ void	Response::createMessage(void)
 	_createBody();
 }
 
+void	Response::addCookies(std::vector<std::string>& cookies)
+{
+	_fields["Set-Cookie"] = cookies;
+}
+
 void	Response::_createStatusLine(void)
 {
 	_message=std::string("HTTP/1.1")+" "+_statusCode+" "+_reasonMessage;

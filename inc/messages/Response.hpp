@@ -30,6 +30,8 @@ class Response
 
 		void		createMessage(void);
 
+		void		addCookies(std::vector<std::string>& cookies);
+
 		void		fillError(std::string statusCode, std::string reasonMessage);
 		void		fillGET(std::string path);
 		void		fillDELETE(std::string path);

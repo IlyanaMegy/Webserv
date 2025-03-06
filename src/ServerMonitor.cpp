@@ -13,7 +13,7 @@ ServerMonitor::ServerMonitor(std::string configFile)
 
 		server = findServer((*it)->getPort());
 		if (server == NULL) {
-			server = new Server((*it)->getPort());
+			server = new Server((*it)->getPort(), *it);
 			if (!server)
 				throw std::runtime_error("Failed to create Server object");
 			addServerToList(server);

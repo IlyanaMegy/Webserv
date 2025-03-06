@@ -225,7 +225,27 @@ int	Request::_parseCompletedFields(void)
 	if (_findHost())
 		return 1;
 	_findConnection();
+	_findCookies();
 	return 0;
+}
+
+void	Request::_findCookies(void)
+{
+	if (_fields.find("cookie") == _fields.end())
+		return ;
+	_split(_fields["cookie"]);
+	_response.addCookies(_fields["cookie"]);
+}
+
+void	Request::_findConnection(void)
+{
+	if (_fields.find("connection") == _fields.end())
+		return ;
+	_split(_fields["connection"]);
+	for (std::vector<std::string>::iterator it = _fields["connection"].begin(); it != _fields["connection"].end(); it++) {
+		if (*it == "close")
+			_response.setShouldClose(true);
+	}
 }
 
 int	Request::_findHost(void)
@@ -238,17 +258,6 @@ int	Request::_findHost(void)
 		return 1;
 	}
 	return 0;
-}
-
-void	Request::_findConnection(void)
-{
-	if (_fields.find("connection") == _fields.end())
-		return ;
-	_split(_fields["connection"]);
-	for (std::vector<std::string>::iterator it = _fields["connection"].begin(); it != _fields["connection"].end(); it++) {
-		if (*it == "close")
-			_response.setShouldClose(true);
-	}
 }
 
 int	Request::_findTransferEncoding(void)
@@ -535,7 +544,7 @@ int	Request::_parseHTTPVer(std::string HTTPVerString)
 		return 1;
 	}
 	if (HTTPVerString[5] != '1') {
-		_response.fillError("505", "Not Implemented");
+		_response.fillError("505", "HTTP Version Not Supported");
 		_stage = DONE;
 		return 1;
 	}

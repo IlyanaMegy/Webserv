@@ -97,9 +97,10 @@ class Request
 		int							_parseCompletedFields(void);
 		int							_findTransferEncoding(void);
 		int							_findContentLength(void);
-		void						_findConnection(void);
-		int							_parseContentLength(std::string contentLength);
 		int							_findHost(void);
+		void						_findConnection(void);
+		void						_findCookies(void);
+		int							_parseContentLength(std::string contentLength);
 
 		void						_parseBody(void);
 		void						_parseFullBody(void);
