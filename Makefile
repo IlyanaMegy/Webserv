@@ -42,7 +42,7 @@ DIR_DUP			=	mkdir -p ${@D}
 all: ${NAME}
 
 ${NAME}: ${OBJS}
-	${CC} $^ -lreadline -o $@
+	${CC} $^ -o $@
 
 ${OBJS_DIR}/%.o: ${SRCS_DIR}/%.cpp
 	${DIR_DUP}

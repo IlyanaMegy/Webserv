@@ -1,4 +1,4 @@
-#include "ServerConf.hpp"
+#include "../../inc/config/ServerConf.hpp"
 
 #include "Request.hpp"
 #include "ParserTools.hpp"
@@ -258,7 +258,7 @@ int ServerConf::isValidLocation(Location &location) const {
 		if (location.getPath()[0] != '/') return (2);
 		if (location.getRootLocation().empty() && _root.empty())
 			location.setRootLocation(getcwd(NULL, 0));
-		if (location.getRootLocation().empty() && !_root.empty()) 
+		if (location.getRootLocation().empty() && !_root.empty())
 			location.setRootLocation(_root);
 		if (isFileExistAndReadable( location.getRootLocation() + location.getPath(), location.getIndexLocation()))
 			return (5);
@@ -292,8 +292,7 @@ std::string ServerConf::getRoot() const { return (_root); }
 std::string ServerConf::getIndex() const { return (_index); }
 bool ServerConf::getAutoindex() const { return (_autoindex); }
 
-const std::vector<Location>::iterator ServerConf::getLocationFromUri(
-	std::string uri) {
+const std::vector<Location>::iterator ServerConf::getLocationFromUri(std::string uri) {
 	std::vector<Location>::iterator it;
 	for (it = _locations.begin(); it != _locations.end(); it++) {
 		if (it->getPath() == uri) return (it);
@@ -329,6 +328,39 @@ void ServerConf::addRootToLocations(std::string root) {
 	is_setted_loca_root = 1;
 }
 
+// std::string ServerConf::getCompletePath(std::string path) {
+// 	if (path.empty()) return (_root);
+//     if (path[0] != '/') {
+//         throw std::runtime_error("Invalid path: must start with '/'");
+//     }
+//     std::string longest_match;
+//     std::string matched_root;
+//     for (std::vector<Location>::iterator it = _locations.begin(); it != _locations.end(); ++it) {
+//         if (path.find(it->getPath()) == 0 && it->getPath().length() > longest_match.length()) {
+//             longest_match = it->getPath();
+//             matched_root = it->getRootLocation();
+//         }
+//     }
+// 	std::cout << RED << "here " << matched_root + path.substr(longest_match.length()) << RESET << std::endl;
+//     if (!longest_match.empty()) {
+//         if (*--matched_root.end() == '/')
+//             return matched_root + path.substr(longest_match.length());
+//         else
+//             return matched_root + "/" + path.substr(longest_match.length());
+//     }
+// 	std::cout << "hzeeeeere" << std::endl;
+//     std::string root_path = _root;
+//     if (*(root_path.end() - 1) == '/')
+//         root_path.erase(root_path.end() - 1);
+//     if (path.find(root_path) == 1) // Check if path starts with root_path
+//     	return _root + path.substr(root_path.length() + 1);
+//     if (*(root_path.end() - 1) == '/')
+//         return _root + path.substr(1);
+//     else
+//         return _root + path;
+// }
+
+
 // const std::string &ServerConfig::getPathErrorPage(short key)
 // {
 // 	std::map<short, std::string>::iterator it = _error_pages.find(key);
@@ -339,10 +371,79 @@ void ServerConf::addRootToLocations(std::string root) {
 
 // /* find location by a name */ //do not using in parser, created for server
 // manager const std::vector<Location>::iterator
-// ServerConfig::getLocationKey(std::string key)
+
+size_t ServerConf::findMatchingLocation(const std::string& uri, const Location*& bestMatch) const {
+    size_t bestMatchLength = 0;
+    bestMatch = NULL;
+
+    for (std::vector<Location>::const_iterator it = _locations.begin(); it != _locations.end(); ++it) {
+        if (uri.find(it->getPath()) == 0 && it->getPath().length() > bestMatchLength) {
+            bestMatch = &(*it);
+            bestMatchLength = it->getPath().length();
+        }
+    }
+
+    return bestMatchLength;
+}
+
+
+std::string ServerConf::getCompletePath(std::string uri) {
+    const Location* location;
+    size_t matchLength = findMatchingLocation(uri, location);
+    std::string root;
+    std::string relativePath;
+
+    if (location) {
+		std::cout << "\nYEAH\n" << std::endl;
+        root = location->getRootLocation();
+        relativePath = uri.substr(matchLength);
+    } else {
+        root = _root;
+        relativePath = uri;
+    }
+
+    if (!root.empty() && root[root.length() - 1] == '/') {
+        return root + relativePath;
+    } else {
+        return root + "/" + relativePath;
+    }
+}
+
+
+// std::string ServerConf::getCompletePath(std::string uri)
 // {
-// 	std::vector<Location>::iterator it;
-// 	for (it = _locations.begin(); it != _locations.end(); it++)
-// 		if (it->getPath() == key) return (it);
-// 	throw std::runtime_error("Error: path to location not found");
+// 	// std::vector<Location>::iterator it;
+// 	// for (it = _locations.begin(); it != _locations.end(); it++)
+// 	// {
+// 	// 	std::cout << BLUE << "\nkey = " << uri << "\npath = " << it->getPath() << "\nrootloca = " << it->getRootLocation() << RESET << std::endl;
+// 	// 	if (it->getPath() == uri)
+// 	// 	{
+// 	// 		std::cout << RED << "\npath = " << it->getPath() << "\nrootloca = " << it->getRootLocation() << RESET << std::endl;
+// 	// 		return (it->getRootLocation());}
+// 	// }
+// 	// throw std::runtime_error("Error: path to location not found");
+// 	const Location* location; 
+// 	size_t matchLength = findMatchingLocation(uri, location);
+	
+//     std::string root;
+//     std::string relativePath;
+
+// 	 if (location) {
+//         root = location->getRootLocation();
+// 		std::cout << BLUE << "\nroot = " << root << " uri = " << uri << RESET << std::endl;
+
+//         relativePath = root.substr(matchLength);
+// 		std::cout << BLUE << " relative = " << relativePath << RESET << std::endl;
+
+//     } else {
+//         root = _root;
+//         relativePath = uri;
+//     }
+
+//     if (!root.empty() && root[root.length() - 1] == '/') {
+//         return root + relativePath;
+//     } else {
+//         return root + "/" + relativePath;
+//     }
 // }
+
