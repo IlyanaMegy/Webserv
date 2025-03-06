@@ -21,10 +21,11 @@ class Server
 		Socket								_socket;
 		std::map<int, Client*>				_clients;
 		std::map<std::string, ServerConf *> _confs;
+		ServerConf*							_defaultConf;
 
 
 	public:
-		Server(unsigned int port);
+		Server(unsigned int port, ServerConf* defaultConf);
 		~Server(void);
 
 		unsigned int	getPort(void);

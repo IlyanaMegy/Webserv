@@ -5,9 +5,10 @@
 
 #include <iostream>
 
-Server::Server(unsigned int port) : _port(port), _socket(port)
+Server::Server(unsigned int port, ServerConf* defaultConf) : _port(port), _socket(port), _defaultConf(defaultConf)
 {
 	(void) _port;
+	(void) _defaultConf;
 	if (listen(_socket.getFd(), MAXCONNECT) < 0)
 		throw std::runtime_error("Failed to listen on socket");
 	// std::cout << "server's socket listening..." << std::endl;
