@@ -1,7 +1,7 @@
 #include "../../inc/config/ServerConf.hpp"
 
-#include "Request.hpp"
-#include "ParserTools.hpp"
+#include "../../inc/messages/Request.hpp"
+#include "../../inc/config/ParserTools.hpp"
 
 ServerConf::ServerConf() {
 	_port = 0;
@@ -328,39 +328,6 @@ void ServerConf::addRootToLocations(std::string root) {
 	is_setted_loca_root = 1;
 }
 
-// std::string ServerConf::getCompletePath(std::string path) {
-// 	if (path.empty()) return (_root);
-//     if (path[0] != '/') {
-//         throw std::runtime_error("Invalid path: must start with '/'");
-//     }
-//     std::string longest_match;
-//     std::string matched_root;
-//     for (std::vector<Location>::iterator it = _locations.begin(); it != _locations.end(); ++it) {
-//         if (path.find(it->getPath()) == 0 && it->getPath().length() > longest_match.length()) {
-//             longest_match = it->getPath();
-//             matched_root = it->getRootLocation();
-//         }
-//     }
-// 	std::cout << RED << "here " << matched_root + path.substr(longest_match.length()) << RESET << std::endl;
-//     if (!longest_match.empty()) {
-//         if (*--matched_root.end() == '/')
-//             return matched_root + path.substr(longest_match.length());
-//         else
-//             return matched_root + "/" + path.substr(longest_match.length());
-//     }
-// 	std::cout << "hzeeeeere" << std::endl;
-//     std::string root_path = _root;
-//     if (*(root_path.end() - 1) == '/')
-//         root_path.erase(root_path.end() - 1);
-//     if (path.find(root_path) == 1) // Check if path starts with root_path
-//     	return _root + path.substr(root_path.length() + 1);
-//     if (*(root_path.end() - 1) == '/')
-//         return _root + path.substr(1);
-//     else
-//         return _root + path;
-// }
-
-
 // const std::string &ServerConfig::getPathErrorPage(short key)
 // {
 // 	std::map<short, std::string>::iterator it = _error_pages.find(key);
@@ -382,10 +349,8 @@ size_t ServerConf::findMatchingLocation(const std::string& uri, const Location*&
             bestMatchLength = it->getPath().length();
         }
     }
-
     return bestMatchLength;
 }
-
 
 std::string ServerConf::getCompletePath(std::string uri) {
     const Location* location;
@@ -394,56 +359,16 @@ std::string ServerConf::getCompletePath(std::string uri) {
     std::string relativePath;
 
     if (location) {
-		std::cout << "\nYEAH\n" << std::endl;
-        root = location->getRootLocation();
+		root = location->getRootLocation();
         relativePath = uri.substr(matchLength);
     } else {
-        root = _root;
+		root = _root;
         relativePath = uri;
     }
-
-    if (!root.empty() && root[root.length() - 1] == '/') {
+	if (!root.empty() && root[root.length() - 1] == '/' && !relativePath.empty() && relativePath[0] == '/')
+		return root + relativePath.erase(0, 1);
+    else if (!root.empty() && root[root.length() - 1] != '/' && !relativePath.empty() && relativePath[0] != '/')
+		return root + "/" + relativePath;
+	else
         return root + relativePath;
-    } else {
-        return root + "/" + relativePath;
-    }
 }
-
-
-// std::string ServerConf::getCompletePath(std::string uri)
-// {
-// 	// std::vector<Location>::iterator it;
-// 	// for (it = _locations.begin(); it != _locations.end(); it++)
-// 	// {
-// 	// 	std::cout << BLUE << "\nkey = " << uri << "\npath = " << it->getPath() << "\nrootloca = " << it->getRootLocation() << RESET << std::endl;
-// 	// 	if (it->getPath() == uri)
-// 	// 	{
-// 	// 		std::cout << RED << "\npath = " << it->getPath() << "\nrootloca = " << it->getRootLocation() << RESET << std::endl;
-// 	// 		return (it->getRootLocation());}
-// 	// }
-// 	// throw std::runtime_error("Error: path to location not found");
-// 	const Location* location; 
-// 	size_t matchLength = findMatchingLocation(uri, location);
-	
-//     std::string root;
-//     std::string relativePath;
-
-// 	 if (location) {
-//         root = location->getRootLocation();
-// 		std::cout << BLUE << "\nroot = " << root << " uri = " << uri << RESET << std::endl;
-
-//         relativePath = root.substr(matchLength);
-// 		std::cout << BLUE << " relative = " << relativePath << RESET << std::endl;
-
-//     } else {
-//         root = _root;
-//         relativePath = uri;
-//     }
-
-//     if (!root.empty() && root[root.length() - 1] == '/') {
-//         return root + relativePath;
-//     } else {
-//         return root + "/" + relativePath;
-//     }
-// }
-
