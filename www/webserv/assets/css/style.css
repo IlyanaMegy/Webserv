@@ -1,94 +1,53 @@
-#greetings{
-	margin-left: 3%;
-	font-size: 35px;
-	color: rgb(73, 67, 173);
-}
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
 
-@keyframes grow {
-    0% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.1);
-    }
-    100% {
-        transform: scale(1);
-    }
-}
-
-.animate-grow {
-    animation: grow 1s ease-in-out;
-}
-
-.menu {
-	padding-top: 50px;
-	padding-bottom: 30px;
-	margin-left: 5%;
-	font-family: 'Roboto', sans-serif;
-	font-size: 20px;
-    position: relative;
-    display: inline-block;
-}
-
-.menu ul {
-    list-style-type: none;
-    padding: 0;
+* {
     margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
 }
 
-.menu ul li {
-    display: inline-block;
-    position: relative;
-}
-
-.menu ul li a {
-    text-decoration: none;
-    padding: 10px;
-    display: block;
-    color: #000;
-}
-
-.menu ul li ul {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-}
-
-.menu ul li:hover ul {
-    display: block;
-	color: aqua;
-}
-
-.menu ul li ul li {
-    display: block;
-}
-
-.separators {
-	font-weight: lighter;
-	font-family: 'Roboto', sans-serif; 
-	margin: 0 10px;
-}
-
-.footer {
-	position: fixed;
-	left: 0;
-	bottom: 0;
-	width: 100%;
-	background-color: #e0f4f0;
-	color: rgb(1, 61, 76);
-	text-align: center;
-}
-
-.flex-container {
+body {
     display: flex;
-    justify-content: space-between;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
 }
 
-.flex-item {
-    flex: 1;
-    padding: 20px;
-    text-align: center;
-    color: rgb(0, 0, 23);
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 5px 15x;
+    background: rgba(255, 255, 255, 0.086);
+}
+
+.navbar-icon {
+    width: 24px;
+    height: 24px;
+    margin-left: 15px;
+}
+
+.wrapper {
+    max-width: 1000px;
+    width: 100%;
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 0px 4px 10px 1px rgba(0, 0, 0, 0.1);
+}
+
+.wrapper .title {
+    height: 100px;
+    background: var(--secondary-color);
+    border-radius: 5px 5px 0 0;
+    color: var(--text-color);
+    font-size: 30px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
