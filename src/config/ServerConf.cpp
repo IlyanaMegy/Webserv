@@ -11,6 +11,21 @@ ServerConf::ServerConf() {
 	_max_body_size = MAXBODYOCTETS;
 	_index = "";
 	_autoindex = false;
+	is_setted_loca_root = 0;
+	initializeErrorPages();
+}
+
+void ServerConf::initializeErrorPages() {
+    _error_pages["400"] = "www/error/400.html";
+    _error_pages["404"] = "www/error/404.html";
+    _error_pages["405"] = "www/error/405.html";
+    _error_pages["408"] = "www/error/408.html";
+    _error_pages["411"] = "www/error/411.html";
+    _error_pages["413"] = "www/error/413.html";
+    _error_pages["500"] = "www/error/500.html";
+    _error_pages["501"] = "www/error/501.html";
+    _error_pages["502"] = "www/error/502.html";
+    _error_pages["505"] = "www/error/505.html";
 }
 
 void ServerConf::setServerName(std::string server_name) {
@@ -292,6 +307,15 @@ std::string ServerConf::getRoot() const { return (_root); }
 std::string ServerConf::getIndex() const { return (_index); }
 bool ServerConf::getAutoindex() const { return (_autoindex); }
 
+std::string ServerConf::getPathErrorPage(std::string statusCode) {
+    std::map<std::string, std::string>::const_iterator it = _error_pages.find(statusCode);
+    if (it != _error_pages.end()) {
+		return (*it).second;
+    } else {
+        throw std::runtime_error("Error page not found for status code: " + statusCode);
+    }
+}
+
 const std::vector<Location>::iterator ServerConf::getLocationFromUri(std::string uri) {
 	std::vector<Location>::iterator it;
 
@@ -315,17 +339,6 @@ void ServerConf::addRootToLocations(std::string root) {
 			it->setRootLocation(root);
 	is_setted_loca_root = 1;
 }
-
-// const std::string &ServerConfig::getPathErrorPage(short key)
-// {
-// 	std::map<short, std::string>::iterator it = _error_pages.find(key);
-// 	if (it == _error_pages.end())
-// 		throw std::runtime_error("Error_page does not exist");
-// 	return (it->second);
-// }
-
-// /* find location by a name */ //do not using in parser, created for server
-// manager const std::vector<Location>::iterator
 
 size_t ServerConf::findMatchingLocation(const std::string& uri, const Location*& bestMatch) const {
     size_t bestMatchLength = 0;

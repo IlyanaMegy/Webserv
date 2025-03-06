@@ -10,8 +10,6 @@ Server::Server(unsigned int port) : _port(port), _socket(port)
 	(void) _port;
 	if (listen(_socket.getFd(), MAXCONNECT) < 0)
 		throw std::runtime_error("Failed to listen on socket");
-	// std::cout << "server's socket listening..." << std::endl;
-	std::cout << "Server is running on port " << port << "..." << std::endl;
 }
 
 Server::~Server(void)
