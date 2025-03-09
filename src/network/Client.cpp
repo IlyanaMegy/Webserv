@@ -16,7 +16,11 @@ Client::Client(Server* server) : _request(NULL), _shouldClose(false), _server(se
 	_socket.fill(clientFd, addr);
 }
 
-Client::~Client(void){}
+Client::~Client(void)
+{
+	if (_request)
+		delete _request;
+}
 
 Request	*Client::getRequest(void)
 {
