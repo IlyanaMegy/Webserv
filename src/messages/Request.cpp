@@ -102,7 +102,8 @@ int	Request::_launchCGI(std::string path)
 void	Request::_parseBody(void)
 {
 	if (_isBodyChunked)
-		_parseChunkedBody();
+		while (_stage != DONE && _stage != PROCESSING && _state != AWAITING_MESSAGE)
+			_parseChunkedBody();
 	else
 		_parseFullBody();
 }

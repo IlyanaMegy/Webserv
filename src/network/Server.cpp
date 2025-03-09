@@ -72,10 +72,7 @@ void	Server::readFrom(int clientFd, Epoll* epoll)
 	if (!_clients[clientFd]->getRequest())
 		_clients[clientFd]->createNewRequest(_clients[clientFd]->leftoverMessage, epoll);
 	_clients[clientFd]->getRequest()->add(std::string(buffer, res));
-	while (_clients[clientFd]->getRequest()->getStage() != Request::DONE && _clients[clientFd]->getRequest()->getStage() != Request::PROCESSING
-			&& _clients[clientFd]->getRequest()->getState() == Request::TREATING_MESSAGE)
-		_clients[clientFd]->getRequest()->parse();
-
+	_clients[clientFd]->getRequest()->parse();
 	if (_clients[clientFd]->getRequest()->getStage() == Request::PROCESSING && _clients[clientFd]->getRequest()->getCGI() == NULL)
 		_clients[clientFd]->getRequest()->treat();
 	std::cout << "End of reading!" << std::endl;
