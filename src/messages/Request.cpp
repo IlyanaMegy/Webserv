@@ -1,14 +1,20 @@
 #include "Request.hpp"
 
 #include "Server.hpp"
+#include "CGI.hpp"
+#include "Epoll.hpp"
 
 Request::Request(void)
-	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _server(NULL), _untreatedMessage("") , _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
+	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _server(NULL), _epoll(NULL), _cgi(NULL), _untreatedMessage("") , _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
 
-Request::Request(Server* server, std::string leftoverMessage)
-	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _server(server), _untreatedMessage(leftoverMessage), _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
+Request::Request(Server* server, Epoll* epoll, std::string leftoverMessage)
+	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _server(server), _epoll(epoll), _cgi(NULL), _untreatedMessage(leftoverMessage), _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
 
-Request::~Request(void) {}
+Request::~Request(void)
+{
+	if (_cgi)
+		delete _cgi;
+}
 
 Response	&Request::getResponse(void)
 {
@@ -30,6 +36,11 @@ Request::State	Request::getState(void)
 	return _state;
 }
 
+CGI*	Request::getCGI(void)
+{
+	return _cgi;
+}
+
 void	Request::add(std::string buffer)
 {
 	_untreatedMessage = _untreatedMessage+buffer;
@@ -44,12 +55,13 @@ void	Request::parse(void)
 		_parseHeader();
 	if (_stage == SEEKING_BODY)
 		_parseBody();
-	if (_stage == PROCESSING)
-		_treat();
-	}
+}
 
-void	Request::_treat(void)
+void	Request::treat(void)
 {
+	if (_path.length() > 3 && _path.substr(_path.length() - 3, 3) == ".py" && _method != DELETE)
+		return (treatCGI());
+
 	if (_method == GET)
 		_response.fillGET(_path);
 	else if (_method == DELETE)
@@ -57,6 +69,34 @@ void	Request::_treat(void)
 	else
 		_response.fillPOST(_path, _body);
 	_stage = DONE;
+}
+
+void	Request::treatCGI(void)
+{
+	if (!_cgi) {
+		if (_launchCGI(_fixPath(_path))) {
+			_response.fillError("502", "Bad Gateway");
+			_stage = DONE;
+		}
+		return ;
+	}
+	if (!_cgi->getHasSucceeded()) {
+		_response.fillError("502", "Bad Gateway");
+		_stage = DONE;
+		return;
+	}
+	_response.fillCGI(_cgi->getOutput());
+	_stage = DONE;
+}
+
+int	Request::_launchCGI(std::string path)
+{
+	if (access(PYTHON_PATH, X_OK) || access(path.c_str(), R_OK))
+		return 1;
+	_cgi = new CGI(_epoll, PYTHON_PATH, path);
+	if (!_cgi)
+		throw std::exception();
+	return 0;
 }
 
 void	Request::_parseBody(void)

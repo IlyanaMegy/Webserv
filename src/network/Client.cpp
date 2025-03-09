@@ -1,6 +1,7 @@
 #include "Client.hpp"
 
 #include "Server.hpp"
+#include "Epoll.hpp"
 
 Client::Client(void) : _request(NULL), _shouldClose(false), _server(NULL), leftoverMessage("") {}
 
@@ -42,9 +43,9 @@ void	Client::setShouldClose(bool shouldClose)
 	_shouldClose = shouldClose;
 }
 
-void	Client::createNewRequest(std::string leftoverMessage)
+void	Client::createNewRequest(std::string leftoverMessage, Epoll* epoll)
 {
-	_request = new Request(_server, leftoverMessage);
+	_request = new Request(_server, epoll, leftoverMessage);
 	if (!_request)
 		throw std::exception();
 }

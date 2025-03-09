@@ -37,6 +37,8 @@ class Response
 		void		fillDELETE(std::string path);
 		void		fillPOST(std::string path, std::string body);
 
+		void		fillCGI(std::string content);
+
 	private:
 		std::string	_message;
 		bool		_shouldClose;

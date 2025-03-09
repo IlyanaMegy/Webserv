@@ -29,15 +29,18 @@ void	runServer(std::string configFile)
 				else if (it->second->isClientKnown(epoll.getFd(i))) {
 					if (epoll.getEvent(i) == (EPOLLIN | EPOLLOUT)
 					|| epoll.getEvent(i) == EPOLLIN)
-						it->second->readFrom(epoll.getFd(i));
+						it->second->readFrom(epoll.getFd(i), &epoll);
 					if (epoll.getEvent(i) == (EPOLLIN | EPOLLOUT)
 					|| epoll.getEvent(i) == EPOLLOUT)
 						it->second->sendTo(epoll.getFd(i));
-	
+
 					if (it->second->getClient(epoll.getFd(i))->getShouldClose()) {
 						epoll.deleteFd(epoll.getFd(i));
 						it->second->closeConnection(epoll.getFd(i));
 					}
+				}
+				else if (Request* request = it->second->findCGIRequest(epoll.getFd(i))) {
+					it->second->readFrom(epoll.getFd(i), &epoll, request);
 				}
 			}
 		}

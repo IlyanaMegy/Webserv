@@ -2,6 +2,8 @@
 
 #include "Request.hpp"
 #include "ServerConf.hpp"
+#include "CGI.hpp"
+#include "Request.hpp"
 
 #include <iostream>
 
@@ -55,7 +57,7 @@ void	Server::acceptClient(Epoll &epoll)
 	epoll.addFd(clientSocket, EPOLLIN | EPOLLOUT);
 }
 
-void	Server::readFrom(int clientFd)
+void	Server::readFrom(int clientFd, Epoll* epoll)
 {
 	char		buffer[BUFFER_SIZE] = "";
 	ssize_t		res;
@@ -68,12 +70,32 @@ void	Server::readFrom(int clientFd)
 		return ;
 	}
 	if (!_clients[clientFd]->getRequest())
-		_clients[clientFd]->createNewRequest(_clients[clientFd]->leftoverMessage);
+		_clients[clientFd]->createNewRequest(_clients[clientFd]->leftoverMessage, epoll);
 	_clients[clientFd]->getRequest()->add(std::string(buffer, res));
-	while (_clients[clientFd]->getRequest()->getStage() != Request::DONE
+	while (_clients[clientFd]->getRequest()->getStage() != Request::DONE && _clients[clientFd]->getRequest()->getStage() != Request::PROCESSING
 			&& _clients[clientFd]->getRequest()->getState() == Request::TREATING_MESSAGE)
 		_clients[clientFd]->getRequest()->parse();
+
+	if (_clients[clientFd]->getRequest()->getStage() == Request::PROCESSING && _clients[clientFd]->getRequest()->getCGI() == NULL)
+		_clients[clientFd]->getRequest()->treat();
 	std::cout << "End of reading!" << std::endl;
+}
+
+void	Server::readFrom(int cgiFd, Epoll* epoll, Request* request)
+{
+	char		buffer[BUFFER_SIZE] = "";
+	ssize_t		res;
+
+	res = read(cgiFd, buffer, BUFFER_SIZE - 1);
+	if (res == -1)
+		throw std::exception();
+	if (res == 0) {
+		epoll->deleteFd(cgiFd);
+		request->getCGI()->wait();
+		request->treatCGI();
+		return ;
+	}
+	request->getCGI()->addOutput(std::string(buffer, res));
 }
 
 void	Server::sendTo(int clientFd)
@@ -101,21 +123,30 @@ void	Server::sendTo(int clientFd)
 // 	std::cerr << "Erreur lors de la création du socket" << std::endl;
 // }
 
-bool Server::isConfigKnown(std::string serverName)
+bool	Server::isConfigKnown(std::string serverName)
 {
 	return _confs.find(serverName) != _confs.end();
 }
 
-bool Server::isClientKnown(int clientFd)
+bool	Server::isClientKnown(int clientFd)
 {
 	return _clients.find(clientFd) != _clients.end();
 }
 
-void Server::addConfig(ServerConf *conf)
+void	Server::addConfig(ServerConf *conf)
 {
 	_confs[conf->getServerName()] = conf;
 }
 
+Request*	Server::findCGIRequest(int cgiFd)
+{
+	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); it++) {
+		if (it->second->getRequest() && it->second->getRequest()->getCGI()
+				&& it->second->getRequest()->getCGI()->getFd() == cgiFd)
+			return it->second->getRequest();
+	}
+	return NULL;
+}
 
 // const char *Server::SocketCreationErrException::what() const throw() {
 // 	std::cerr << "Erreur lors de la création du socket" << std::endl;

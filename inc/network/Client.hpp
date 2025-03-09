@@ -9,6 +9,7 @@
 # define BUFFER_SIZE 1024
 
 class	Server;
+class	Epoll;
 
 class Client
 {
@@ -33,7 +34,7 @@ class Client
 
 		void	setShouldClose(bool shouldClose);
 
-		void	createNewRequest(std::string leftoverMessage);
+		void	createNewRequest(std::string leftoverMessage, Epoll* epoll);
 		void	deleteRequest(void);
 
 };

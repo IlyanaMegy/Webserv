@@ -15,6 +15,8 @@
 # define MAXBODYOCTETS 2000000000
 
 class	Server;
+class	CGI;
+class	Epoll;
 
 class Request
 {
@@ -40,17 +42,21 @@ class Request
 		};
 
 		Request(void);
-		Request(Server* server, std::string leftoverMessage);
+		Request(Server* server, Epoll* epoll, std::string leftoverMessage);
 		~Request(void);
 
 		Response					&getResponse(void);
 		std::string					getUntreatedMessage(void);
 		Stage						getStage(void);
 		State						getState(void);
-
-
+		CGI*						getCGI(void);
+		
+		
 		void						add(std::string buffer);
 		void						parse(void);
+		
+		void						treat(void);
+		void						treatCGI(void);
 
 	private:
 
@@ -61,6 +67,8 @@ class Request
 		Response											_response;
 
 		Server*												_server;
+		Epoll*												_epoll;
+		CGI*												_cgi;
 
 		std::string											_untreatedMessage;
 	
@@ -108,8 +116,9 @@ class Request
 		unsigned int				_findChunkLength(void);
 		std::string					_findChunk(unsigned int chunkLength);
 
+		int							_launchCGI(std::string path);
 
-		void						_treat(void);
+
 
 		static std::string			_toLower(std::string s);
 		static bool					_isDelimiter(unsigned char c);

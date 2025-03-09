@@ -12,7 +12,9 @@
 
 # define MAXCONNECT 30
 
-class ServerConf;
+class	ServerConf;
+class	Epoll;
+class	Request;
 
 class Server
 {
@@ -33,14 +35,17 @@ class Server
 		Client			*getClient(int clientFd);
 
 		void			acceptClient(Epoll &epoll);
-		void			readFrom(int clientFd);
+		void			readFrom(int clientFd, Epoll* epoll);
+		void			readFrom(int cgiFd, Epoll* epoll, Request* request);
 		void			sendTo(int clientFd);
 		void			closeConnection(int clientFd);
 
 		bool 			isConfigKnown(std::string serverName);
 		bool			isClientKnown(int clientFd);
 		void 			addConfig(ServerConf *conf);
-	
+
+		Request*		findCGIRequest(int cgiFd);
+
 		
 		// class SocketCreationErrException : public std::exception {
 		// 	public:

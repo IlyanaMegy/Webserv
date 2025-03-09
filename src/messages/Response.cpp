@@ -68,10 +68,18 @@ void	Response::_createBody(void)
 
 void	Response::fillError(std::string statusCode, std::string reasonMessage)
 {
+	_fillContent(ERRORPATH+statusCode+".html");
 	_fillStatusLine(statusCode, reasonMessage);
 	_shouldClose = true;
 	_fillHeader();
-	_fillContent(ERRORPATH+statusCode+".html");
+	_isComplete = true;
+}
+
+void	Response::fillCGI(std::string content)
+{
+	_content = content;
+	_fillStatusLine("200", "OK");
+	_fillHeader();
 	_isComplete = true;
 }
 

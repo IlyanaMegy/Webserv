@@ -9,7 +9,8 @@ SRCS_CONFIG		:=	ConfigParser.cpp \
 					ServerConf.cpp
 
 SRCS_MESSAGES	:=	Request.cpp \
-					Response.cpp
+					Response.cpp \
+					CGI.cpp
 
 SRCS_NETWORK	:=	Client.cpp \
 					Epoll.cpp \
