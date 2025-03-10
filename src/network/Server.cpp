@@ -54,7 +54,7 @@ void	Server::acceptClient(Epoll &epoll)
 	clientSocket = client->getSocket().getFd();
 	_clients[clientSocket] = client;
 	std::cout << "New client accepted!" << std::endl;
-	epoll.addFd(clientSocket, EPOLLIN | EPOLLOUT);
+	epoll.addFd(clientSocket, EPOLLIN | EPOLLOUT, TIMEOUT);
 }
 
 void	Server::readFrom(int clientFd, Epoll* epoll)
@@ -72,6 +72,8 @@ void	Server::readFrom(int clientFd, Epoll* epoll)
 	if (!_clients[clientFd]->getRequest())
 		_clients[clientFd]->createNewRequest(_clients[clientFd]->leftoverMessage, epoll);
 	_clients[clientFd]->getRequest()->add(std::string(buffer, res));
+	if (_clients[clientFd]->getRequest()->getResponse().getIsComplete())
+		return ;
 	_clients[clientFd]->getRequest()->parse();
 	if (_clients[clientFd]->getRequest()->getStage() == Request::PROCESSING && _clients[clientFd]->getRequest()->getCGI() == NULL)
 		_clients[clientFd]->getRequest()->treat();

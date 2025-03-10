@@ -90,6 +90,7 @@ void	Epoll::wait(void)
 
 	_timeoutFds.clear();
 	_checkTimers();
+	_updateTimers();
 }
 
 void	Epoll::_checkTimers(void)
@@ -102,6 +103,16 @@ void	Epoll::_checkTimers(void)
 		if (_isTimeout(tv, it->second))
 			_timeoutFds.push_back(it->first);
 	}
+}
+
+void	Epoll::_updateTimers(void)
+{
+	for (int i = 0; i < _ReadyFdsNb; i++) {
+		if ((_events[i].events == EPOLLIN || _events[i].events == (EPOLLIN | EPOLLOUT))
+				&& _timeouts.find(_events[i].data.fd) != _timeouts.end())
+			_timeouts[_events[i].data.fd].tv_sec+= TIMEOUT;
+	}
+
 }
 
 bool	Epoll::_isTimeout(struct timeval& tv, struct timeval& maxTv)

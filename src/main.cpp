@@ -19,9 +19,15 @@ void	runServer(std::string configFile)
 
 		for (int i = 0; i < epoll.getTimeoutFdsNb(); i++) {
 			for (std::map<int, Server*>::iterator it = serverMonitor.getServers().begin(); it != serverMonitor.getServers().end(); it++)
-				if (Request* request = it->second->findCGIRequest(epoll.getTimeoutFd(i)))
+				if (it->second->isClientKnown(epoll.getTimeoutFd(i))) {
+					if (!it->second->getClient(epoll.getTimeoutFd(i))->getRequest())
+						it->second->getClient(epoll.getTimeoutFd(i))->createNewRequest("", &epoll);
+					it->second->getClient(epoll.getTimeoutFd(i))->getRequest()->getResponse().fillError("408", "Request Timeout");
+				}
+				else if (Request* request = it->second->findCGIRequest(epoll.getTimeoutFd(i))) {
 					request->treatCGI();
-			epoll.deleteFd(epoll.getTimeoutFd(i));
+					epoll.deleteFd(epoll.getTimeoutFd(i));
+				}
 		}
 
 		for (int i = 0; i < epoll.getReadyFdsNb(); i++) {

@@ -10,7 +10,7 @@
 # include <sys/time.h>
 
 # define MAX_EVENTS 100
-# define CGI_TIMEOUT 5
+# define TIMEOUT 10
 
 class	Server;
 
@@ -27,6 +27,7 @@ class Epoll
 
 		void	_addTimer(int fd, int timeout);
 		void	_checkTimers(void);
+		void	_updateTimers(void);
 
 		static bool	_isTimeout(struct timeval& tv, struct timeval& maxTv);
 

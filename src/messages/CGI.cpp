@@ -64,5 +64,5 @@ void	CGI::_launch(void)
 
 	close(_pipeFd[WRITE_END]);
 
-	_epoll->addFd(_pipeFd[READ_END], EPOLLIN, CGI_TIMEOUT);
+	_epoll->addFd(_pipeFd[READ_END], EPOLLIN, TIMEOUT);
 }
