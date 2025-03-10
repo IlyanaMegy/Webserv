@@ -1,4 +1,5 @@
 #include "Location.hpp"
+#include "../../inc/debug.hpp"
 
 #include "ParserTools.hpp"
 #include "Request.hpp"
@@ -18,6 +19,7 @@ Location::~Location() {}
 void Location::setPath(std::string param) { _path = param; }
 
 void Location::setRootLocation(std::string param) {
+	print_it(param, "root location :");
 	if (getTypePath(param) != 2)
 		throw std::runtime_error("Error: Invalid IP address format for host");
 	if (!param.empty() && param[param.size() - 1] == ';')

@@ -1,5 +1,5 @@
 #include "../../inc/messages/ServerConf.hpp"
-
+// #include "../../inc/debug.hpp"
 #include "../../inc/messages/Request.hpp"
 #include "../../inc/config/ParserTools.hpp"
 
@@ -139,7 +139,7 @@ void ServerConf::setLocation(std::string path,  std::vector<std::string> params)
 				throw std::runtime_error( "Allow_methods of location is duplicated");
 			std::vector<std::string> methods;
 			while (++i < params.size()) {
-				if (findChar(params[i], ';') != -1) {
+				if (findChar(params[i], ';') >= 1) {
 					checkToken(params[i]);
 					if (!params[i].empty() && params[i][params[i].size() - 1] == ';')
 						params[i].erase(params[i].size() - 1);
@@ -191,7 +191,7 @@ void ServerConf::setLocation(std::string path,  std::vector<std::string> params)
 		} else if (params[i] == "cgi_ext" && (i + 1) < params.size()) {											// ! \\ check later
 			std::vector<std::string> extension;
 			while (++i < params.size()) {
-				if (params[i].find(";") != std::string::npos) {
+				if (findChar(params[i+1], ';') < 1) {
 					checkToken(params[i]);
 					extension.push_back(params[i]);
 					break;
@@ -205,7 +205,7 @@ void ServerConf::setLocation(std::string path,  std::vector<std::string> params)
 		} else if (params[i] == "cgi_path" && (i + 1) < params.size()) {										// ! \\ check later
 			std::vector<std::string> path;
 			while (++i < params.size()) {
-				if (params[i].find(";") != std::string::npos) {
+				if (findChar(params[i+1], ';') < 1) {
 					checkToken(params[i]);
 					path.push_back(params[i]);
 					break;
@@ -228,7 +228,7 @@ void ServerConf::setLocation(std::string path,  std::vector<std::string> params)
 			new_loca.setMaxBodySize(params[i]);
 			flag_max_size = true;
 		} else if (i < params.size())
-			throw std::runtime_error("params in a location is invalid");
+			throw std::runtime_error("a parameter in a location is invalid : " + params[i]);
 	}
 	if (new_loca.getPath() != "/cgi-bin" && new_loca.getIndexLocation().empty())
 		new_loca.setIndexLocation(_index);
@@ -346,6 +346,15 @@ bool ServerConf::isValidMethod(std::string uri, Request::Method method) {
 	if (std::find(locationMethods.begin(), locationMethods.end(), method) != locationMethods.end())
 		return (true);
 	return (false);
+}
+
+bool ServerConf::isCgiPath(const std::string& path) const {
+    if (findChar(path, '.') >= 1) {
+        std::string extension = path.substr(path.rfind('.'));
+        if (extension == ".py" || extension == ".pl" || extension == ".php")
+            return true;        
+    }
+    return false;
 }
 
 void ServerConf::addRootToLocations(std::string root) {

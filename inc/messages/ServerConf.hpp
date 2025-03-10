@@ -8,9 +8,9 @@
 #include <map>
 #include <vector>
 
-#include "Location.hpp"
-#include "messages/Request.hpp"
-#include "style.hpp"
+#include "../config/Location.hpp"
+#include "Request.hpp"
+#include "../style.hpp"
 
 class ServerConf {
    private:
@@ -55,6 +55,7 @@ class ServerConf {
 	const std::vector<Location>::iterator getLocationFromUri(std::string uri);
 
 	bool is_setted_loca_root;
+	bool isCgiPath(const std::string& path) const;
 
 	bool isValidMethod(std::string uri, Request::Method method);
 

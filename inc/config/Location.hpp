@@ -37,7 +37,6 @@ class Location {
 	unsigned long getClientMBS() const;
 
    private:
-	// bool setted_root = 1;
 	std::string _path;
 	std::string _root;
 	std::string _index;
