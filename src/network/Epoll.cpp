@@ -38,12 +38,22 @@ int Epoll::getReadyFdsNb(void) const
 	return _ReadyFdsNb;
 }
 
-int	Epoll::getFd(int i) const
+int	Epoll::getReadyFd(int i) const
 {
 	return _events[i].data.fd;
 }
 
-void	Epoll::addFd(int fd, int flags)
+int	Epoll::getTimeoutFdsNb(void) const
+{
+	return _timeoutFds.size();
+}
+
+int	Epoll::getTimeoutFd(int i) const
+{
+	return _timeoutFds[i];
+}
+
+void	Epoll::addFd(int fd, int flags, int timeout)
 {
 	struct epoll_event event;
 
@@ -51,11 +61,25 @@ void	Epoll::addFd(int fd, int flags)
 	event.data.fd = fd;
 	if (epoll_ctl(_epollFd, EPOLL_CTL_ADD, fd, &event) == -1)
 		throw std::exception();
+	if (timeout != - 1)
+		_addTimer(fd, timeout);
+}
+
+void	Epoll::_addTimer(int fd, int timeout)
+{
+	struct timeval	tv;
+
+	if (gettimeofday(&tv, NULL))
+		throw std::exception();
+	tv.tv_sec+= timeout;
+	_timeouts[fd] = tv;
 }
 
 void	Epoll::deleteFd(int fd)
 {
 	epoll_ctl(_epollFd, EPOLL_CTL_DEL, fd, NULL);
+	if (_timeouts.find(fd) != _timeouts.end())
+		_timeouts.erase(fd);
 }
 
 void	Epoll::wait(void)
@@ -63,4 +87,26 @@ void	Epoll::wait(void)
 	_ReadyFdsNb = epoll_wait(_epollFd, _events, MAX_EVENTS, -1);
 	if (_ReadyFdsNb == -1)
 		throw std::exception();
+
+	_timeoutFds.clear();
+	_checkTimers();
 }
+
+void	Epoll::_checkTimers(void)
+{
+	struct timeval	tv;
+
+	if (gettimeofday(&tv, NULL))
+		throw std::exception();
+	for (std::map<int, struct timeval>::iterator it = _timeouts.begin(); it != _timeouts.end(); it++) {
+		if (_isTimeout(tv, it->second))
+			_timeoutFds.push_back(it->first);
+	}
+}
+
+bool	Epoll::_isTimeout(struct timeval& tv, struct timeval& maxTv)
+{
+	return tv.tv_sec > maxTv.tv_sec || (tv.tv_sec == maxTv.tv_sec && tv.tv_usec > maxTv.tv_usec);
+}
+
+

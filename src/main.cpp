@@ -17,30 +17,37 @@ void	runServer(std::string configFile)
 			std::cout << e.what() << std::endl;
 		}
 
+		for (int i = 0; i < epoll.getTimeoutFdsNb(); i++) {
+			for (std::map<int, Server*>::iterator it = serverMonitor.getServers().begin(); it != serverMonitor.getServers().end(); it++)
+				if (Request* request = it->second->findCGIRequest(epoll.getTimeoutFd(i)))
+					request->treatCGI();
+			epoll.deleteFd(epoll.getTimeoutFd(i));
+		}
+
 		for (int i = 0; i < epoll.getReadyFdsNb(); i++) {
 			for (std::map<int, Server*>::iterator it = serverMonitor.getServers().begin(); it != serverMonitor.getServers().end(); it++) {
-				if (epoll.getFd(i) == it->first) {
+				if (epoll.getReadyFd(i) == it->first) {
 					try {
 						it->second->acceptClient(epoll);
 					} catch (std::exception &e) {
 						std::cout << e.what() << std::endl;
 					}
 				}
-				else if (it->second->isClientKnown(epoll.getFd(i))) {
+				else if (it->second->isClientKnown(epoll.getReadyFd(i))) {
 					if (epoll.getEvent(i) == (EPOLLIN | EPOLLOUT)
 					|| epoll.getEvent(i) == EPOLLIN)
-						it->second->readFrom(epoll.getFd(i), &epoll);
+						it->second->readFrom(epoll.getReadyFd(i), &epoll);
 					if (epoll.getEvent(i) == (EPOLLIN | EPOLLOUT)
 					|| epoll.getEvent(i) == EPOLLOUT)
-						it->second->sendTo(epoll.getFd(i));
+						it->second->sendTo(epoll.getReadyFd(i));
 
-					if (it->second->getClient(epoll.getFd(i))->getShouldClose()) {
-						epoll.deleteFd(epoll.getFd(i));
-						it->second->closeConnection(epoll.getFd(i));
+					if (it->second->getClient(epoll.getReadyFd(i))->getShouldClose()) {
+						epoll.deleteFd(epoll.getReadyFd(i));
+						it->second->closeConnection(epoll.getReadyFd(i));
 					}
 				}
-				else if (Request* request = it->second->findCGIRequest(epoll.getFd(i))) {
-					it->second->readFrom(epoll.getFd(i), &epoll, request);
+				else if (Request* request = it->second->findCGIRequest(epoll.getReadyFd(i))) {
+					it->second->readFrom(epoll.getReadyFd(i), &epoll, request);
 				}
 			}
 		}
