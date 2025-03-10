@@ -12,7 +12,10 @@ CGI::CGI(Epoll* epoll, std::string program, std::string cgi)
 	_launch();
 }
 
-CGI::~CGI(void) {}
+CGI::~CGI(void)
+{
+	close(_pipeFd[READ_END]);
+}
 
 int	CGI::getFd(void)
 {
@@ -36,8 +39,6 @@ void	CGI::addOutput(std::string buffer)
 
 void	CGI::wait(void)
 {
-	close(_pipeFd[READ_END]);
-	
 	int	wstatus;
 
 	_hasSucceeded = waitpid(_cpid, &wstatus, 0) != - 1 && WIFEXITED(wstatus) && WEXITSTATUS(wstatus) == 0;
