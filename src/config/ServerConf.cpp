@@ -1,7 +1,9 @@
 #include "../../inc/messages/ServerConf.hpp"
+#include <iostream>
 // #include "../../inc/debug.hpp"
 #include "../../inc/messages/Request.hpp"
 #include "../../inc/config/ParserTools.hpp"
+#include "../../inc/debug.hpp"
 
 ServerConf::ServerConf() {
 	_port = 0;
@@ -191,13 +193,13 @@ void ServerConf::setLocation(std::string path,  std::vector<std::string> params)
 		} else if (params[i] == "cgi_ext" && (i + 1) < params.size()) {											// ! \\ check later
 			std::vector<std::string> extension;
 			while (++i < params.size()) {
-				if (findChar(params[i+1], ';') < 1) {
-					checkToken(params[i]);
+				if (findChar(params[i], ';') < 1)
 					extension.push_back(params[i]);
-					break;
-				} else {
+				else if (!params[i].empty() && params[i][params[i].size() - 1] == ';')
+				{
+					params[i].erase(params[i].size() - 1);
 					extension.push_back(params[i]);
-					if (i + 1 >= params.size())
+					if ( (findChar(params[i], ';') >= 1) && (i + 1 >= params.size()))
 						throw std::runtime_error("Token is invalid");
 				}
 			}
@@ -207,6 +209,8 @@ void ServerConf::setLocation(std::string path,  std::vector<std::string> params)
 			while (++i < params.size()) {
 				if (findChar(params[i+1], ';') < 1) {
 					checkToken(params[i]);
+					if (!params[i].empty() && params[i][params[i].size() - 1] == ';')
+						params[i].erase(params[i].size() - 1);
 					path.push_back(params[i]);
 					break;
 				} else {
@@ -249,10 +253,12 @@ void ServerConf::setLocation(std::string path,  std::vector<std::string> params)
 
 int ServerConf::isValidLocation(Location &location) const {
 	if (location.getPath() == "/cgi-bin") {
-		if (location.getCgiPath().empty() || location.getCgiExtension().empty() || location.getIndexLocation().empty())
+		if (location.getCgiPath().empty() || location.getCgiExtension().empty())
 			return (1);
+		if (location.getIndexLocation().empty())
+			location.setIndexLocation("first.py");								//!\ CHANGE IT LATER
 		if (checkFile(location.getIndexLocation(), 4) < 0) {
-			std::string path = location.getRootLocation() + location.getPath() + "/" + location.getIndexLocation();
+			std::string path = location.getRootLocation() + "/" + location.getIndexLocation();
 			if (getTypePath(path) != 1) {
 				std::string root = getcwd(NULL, 0);
 				location.setRootLocation(root);
@@ -263,23 +269,27 @@ int ServerConf::isValidLocation(Location &location) const {
 		}
 		if (location.getCgiPath().size() != location.getCgiExtension().size())
 			return (1);
-		std::vector<std::string>::const_iterator it;
-		for (it = location.getCgiPath().begin(); it != location.getCgiPath().end(); ++it)
-			if (getTypePath(*it) < 0)
+		std::vector<std::string> cgiPaths = location.getCgiPath();
+		for (std::vector<std::string>::const_iterator it = cgiPaths.begin(); it != cgiPaths.end(); ++it) {
+			std::string path = *it;
+			if (!path.empty() && path[path.length() - 1] == ';')
+				path.erase(path.length() - 1);
+			if (getTypePath(path) != 1)
 				return (1);
-		std::vector<std::string>::const_iterator it_path;
-		for (it = location.getCgiExtension().begin(); it != location.getCgiExtension().end(); ++it) {
-			std::string tmp = *it;
-			if (tmp != ".py" && tmp != ".sh" && tmp != "*.py" && tmp != "*.sh")
+			if (checkFile(path, X_OK) < 0)
 				return (1);
-			for (it_path = location.getCgiPath().begin();  it_path != location.getCgiPath().end(); ++it_path) {
-				std::string tmp_path = *it_path;
-				if (tmp == ".py" || tmp == "*.py") {
-					if (tmp_path.find("python") != std::string::npos)
-						location._extPath.insert(std::make_pair(".py", tmp_path));
-				} else if (tmp == ".sh" || tmp == "*.sh")
-					if (tmp_path.find("bash") != std::string::npos)
-						location._extPath[".sh"] = tmp_path;
+		}
+		std::vector<std::string> cgiExts = location.getCgiExtension();
+		for (std::vector<std::string>::const_iterator it = cgiExts.begin(); it != cgiExts.end(); ++it) {
+			std::string ext = *it;
+			if (ext != ".py" && ext != ".sh" && ext != "*.py" && ext != "*.sh")
+				return (1);
+			for (std::vector<std::string>::const_iterator it_path = cgiPaths.begin(); it_path != cgiPaths.end(); ++it_path) {
+				std::string path = *it_path;
+				if ((ext == ".py" || ext == "*.py") && path.find("python") != std::string::npos)
+					location._extPath[".py"] = path;
+				else if ((ext == ".sh" || ext == "*.sh") && path.find("bash") != std::string::npos)
+					location._extPath[".sh"] = path;
 			}
 		}
 		if (location.getCgiPath().size() != location.getExtensionPath().size())
@@ -351,8 +361,13 @@ bool ServerConf::isValidMethod(std::string uri, Request::Method method) {
 bool ServerConf::isCgiPath(const std::string& path) const {
     if (findChar(path, '.') >= 1) {
         std::string extension = path.substr(path.rfind('.'));
-        if (extension == ".py" || extension == ".pl" || extension == ".php")
-            return true;        
+        for (std::vector<Location>::const_iterator it = _locations.begin(); it != _locations.end(); ++it) {
+            if (it->getPath() == "/cgi-bin") {
+                std::map<std::string, std::string> extPath = it->getExtensionPath();
+                if (extPath.find(extension) != extPath.end())
+                    return true;
+            }
+        }
     }
     return false;
 }
