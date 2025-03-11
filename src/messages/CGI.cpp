@@ -97,10 +97,13 @@ void	CGI::_setEnv(void)
 	
 	_env["REQUEST_METHOD"] = _request->getMethod() == Request::GET ? "GET" : "POST";
 	
+	_env["SCRIPT_NAME"] = _cgi;
+	
 	_env["SERVER_PORT"] = _itos(_request->getServer()->getPort());
 	
 	_env["SERVER_PROTOCOL"] = "HTTP/1.1";
 	
+	_env["SERVER_SOFTWARE"] = "webserv";
 
 }
 
