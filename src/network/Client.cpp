@@ -11,7 +11,7 @@ Client::Client(Server* server) : _request(NULL), _shouldClose(false), _server(se
 	struct sockaddr_in addr;
 	socklen_t	addrLen = sizeof(struct sockaddr_in);
 
-	clientFd = accept(server->getSocket().getFd(), (struct sockaddr *)&addr, &addrLen);
+	clientFd = accept4(server->getSocket().getFd(), (struct sockaddr *)&addr, &addrLen, SOCK_CLOEXEC);
 	if (clientFd == -1)
 		throw std::runtime_error("Failed to accept client");
 	_socket.fill(clientFd, addr);

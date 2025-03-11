@@ -9,7 +9,7 @@
 Socket::Socket(void) : _opt(1), _fd(-1) {}
 
 Socket::Socket(int port) : _opt(1) {
-	_fd = socket(AF_INET, SOCK_STREAM, 0);
+	_fd = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
 	if (_fd == -1)
 		throw std::runtime_error("Failed to create socket");
 

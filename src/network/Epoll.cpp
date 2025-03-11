@@ -4,7 +4,7 @@
 
 Epoll::Epoll(std::map<int, Server*>& servers)
 {
-	_epollFd = epoll_create(1);
+	_epollFd = epoll_create1(EPOLL_CLOEXEC);
 	if (_epollFd == -1)
 		throw std::exception();
 
