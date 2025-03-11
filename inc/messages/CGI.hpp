@@ -6,6 +6,7 @@
 #include <sys/wait.h>
 #include <map>
 #include <string.h>
+#include <vector>
 
 #define PYTHON_PATH "/usr/bin/python3"
 
@@ -49,10 +50,11 @@ class CGI
 		bool		_hasSucceeded;
 		std::string	_output;
 
-		void	_setEnv(void);
-		void 	_convertEnv(void);
-		void	_fillVar(char** varp, std::string key, std::string value);
-		void	_launch(void);
+		void		_setEnv(void);
+		std::string	_createCookieString(std::vector<std::string> cookies);
+		void		_convertEnv(void);
+		void		_fillVar(char** varp, std::string key, std::string value);
+		void		_launch(void);
 
 		static std::string	_itos(int value);
 

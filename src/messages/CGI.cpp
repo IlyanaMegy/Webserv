@@ -105,6 +105,18 @@ void	CGI::_setEnv(void)
 	
 	_env["SERVER_SOFTWARE"] = "webserv";
 
+	if (_request->getFields().find("cookie") != _request->getFields().end())
+		_env["HTTP_COOKIE"] = _createCookieString(_request->getFields()["cookie"]);
+}
+
+std::string	CGI::_createCookieString(std::vector<std::string> cookies)
+{
+	std::string	cookiesString;
+
+	for (size_t i = 0; i < cookies.size() - 1; i++)
+		cookiesString+=cookies[i]+";";
+	cookiesString+=cookies[cookies.size() - 1];
+	return cookiesString;
 }
 
 void	CGI::_convertEnv(void)
