@@ -1,11 +1,14 @@
 #include "CGI.hpp"
 
 #include "Epoll.hpp"
+#include "Request.hpp"
+#include "Server.hpp"
+#include "Socket.hpp"
 
-CGI::CGI(void) : _arg(NULL), _env(NULL), _cpid(-1), _epoll(NULL), _hasSucceeded(false) {}
+CGI::CGI(void) : _envp(NULL), _cpid(-1), _epoll(NULL), _client(NULL), _request(NULL), _hasSucceeded(false) {}
 
-CGI::CGI(Epoll* epoll, std::string program, std::string cgi)
-	: _program(program), _cgi(cgi), _arg(NULL), _env(NULL), _cpid(-1), _epoll(epoll), _hasSucceeded(false)
+CGI::CGI(Epoll* epoll, Request* request, std::string program, std::string cgi)
+	: _program(program), _cgi(cgi), _envp(NULL), _cpid(-1), _epoll(epoll), _client(request->getClient()), _request(request),_hasSucceeded(false)
 {
 	_setEnv();
 	_convertEnv();
@@ -78,6 +81,26 @@ void	CGI::_launch(void)
 
 void	CGI::_setEnv(void)
 {
+	if (_request->getBodyLength())
+		_env["CONTENT_LENGTH"] = _request->getBodyLength();
+	
+	if (_request->getFields().find("content-type") != _request->getFields().end())
+		_env["CONTENT_TYPE"] = _request->getFields()["content-type"][0];
+
+	_env["GATEWAY_INTERFACE"] = "CGI/1.1";
+	
+	_env["PATH_INFO"] = _cgi;
+	
+	_env["QUERY_STRING"] = _request->getQuery();
+	
+	_env["REMOTE_ADDR"] = std::string(inet_ntoa(_client->getSocket().getAddr().sin_addr));
+	
+	_env["REQUEST_METHOD"] = _request->getMethod() == Request::GET ? "GET" : "POST";
+	
+	_env["SERVER_PORT"] = _itos(_request->getServer()->getPort());
+	
+	_env["SERVER_PROTOCOL"] = "HTTP/1.1";
+	
 
 }
 

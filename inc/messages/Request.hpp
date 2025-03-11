@@ -17,6 +17,7 @@
 class	Server;
 class	CGI;
 class	Epoll;
+class	Client;
 
 class Request
 {
@@ -42,19 +43,27 @@ class Request
 		};
 
 		Request(void);
-		Request(Server* server, Epoll* epoll, std::string leftoverMessage);
+		Request(Server* server, Client* client, Epoll* epoll, std::string leftoverMessage);
 		~Request(void);
 
-		Response					&getResponse(void);
-		std::string					getUntreatedMessage(void);
-		Stage						getStage(void);
-		State						getState(void);
-		CGI*						getCGI(void);
+		Response											&getResponse(void);
+		std::string											getUntreatedMessage(void);
+		Stage												getStage(void);
+		State												getState(void);
+		CGI*												getCGI(void);
+		Server*												getServer(void);
+		Client*												getClient(void);
+		Method												getMethod(void);
+		std::string											getPath(void);
+		std::string											getQuery(void);
+		std::map< std::string, std::vector<std::string> >&	getFields(void);
+		unsigned int										getBodyLength(void);
+		std::string											getBody(void);
 		
 		
 		void						add(std::string buffer);
 		void						parse(void);
-		
+
 		void						treat(void);
 		void						treatCGI(void);
 
@@ -67,6 +76,7 @@ class Request
 		Response											_response;
 
 		Server*												_server;
+		Client*												_client;
 		Epoll*												_epoll;
 		CGI*												_cgi;
 
@@ -75,6 +85,7 @@ class Request
 		Method												_method;
 		std::string											_host;
 		std::string											_path;
+		std::string											_query;
 		std::map<std::string, std::string>					_arguments;
 	
 		std::map< std::string, std::vector<std::string> >	_fields;

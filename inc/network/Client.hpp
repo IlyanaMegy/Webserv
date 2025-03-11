@@ -2,6 +2,8 @@
 #define CLIENT_HPP
 
 # include <stdexcept>
+# include <arpa/inet.h>
+
 
 # include "Socket.hpp"
 # include "Request.hpp"

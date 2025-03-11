@@ -45,7 +45,7 @@ void	Client::setShouldClose(bool shouldClose)
 
 void	Client::createNewRequest(std::string leftoverMessage, Epoll* epoll)
 {
-	_request = new Request(_server, epoll, leftoverMessage);
+	_request = new Request(_server, this, epoll, leftoverMessage);
 	if (!_request)
 		throw std::exception();
 }

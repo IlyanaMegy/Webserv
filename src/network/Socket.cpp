@@ -47,3 +47,8 @@ int Socket::getFd(void) const
 {
 	return _fd;
 }
+
+struct sockaddr_in	Socket::getAddr(void) const
+{
+	return _addr;
+}

@@ -10,12 +10,14 @@
 #define PYTHON_PATH "/usr/bin/python3"
 
 class	Epoll;
+class	Client;
+class	Request;
 
 class CGI
 {
 	public:
 		CGI(void);
-		CGI(Epoll* epoll, std::string program, std::string cgi);
+		CGI(Epoll* epoll, Request* request, std::string program, std::string cgi);
 		~CGI(void);
 
 		enum PipeEnd {
@@ -41,6 +43,8 @@ class CGI
 		int	_cpid;
 
 		Epoll*		_epoll;
+		Client*		_client;
+		Request*	_request;
 
 		bool		_hasSucceeded;
 		std::string	_output;

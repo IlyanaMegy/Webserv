@@ -5,10 +5,10 @@
 #include "Epoll.hpp"
 
 Request::Request(void)
-	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _server(NULL), _epoll(NULL), _cgi(NULL), _untreatedMessage("") , _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
+	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _server(NULL), _client(NULL), _epoll(NULL), _cgi(NULL), _untreatedMessage("") , _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
 
-Request::Request(Server* server, Epoll* epoll, std::string leftoverMessage)
-	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _server(server), _epoll(epoll), _cgi(NULL), _untreatedMessage(leftoverMessage), _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
+Request::Request(Server* server, Client* client, Epoll* epoll, std::string leftoverMessage)
+	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _server(server), _client(client), _epoll(epoll), _cgi(NULL), _untreatedMessage(leftoverMessage), _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
 
 Request::~Request(void)
 {
@@ -39,6 +39,46 @@ Request::State	Request::getState(void)
 CGI*	Request::getCGI(void)
 {
 	return _cgi;
+}
+
+Server*	Request::getServer(void)
+{
+	return _server;
+}
+
+Client*	Request::getClient(void)
+{
+	return _client;
+}
+
+Request::Method	Request::getMethod(void)
+{
+	return _method;
+}
+
+std::string	Request::getPath(void)
+{
+	return _path;
+}
+
+std::string Request::getQuery(void)
+{
+	return _query;
+}
+
+std::map< std::string, std::vector<std::string> >&	Request::getFields(void)
+{
+	return _fields;
+}
+
+unsigned int	Request::getBodyLength(void)
+{
+	return _bodyLength;
+}
+
+std::string	Request::getBody(void)
+{
+	return _body;
 }
 
 void	Request::add(std::string buffer)
@@ -93,7 +133,7 @@ int	Request::_launchCGI(std::string path)
 {
 	if (access(PYTHON_PATH, X_OK) || access(path.c_str(), R_OK))
 		return 1;
-	_cgi = new CGI(_epoll, PYTHON_PATH, path);
+	_cgi = new CGI(_epoll, this, PYTHON_PATH, path);
 	if (!_cgi)
 		throw std::exception();
 	return 0;
@@ -548,6 +588,7 @@ int	Request::_parseQuery(std::string query)
 		return 1;
 	_arguments[pair.substr(0, affectPos == std::string::npos ? pair.length() : affectPos)]
 		= affectPos == std::string::npos ? "" : pair.substr(affectPos + 1, pair.length() - (affectPos + 1));
+	_query = query;
 	return 0;
 }
 
