@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <string>
 #include <sys/wait.h>
+#include <map>
+#include <string.h>
 
 #define PYTHON_PATH "/usr/bin/python3"
 
@@ -31,8 +33,9 @@ class CGI
 	private:
 		std::string	_program;
 		std::string	_cgi;
-		char**		_arg;
-		char**		_env;
+
+		std::map<std::string, std::string>	_env;
+		char**								_envp;
 
 		int	_pipeFd[2];
 		int	_cpid;
@@ -42,7 +45,12 @@ class CGI
 		bool		_hasSucceeded;
 		std::string	_output;
 
+		void	_setEnv(void);
+		void 	_convertEnv(void);
+		void	_fillVar(char** varp, std::string key, std::string value);
 		void	_launch(void);
+
+		static std::string	_itos(int value);
 
 };
 
