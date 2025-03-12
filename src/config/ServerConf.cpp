@@ -258,7 +258,7 @@ int ServerConf::isValidLocation(Location &location) {
 
 bool ServerConf::isLocationCgi(std::vector<Location>::iterator location) const { return (location->isCgiLocation()); }
 
-bool ServerConf::isScriptPath(std::string scriptPath) {
+bool ServerConf::isCgi(std::string scriptPath) {
 	for (std::vector<Location>::iterator it = _locations.begin(); it != _locations.end(); it++)
 		if (it->isCgiLocation() && it->getCgiExtension() == scriptPath.substr(scriptPath.rfind('.')))
 			return (true);
