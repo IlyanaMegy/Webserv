@@ -1,25 +1,31 @@
 :root {
 	--primary-color: #134daaa7;
 	--secondary-color: #134daaa7;
-	--background-color: #072452;
+	--background-color: #102241f0;
 	--text-color: #fdfffa;
 	--input-border-color: lightgrey;
 	--input-placeholder-color: #999;
 	--button-hover-color: #2062cea7;
 }
 
-body{
+.body_register {
   height: 100vh;
   background: var(--background-color);
   padding: 15px;
 }
 
+.body_register .navbar {
+  background: rgba(255, 255, 255, 0.024);
+}
+
 .wrapper .title {
-	height: 90px;
+	height: 90px;   
 }
 
 .wrapper {
 	max-width: 500px;
+  margin-top: 450px;
+  margin-left: 30%;
 }
 
 .wrapper form {
@@ -65,15 +71,18 @@ form h3{
 }
 
 .input-box.button input{
-  color: #fff;
+  margin-top: 5px;
+  color: #ffffff;
   letter-spacing: 1px;
   border: none;
   background: #134daaa7;
-  cursor: pointer;
+  cursor: default;
 }
 .input-box.button input:hover{
+  color: #fffa6f;
   background: var(--button-hover-color);
 }
+
 form .text h3{
  color: #333;
  width: 100%;

@@ -1,10 +1,9 @@
-var userName = null;
 document.addEventListener("DOMContentLoaded", function() {
-	var header = document.getElementById("greetings");
+    var header = document.getElementById("username");
     if (userName && userName != "") {
         header.textContent = userName;
     } else {
         header.textContent = "Stranger";
     }
-	header.classList.add("animate-grow");
+    document.getElementById("greetings").classList.add("animate-grow");
 });

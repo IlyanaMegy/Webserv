@@ -7,7 +7,7 @@
     font-family: "Poppins", sans-serif;
 }
 
-body {
+.body_default {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -26,10 +26,16 @@ body {
     background: rgba(255, 255, 255, 0.086);
 }
 
-.navbar-icon {
-    width: 24px;
-    height: 24px;
-    margin-left: 15px;
+.navbar_icons {
+	width: 30px;
+	height: 30px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.navbar_icons:hover {
+	width: 32px;
+	height: 32px;
 }
 
 .wrapper {

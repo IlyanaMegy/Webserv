@@ -11,40 +11,42 @@
 	<script src="assets/js/script.js" defer></script>
 	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
-	
-	<style>
-		body,h1 {font-family: "Raleway", sans-serif}
-		body, html {height: 100%; margin: 0;}
-		.bgimg {
-			background-image: url('./assets/images/bg.jpg');
-			min-height: 100%;
-			opacity: 0.99;
-			background-position: center;
-			background-size: cover;
-			width: 100%; /* Ensure full width */
-		}
-	</style>
-</head>
-<nav class="navbar fixed-top">
-	<div class="container-fluid">
-	  <a class="navbar-brand" href="#">NOM</a>
-	  <div class="d-flex">
-	<a href="index.html"><img src="assets/images/home.svg" alt="Go Home" class="navbar-icon"></a>
-	<a href="login.html"><img src="assets/images/login.svg" alt="Log in" class="navbar-icon"></a>
-	  </div>
-	</div>
 
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+			fetch('/cgi-bin/get_user.py')
+				.then(response => response.json())
+				.then(data => {
+					var header = document.getElementById("username");
+					header.textContent = data.userName || "Stranger";
+					document.getElementById("greetings").classList.add("animate-grow");
+				})
+				.catch(error => console.error('Error fetching user data:', error));
+		});
+	</script>
+</head>
+<body>
+<div class="body_index">
+	<nav class="navbar fixed-top">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="#">WEBSERV...</a>
+			<div class="d-flex">
+				<a href="index.html"><img class="navbar_icons" style="margin-right: 15px;" src="assets/images/home.svg" alt="Go Home" class="navbar-icon"></a>
+				<a href="register.html"><img class="navbar_icons" src="assets/images/user.svg" alt="Register" class="navbar-icon"></a>
+			</div>
+		</div>
 	</nav>
 	<div class="bgimg w3-display-container w3-animate-opacity w3-text-white">
 		<div class="w3-display-middle">
-			<h1 class="w3-jumbo w3-animate-top">COMING SOON...</h1>
+			<h1 class="w3-jumbo w3-animate-top greetings">Hello <span id="username"> !</span></h1>
 			<hr class="w3-border-grey" style="margin:auto;width:40%">
 		</div>
 	</div>
+</div>
 </body>
-<!-- <footer>
+<footer>
 	<div class="footer">
 		<p>&copy; 2025 WebServ</p>
 	</div>
-</footer> -->
+</footer>
 </html>
