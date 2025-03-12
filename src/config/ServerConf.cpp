@@ -256,7 +256,7 @@ int ServerConf::isValidLocation(Location &location) {
 	return (0);
 }
 
-bool ServerConf::isLocationCgi(std::vector<Location>::iterator location) const { return (location->isCgiLocation()); }
+// bool ServerConf::isLocationCgi(std::vector<Location>::iterator location) const { return (location->isCgiLocation()); }
 
 bool ServerConf::isCgi(std::string scriptPath) {
 	for (std::vector<Location>::iterator it = _locations.begin(); it != _locations.end(); it++)

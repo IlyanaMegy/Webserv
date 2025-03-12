@@ -57,7 +57,7 @@ class ServerConf {
 
 	bool		isValidMethod(std::string uri, Request::Method method);
 	int			isValidLocation(Location& location);
-	bool 		isLocationCgi(std::vector<Location>::iterator location) const;
+	// bool 		isLocationCgi(std::vector<Location>::iterator location) const;
 	bool 		isCgi(std::string scriptPath);
 	bool		checkLocationsDuplicate();
 
