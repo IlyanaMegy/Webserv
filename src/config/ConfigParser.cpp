@@ -93,19 +93,21 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 	{
 		if (params[i] == "listen" && (i + 1) < params.size())
 		{
-			if (findChar(params[i+1], ';') < 1)
+			if (findChar(params[++i], ';') < 1)
 				break;
 			if (server->getPort())
 				throw std::runtime_error("Port is duplicated");
-			server->setPort(params[++i]);
+			server->setPort(params[i]);
 		}
 		else if (params[i] == "location" && (i + 1) < params.size())
 		{
 			std::string	path;
-			i++;
-			if (params[i] == "{" || params[i] == "}")
+
+			if (params[++i] == "{" || params[i] == "}")
 				throw std::runtime_error("Wrong character in server scope{}");
-			path = params[i];
+			if (params[i] == "~")
+				path = params[i++] + " ";
+			path += params[i];
 			std::vector<std::string> codes;
 			if (params[++i] != "{")
 				throw std::runtime_error("Wrong character in server scope{}");
@@ -193,21 +195,21 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 		}
 	}
 	if (server->getServerName().empty())
-		server->setServerName("Server name from config file not found or unreadable");
+		server->setServerName("[CONFIG] Error : server_name not found or unreadable");
 	if (server->getRoot().empty())
 		server->setRoot("/");
 	if(!server->is_setted_loca_root && !server->getRoot().empty())
 		server->addRootToLocations(server->getRoot());
 	if (!server->getPort())
-		throw std::runtime_error("Port from config file not found or unreadable");
+		throw std::runtime_error("[CONFIG] Error : port not found or unreadable");
 	if (server->getHost() == 0)
 		server->setHost("localhost");
 	if (server->getIndex().empty())
 		server->setIndex("index.html");
 	if (isFileExistAndReadable(server->getRoot(), server->getIndex()))
-		throw std::runtime_error("Index from config file not found or unreadable");
-	if (server->checkLocations())
-		throw std::runtime_error("Location is duplicated");
+		throw std::runtime_error("[CONFIG] Error : index not found or unreadable");
+	if (server->checkLocationsDuplicate())
+		throw std::runtime_error("[CONFIG] Error : location is duplicated");
 	// if (!server->isValidErrorPages())
 	// 	throw std::runtime_error("Incorrect path for error page or number of error");
 }

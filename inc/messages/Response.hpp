@@ -65,6 +65,8 @@ class Response
 
 		static std::string	_itos(int value);
 
+		std::string    _fixPath(std::string path);
+
 };
 
 #endif

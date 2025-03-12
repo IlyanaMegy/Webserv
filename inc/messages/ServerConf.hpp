@@ -24,6 +24,7 @@ class ServerConf {
 	bool _autoindex;
 	std::vector<Location> _locations;
 	std::map<std::string, std::string> _error_pages;
+	// map pour stocker path -> Location
 
    public:
 	ServerConf(void);
@@ -41,8 +42,7 @@ class ServerConf {
 	void setAutoindex(std::string autoindex);
 	void setErrorPage(std::string err_code, std::string err_page);
 
-	int isValidLocation(Location& location) const;
-	bool checkLocations() const;
+	
 
 	std::string getServerName(void) const;
 	unsigned int getPort(void) const;
@@ -58,6 +58,8 @@ class ServerConf {
 	bool isCgiPath(const std::string& path) const;
 
 	bool isValidMethod(std::string uri, Request::Method method);
+	int isValidLocation(Location& location);
+	bool checkLocationsDuplicate();
 
 	void addRootToLocations(std::string root);
 

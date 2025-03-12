@@ -148,7 +148,7 @@ void	Response::_fillHeader(void)
 int	Response::_fillContent(std::string path)
 {
 	std::string		line;
-	std::ifstream	ifs(path.c_str());
+	std::ifstream	ifs(_fixPath(path).c_str());
 
 	if (ifs.fail()) {
 		fillError("404", "Not found");
@@ -181,4 +181,16 @@ std::string	Response::_itos(int value)
 	stream << value;
 	res = stream.str();
 	return res;
+}
+
+std::string    Response::_fixPath(std::string path)
+{
+    if (path.empty())
+        return path;
+    if (path[0] == '/') {
+        if (path.length() == 1)
+            return "default/site/welcome.html";
+        return path.substr(1, path.length() - 1);
+    }
+    return path;
 }
