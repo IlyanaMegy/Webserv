@@ -66,7 +66,7 @@ class ServerConf {
 	size_t 	findMatchingLocation(const std::string& uri, Location* bestMatch);
 	std::string getCompletePath(std::string uri);
 	size_t findMatchingCgiLocation(std::string scriptPath, Location* bestMatch);
-	std::string getCgiPathFromScriptPath(std::string scriptPath);
+	std::string getCgiPathForScript(std::string scriptPath);
 
 	// !TODO: Implement these functions
 	// const std::map<short, std::string> getErrorPages(void);

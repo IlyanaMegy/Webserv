@@ -333,7 +333,7 @@ size_t ServerConf::findMatchingCgiLocation(std::string scriptPath, Location* bes
     return bestMatchLength;
 }
 
-std::string ServerConf::getCgiPathFromScriptPath(std::string scriptPath) {
+std::string ServerConf::getCgiPathForScript(std::string scriptPath) {
     Location location;
     size_t matchLength = findMatchingCgiLocation(scriptPath, &location);
 
