@@ -23,6 +23,9 @@ ServerMonitor::ServerMonitor(std::string configFile)
 		server->addConfig(*it);
 		std::cout << MAGENTA << "[CONFIG] Server " << (*it)->getServerName() << " is listening on port " << (*it)->getPort() << RESET << std::endl;
 		std::cout << std::endl;
+
+		std::cout << OLIV << "testing function getCgiPathFromScriptPath()\ntesting path : /hello/test.py" << std::endl;
+		std::cout << "-> " << (*it)->getCgiPathFromScriptPath("/hello/test.py") << RESET << std::endl;
 	}
 }
 

@@ -1,8 +1,6 @@
 #include "../../inc/messages/ServerConf.hpp"
-#include <iostream>
 #include "../../inc/messages/Request.hpp"
 #include "../../inc/config/ParserTools.hpp"
-#include "../../inc/debug.hpp"
 
 ServerConf::ServerConf() {
 	_port = 0;
@@ -185,7 +183,8 @@ void ServerConf::setLocation(std::string path,  std::vector<std::string> params)
 			}
 			else
 				throw std::runtime_error("[CONFIG] Error : cgi_path is invalid" + params[i]);
-			new_loca.setCgiPath(params[i]);		
+			new_loca.setCgiPath(params[i]);
+			new_loca.setIsCgiLocation(true);
 		} else if (params[i] == "client_max_body_size" && (i + 1) < params.size()) {
 			if (findChar(params[i+1], ';') < 1)
 				throw std::runtime_error("[CONFIG] Error : Unsupported directive in location");
@@ -201,6 +200,40 @@ void ServerConf::setLocation(std::string path,  std::vector<std::string> params)
 	if (isValidLocation(new_loca)) throw std::runtime_error("No extension found in path after '~ '");
 	if (checkLocationsDuplicate()) throw std::runtime_error("[CONFIG] Error : location is duplicated");
 	_locations.push_back(new_loca);
+}
+
+std::string ServerConf::getServerName() const { return (_server_name); }
+unsigned int ServerConf::getPort() const { return (_port); }
+in_addr_t ServerConf::getHost() const { return (_host); }
+unsigned int ServerConf::getMaxBodySize() const { return (_max_body_size); }
+std::vector<Location> ServerConf::getLocations() const { return (_locations); }
+std::string ServerConf::getRoot() const { return (_root); }
+std::string ServerConf::getIndex() const { return (_index); }
+bool ServerConf::getAutoindex() const { return (_autoindex); }
+
+std::string ServerConf::getPathErrorPage(std::string statusCode) {
+    std::map<std::string, std::string>::const_iterator it = _error_pages.find(statusCode);
+    if (it != _error_pages.end())
+		return (*it).second;
+    else
+        throw std::runtime_error("Error page not found for status code: " + statusCode);
+}
+
+const std::vector<Location>::iterator ServerConf::getLocationFromUri(std::string uri) {
+	std::vector<Location>::iterator it;
+
+	for (it = _locations.begin(); it != _locations.end(); it++)
+		if (it->getPath() == uri) return (it);
+	throw std::runtime_error("Error: path to location not found");
+}
+
+bool ServerConf::isValidMethod(std::string uri, Request::Method method) {
+	Location	location;
+	findMatchingLocation(uri, &location);
+	std::vector<Request::Method> locationMethods = location.getMethods();
+	if (std::find(locationMethods.begin(), locationMethods.end(), method) != locationMethods.end())
+		return (true);
+	return (false);
 }
 
 int ServerConf::isValidLocation(Location &location) {
@@ -223,69 +256,26 @@ int ServerConf::isValidLocation(Location &location) {
 	return (0);
 }
 
+bool ServerConf::isLocationCgi(std::vector<Location>::iterator location) const { return (location->isCgiLocation()); }
+
+bool ServerConf::isScriptPath(std::string scriptPath) {
+	for (std::vector<Location>::iterator it = _locations.begin(); it != _locations.end(); it++)
+		if (it->isCgiLocation() && it->getCgiExtension() == scriptPath.substr(scriptPath.rfind('.')))
+			return (true);
+	return (false);
+}
+
 bool ServerConf::checkLocationsDuplicate() {
-	if (_locations.size() < 2) return (false);
 	std::vector<Location>::iterator first;
 	std::vector<Location>::const_iterator second;
+
+	if (_locations.size() < 2) return (false);
 	for (first = _locations.begin(); first != _locations.end() - 1; first++)
-	{
 		for (second = first + 1; second != _locations.end(); second++)
 			if (first->getPath() == second->getPath())
 				return (true);
-		if (first->getCgiPath().size() != 0)
-			first->setIsCgiLocation(true);
-	}
 	return (false);
 }
-
-std::string ServerConf::getServerName() const { return (_server_name); }
-unsigned int ServerConf::getPort() const { return (_port); }
-in_addr_t ServerConf::getHost() const { return (_host); }
-unsigned int ServerConf::getMaxBodySize() const { return (_max_body_size); }
-std::vector<Location> ServerConf::getLocations() const { return (_locations); }
-std::string ServerConf::getRoot() const { return (_root); }
-std::string ServerConf::getIndex() const { return (_index); }
-bool ServerConf::getAutoindex() const { return (_autoindex); }
-
-std::string ServerConf::getPathErrorPage(std::string statusCode) {
-    std::map<std::string, std::string>::const_iterator it = _error_pages.find(statusCode);
-    if (it != _error_pages.end()) {
-		return (*it).second;
-    } else {
-        throw std::runtime_error("Error page not found for status code: " + statusCode);
-    }
-}
-
-const std::vector<Location>::iterator ServerConf::getLocationFromUri(std::string uri) {
-	std::vector<Location>::iterator it;
-
-	for (it = _locations.begin(); it != _locations.end(); it++)
-		if (it->getPath() == uri) return (it);
-	throw std::runtime_error("Error: path to location not found");
-}
-
-bool ServerConf::isValidMethod(std::string uri, Request::Method method) {
-	Location	location;
-	findMatchingLocation(uri, &location);
-	std::vector<Request::Method> locationMethods = location.getMethods();
-	if (std::find(locationMethods.begin(), locationMethods.end(), method) != locationMethods.end())
-		return (true);
-	return (false);
-}
-
-// bool ServerConf::isCgiPath(const std::string& path) const {
-//     if (findChar(path, '.') >= 1) {
-//         std::string extension = path.substr(path.rfind('.'));
-//         for (std::vector<Location>::const_iterator it = _locations.begin(); it != _locations.end(); ++it) {
-//             if (it->getPath() == "/cgi-bin") {
-//                 std::map<std::string, std::string> extPath = it->getExtensionPath();
-//                 if (extPath.find(extension) != extPath.end())
-//                     return true;
-//             }
-//         }
-//     }
-//     return false;
-// }
 
 void ServerConf::addRootToLocations(std::string root) {
 	std::vector<Location>::iterator it;
@@ -328,11 +318,28 @@ std::string ServerConf::getCompletePath(std::string uri) {
         return root + relativePath;
 }
 
-// bool ServerConf::isValidErrorPages() {
-// 	std::map<std::string, std::string>::const_iterator it;
-// 	for (it = _error_pages.begin(); it != _error_pages.end(); it++) {
-// 		if (getTypePath((*it).second) != 1)
-// 			return false;
-// 	}
-// 	return true;
-// }
+size_t ServerConf::findMatchingCgiLocation(std::string scriptPath, Location* bestMatch) {
+    size_t bestMatchLength = 0;
+    std::string scriptExtension = scriptPath.substr(scriptPath.rfind('.'));
+    for (std::vector<Location>::iterator it = _locations.begin(); it != _locations.end(); ++it) {
+        if (it->isCgiLocation() && it->getCgiExtension() == scriptExtension) {
+			std::string completePath = it->getRootLocation() + scriptPath;
+			if (completePath.length() > bestMatchLength) {
+				*bestMatch = (*it);
+				bestMatchLength = completePath.length();
+			}
+        }
+    }
+    return bestMatchLength;
+}
+
+std::string ServerConf::getCgiPathFromScriptPath(std::string scriptPath) {
+    Location location;
+    size_t matchLength = findMatchingCgiLocation(scriptPath, &location);
+
+    if (matchLength > 0) {
+        return location.getCgiPath();
+    } else {
+        throw std::runtime_error("GOTO getCgiPathFromScriptPath() :\nError: CGI path not found for script path: " + scriptPath);				//!\ ERROR : CGI path not found for script path
+    }
+}

@@ -42,32 +42,33 @@ class ServerConf {
 	void setAutoindex(std::string autoindex);
 	void setErrorPage(std::string err_code, std::string err_page);
 
-	
-
-	std::string getServerName(void) const;
+	std::string 		getServerName(void) const;
 	unsigned int getPort(void) const;
 	in_addr_t getHost(void) const;
 	unsigned int getMaxBodySize(void) const;
 	std::vector<Location> getLocations(void) const;
 	std::string getRoot(void) const;
 	std::string getIndex(void) const;
-	bool getAutoindex(void) const;
+	bool 		getAutoindex(void) const;
+	
 	const std::vector<Location>::iterator getLocationFromUri(std::string uri);
 
-	bool is_setted_loca_root;
-	bool isCgiPath(const std::string& path) const;
+	bool 		is_setted_loca_root;
 
-	bool isValidMethod(std::string uri, Request::Method method);
-	int isValidLocation(Location& location);
-	bool checkLocationsDuplicate();
+	bool		isValidMethod(std::string uri, Request::Method method);
+	int			isValidLocation(Location& location);
+	bool 		isLocationCgi(std::vector<Location>::iterator location) const;
+	bool 		isScriptPath(std::string scriptPath);
+	bool		checkLocationsDuplicate();
 
-	void addRootToLocations(std::string root);
+	void	addRootToLocations(std::string root);
 
-	size_t findMatchingLocation(const std::string& uri, Location* bestMatch);
+	size_t 	findMatchingLocation(const std::string& uri, Location* bestMatch);
 	std::string getCompletePath(std::string uri);
+	size_t findMatchingCgiLocation(std::string scriptPath, Location* bestMatch);
+	std::string getCgiPathFromScriptPath(std::string scriptPath);
 
 	// !TODO: Implement these functions
-	// bool isValidErrorPages(void);
 	// const std::map<short, std::string> getErrorPages(void);
 	std::string getPathErrorPage(std::string key);
 };

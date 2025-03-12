@@ -38,6 +38,7 @@ class Location {
 	std::map<std::string, std::string> getExtensionPath() const;
 	unsigned long getClientMBS() const;
 	bool isCgiLocation() const;
+
    private:
 	std::string _path;
 	std::string _root;

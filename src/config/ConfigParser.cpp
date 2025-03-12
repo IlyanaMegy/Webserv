@@ -2,8 +2,7 @@
 
 #include "ParserTools.hpp"
 
-ConfigParser::~ConfigParser()
-{}
+ConfigParser::~ConfigParser(){}
 
 static std::string readFile(std::string path) {
 	if (path.empty() || path.length() == 0) return (NULL);
@@ -214,6 +213,3 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 	// 	throw std::runtime_error("Incorrect path for error page or number of error");
 }
 
-size_t	ConfigParser::getNbServer() const {
-	return _nb_server;
-}
