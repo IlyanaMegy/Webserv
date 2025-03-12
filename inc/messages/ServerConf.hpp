@@ -24,7 +24,7 @@ class ServerConf {
 	bool _autoindex;
 	std::vector<Location> _locations;
 	std::map<std::string, std::string> _error_pages;
-	// map pour stocker path -> Location
+	std::map<std::string, std::string> _cgiPathSaves;
 
    public:
 	ServerConf(void);

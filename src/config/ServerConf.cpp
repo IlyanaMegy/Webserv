@@ -335,11 +335,14 @@ size_t ServerConf::findMatchingCgiLocation(std::string scriptPath, Location* bes
 
 std::string ServerConf::getCgiPathForScript(std::string scriptPath) {
     Location location;
+
+    if (_cgiPathSaves.find(scriptPath) != _cgiPathSaves.end()) 
+		return _cgiPathSaves[scriptPath];
+
     size_t matchLength = findMatchingCgiLocation(scriptPath, &location);
 
-    if (matchLength > 0) {
-        return location.getCgiPath();
-    } else {
-        throw std::runtime_error("GOTO getCgiPathFromScriptPath() :\nError: CGI path not found for script path: " + scriptPath);				//!\ ERROR : CGI path not found for script path
-    }
+    if (matchLength <= 0)
+		throw std::runtime_error("[CONFIG] Error: CGI path not found for script path: " + scriptPath);				//!\ ERROR : CGI path not found for script path
+	_cgiPathSaves[scriptPath] = location.getCgiPath();
+	return location.getCgiPath();   
 }
