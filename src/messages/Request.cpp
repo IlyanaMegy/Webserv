@@ -65,7 +65,7 @@ void	Request::_treat(void)
 	{
 		if (_path == "/favicon.ico")
 		{
-			std::string faviconPath = _defaultConf->getLocationCompletePath("/favicon.ico") + "/favicon.ico";
+			std::string faviconPath = _defaultConf->getLocationCompletePath("/favicon.ico") + _path;
 			if (isFileExistAndReadable(faviconPath))
 				_response.fillGET(faviconPath);
 			else
