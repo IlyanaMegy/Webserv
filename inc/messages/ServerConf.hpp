@@ -64,7 +64,9 @@ class ServerConf {
 	void	addRootToLocations(std::string root);
 
 	size_t 	findMatchingLocation(const std::string& uri, Location* bestMatch);
-	std::string getCompletePath(std::string uri);
+	std::string getLocationCompletePath(std::string uri);
+	std::string getIndexLocation(std::string uri);
+
 	size_t findMatchingCgiLocation(std::string scriptPath, Location* bestMatch);
 	std::string getCgiPathForScript(std::string scriptPath);
 

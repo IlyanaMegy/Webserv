@@ -1,6 +1,5 @@
-#include "Client.hpp"
-
-#include "Server.hpp"
+#include "../../inc/network/Client.hpp"
+#include "../../inc/network/Server.hpp"
 
 Client::Client(void) : _request(NULL), _shouldClose(false), _server(NULL), leftoverMessage("") {}
 
@@ -12,7 +11,7 @@ Client::Client(Server* server) : _request(NULL), _shouldClose(false), _server(se
 
 	clientFd = accept(server->getSocket().getFd(), (struct sockaddr *)&addr, &addrLen);
 	if (clientFd == -1)
-		throw std::runtime_error("Failed to accept client");
+		throw std::runtime_error("[CLIENT] Error : Failed to accept client");
 	_socket.fill(clientFd, addr);
 }
 
@@ -40,9 +39,9 @@ void	Client::setShouldClose(bool shouldClose)
 
 void	Client::createNewRequest(std::string leftoverMessage)
 {
-	_request = new Request(_server, leftoverMessage);
+	_request = new Request(_server, leftoverMessage, _server->getDefaultConf());
 	if (!_request)
-		throw std::exception();
+		throw std::runtime_error("[CLIENT] Error : Failed to create new request");
 }
 
 void	Client::deleteRequest(void)

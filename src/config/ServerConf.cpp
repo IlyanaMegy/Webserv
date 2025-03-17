@@ -297,7 +297,15 @@ size_t ServerConf::findMatchingLocation(const std::string& uri, Location* bestMa
     return bestMatchLength;
 }
 
-std::string ServerConf::getCompletePath(std::string uri) {
+std::string ServerConf::getIndexLocation(std::string uri) {
+	Location location;
+	size_t matchLength = findMatchingLocation(uri, &location);
+	if (matchLength <= 0)
+		return NULL;
+	return location.getIndexLocation();
+}
+
+std::string ServerConf::getLocationCompletePath(std::string uri) {
     Location location;
     size_t matchLength = findMatchingLocation(uri, &location);
     std::string root;

@@ -40,6 +40,7 @@ class Server
 		bool 			isConfigKnown(std::string serverName);
 		bool			isClientKnown(int clientFd);
 		void 			addConfig(ServerConf *conf);
+		ServerConf* getDefaultConf() const;
 	
 		
 		// class SocketCreationErrException : public std::exception {

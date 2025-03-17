@@ -21,24 +21,42 @@ void	runServer(std::string configFile)
 			for (std::map<int, Server*>::iterator it = serverMonitor.getServers().begin(); it != serverMonitor.getServers().end(); it++) {
 				if (epoll.getFd(i) == it->first) {
 					try {
+						std::cout << TEAL << "\n[MAIN] Dealing with the server, trying to accept a client" << RESET << std::endl;
 						it->second->acceptClient(epoll);
 					} catch (std::exception &e) {
 						std::cout << e.what() << std::endl;
 					}
 				}
 				else if (it->second->isClientKnown(epoll.getFd(i))) {
-					if (epoll.getEvent(i) == (EPOLLIN | EPOLLOUT)
-					|| epoll.getEvent(i) == EPOLLIN)
+					if (epoll.getEvent(i) == (EPOLLIN | EPOLLOUT) || epoll.getEvent(i) == EPOLLIN)
 						it->second->readFrom(epoll.getFd(i));
-					if (epoll.getEvent(i) == (EPOLLIN | EPOLLOUT)
-					|| epoll.getEvent(i) == EPOLLOUT)
+					if (epoll.getEvent(i) == (EPOLLIN | EPOLLOUT) || epoll.getEvent(i) == EPOLLOUT)
 						it->second->sendTo(epoll.getFd(i));
-	
 					if (it->second->getClient(epoll.getFd(i))->getShouldClose()) {
 						epoll.deleteFd(epoll.getFd(i));
 						it->second->closeConnection(epoll.getFd(i));
 					}
 				}
+				
+				
+				// if (epoll.getFd(i) == it->first) {
+				// 	try {
+				// 		std::cout << TEAL << "[MAIN] here with epoll.getFd(" << i << ") = " << epoll.getFd(i) << " and it->first = " << RESET << std::endl;
+				// 		it->second->acceptClient(epoll);
+				// 	} catch (std::exception &e) {
+				// 		std::cout << e.what() << std::endl;
+				// 	}
+				// }
+				// else if (it->second->isClientKnown(epoll.getFd(i))) {
+				// 	if (epoll.getEvent(i) == (EPOLLIN | EPOLLOUT) || epoll.getEvent(i) == EPOLLIN)
+				// 		it->second->readFrom(epoll.getFd(i));
+				// 	if (epoll.getEvent(i) == (EPOLLIN | EPOLLOUT) || epoll.getEvent(i) == EPOLLOUT)
+				// 		it->second->sendTo(epoll.getFd(i));
+				// 	if (it->second->getClient(epoll.getFd(i))->getShouldClose()) {
+				// 		epoll.deleteFd(epoll.getFd(i));
+				// 		it->second->closeConnection(epoll.getFd(i));
+				// 	}
+				// }
 			}
 		}
 	}

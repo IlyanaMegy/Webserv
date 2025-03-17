@@ -1,7 +1,6 @@
-#include "Server.hpp"
-
-#include "Request.hpp"
-#include "ServerConf.hpp"
+#include "../../inc/network/Server.hpp"
+#include "../../inc/messages/Request.hpp"
+#include "../../inc/messages/ServerConf.hpp"
 
 #include <iostream>
 
@@ -51,7 +50,7 @@ void	Server::acceptClient(Epoll &epoll)
 		throw std::exception();
 	clientSocket = client->getSocket().getFd();
 	_clients[clientSocket] = client;
-	std::cout << "New client accepted!" << std::endl;
+	std::cout << GOLD << "[SERVER] New client " << clientSocket << " accepted on port " << _port << "!" << RESET << std::endl;
 	epoll.addFd(clientSocket, EPOLLIN | EPOLLOUT);
 }
 
@@ -70,10 +69,9 @@ void	Server::readFrom(int clientFd)
 	if (!_clients[clientFd]->getRequest())
 		_clients[clientFd]->createNewRequest(_clients[clientFd]->leftoverMessage);
 	_clients[clientFd]->getRequest()->add(std::string(buffer, res));
-	while (_clients[clientFd]->getRequest()->getStage() != Request::DONE
-			&& _clients[clientFd]->getRequest()->getState() == Request::TREATING_MESSAGE)
+	std::cout << GOLD << "[SERVER] New Request added for client " << BOLD << clientFd << RESET << GOLD << " !\n>>\n" << _clients[clientFd]->getRequest()->getUntreatedMessage() << RESET << std::endl;
+	while (_clients[clientFd]->getRequest()->getStage() != Request::DONE && _clients[clientFd]->getRequest()->getState() == Request::TREATING_MESSAGE)
 		_clients[clientFd]->getRequest()->parse();
-	std::cout << "End of reading!" << std::endl;
 }
 
 void	Server::sendTo(int clientFd)
@@ -93,13 +91,8 @@ void	Server::sendTo(int clientFd)
 	if (send(clientFd, responseMessage.c_str(), responseMessage.length(), 0) == -1)
 		throw std::exception();
 	_clients[clientFd]->deleteRequest();
-	std::cout << "Sent to client " << CYAN << clientFd << RESET << std::endl;
+	std::cout << GOLD << "[SERVER] Response sent to client " << BOLD << clientFd << RESET << std::endl;
 }
-
-
-// const char *Server::SocketCreationErrException::what() const throw() {
-// 	std::cerr << "Erreur lors de la création du socket" << std::endl;
-// }
 
 bool Server::isConfigKnown(std::string serverName)
 {
@@ -116,7 +109,8 @@ void Server::addConfig(ServerConf *conf)
 	_confs[conf->getServerName()] = conf;
 }
 
+ServerConf* Server::getDefaultConf() const
+{
+	return _defaultConf;
+}
 
-// const char *Server::SocketCreationErrException::what() const throw() {
-// 	std::cerr << "Erreur lors de la création du socket" << std::endl;
-// }

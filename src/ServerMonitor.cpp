@@ -24,14 +24,14 @@ ServerMonitor::ServerMonitor(std::string configFile)
 		std::cout << MAGENTA << "[CONFIG] Server " << (*it)->getServerName() << " is listening on port " << (*it)->getPort() << RESET << std::endl;
 		std::cout << std::endl;
 
-		std::cout << OLIV << "testing function getCgiPathForScript()\ntesting path : /hello/test.py" << std::endl;
-		std::cout << "-> " << (*it)->getCgiPathForScript("/hello/test.py") << RESET << std::endl;
-		std::cout << std::endl;
-		std::cout << OLIV << "RETRY testing function getCgiPathForScript()\ntesting path : /hello/test.py" << std::endl;
-		std::cout << "-> " << (*it)->getCgiPathForScript("/hello/test.py") << RESET << std::endl;
-		std::cout << std::endl;
-		std::cout << OLIV << "testing function getCgiPathForScript()\ntesting path : /hello/test2.py" << std::endl;
-		std::cout << "-> " << (*it)->getCgiPathForScript("/hello/toto.py") << RESET << std::endl;
+		// std::cout << OLIV << "testing function getCgiPathForScript()\ntesting path : /hello/test.py" << std::endl;
+		// std::cout << "-> " << (*it)->getCgiPathForScript("/hello/test.py") << RESET << std::endl;
+		// std::cout << std::endl;
+		// std::cout << OLIV << "RETRY testing function getCgiPathForScript()\ntesting path : /hello/test.py" << std::endl;
+		// std::cout << "-> " << (*it)->getCgiPathForScript("/hello/test.py") << RESET << std::endl;
+		// std::cout << std::endl;
+		// std::cout << OLIV << "testing function getCgiPathForScript()\ntesting path : /hello/test2.py" << std::endl;
+		// std::cout << "-> " << (*it)->getCgiPathForScript("/hello/toto.py") << RESET << std::endl;
 	}
 }
 

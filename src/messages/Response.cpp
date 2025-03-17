@@ -1,8 +1,9 @@
-#include "Response.hpp"
+#include "../../inc/messages/Response.hpp"
+#include "../../inc/messages/ServerConf.hpp"
 
 Response::Response(void) : _message(""), _shouldClose(false), _isComplete(false), _statusCode(""), _reasonMessage(""), _content(""), _path("") {}
-
-Response::~Response(void) {}
+Response::~Response(void)
+{}
 
 void	Response::setStatusCode(std::string statusCode)
 {
@@ -17,6 +18,11 @@ void	Response::setReasonMessage(std::string reasonMessage)
 void	Response::setShouldClose(bool shouldClose)
 {
 	_shouldClose = shouldClose;
+}
+
+void	Response::setServerConf(ServerConf* serverConf)
+{
+	_defaultConf = serverConf;
 }
 
 std::string	Response::getMessage(void) const
@@ -185,12 +191,15 @@ std::string	Response::_itos(int value)
 
 std::string    Response::_fixPath(std::string path)
 {
-    if (path.empty())
+	if (path.empty())
         return path;
     if (path[0] == '/') {
-        if (path.length() == 1)
-            return "default/site/welcome.html";
-        return path.substr(1, path.length() - 1);
-    }
+		if (path.length() == 1)
+			return _defaultConf->getIndexLocation(path);
+		if (_defaultConf->isCgi(path))
+			return _defaultConf->getCgiPathForScript(path);
+		return _defaultConf->getLocationCompletePath(path) + path.substr(1, path.length() - 1);
+		// return path.substr(1, path.length() - 1);
+	}
     return path;
 }

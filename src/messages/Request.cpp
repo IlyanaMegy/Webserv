@@ -1,12 +1,15 @@
-#include "Request.hpp"
+#include "../../inc/messages/Request.hpp"
+#include "../../inc/network/Server.hpp"	
+#include "../../inc/messages/ServerConf.hpp"
 
-#include "Server.hpp"
+#include <fstream>
 
 Request::Request(void)
 	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _server(NULL), _untreatedMessage("") , _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
 
-Request::Request(Server* server, std::string leftoverMessage)
-	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _server(server), _untreatedMessage(leftoverMessage), _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
+Request::Request(Server* server, std::string leftoverMessage, ServerConf* defaultConf)
+	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _server(server), _defaultConf(defaultConf), _untreatedMessage(leftoverMessage), 
+	_fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
 
 Request::~Request(void) {}
 
@@ -45,13 +48,32 @@ void	Request::parse(void)
 	if (_stage == SEEKING_BODY)
 		_parseBody();
 	if (_stage == PROCESSING)
+	{
+		_response.setServerConf(_defaultConf);
 		_treat();
 	}
+}
+
+bool isFileExistAndReadable(const std::string& path) {
+    std::ifstream file(path.c_str());
+    return file.good();
+}
 
 void	Request::_treat(void)
 {
 	if (_method == GET)
-		_response.fillGET(_path);
+	{
+		if (_path == "/favicon.ico")
+		{
+			std::string faviconPath = _defaultConf->getLocationCompletePath("/favicon.ico") + "/favicon.ico";
+			if (isFileExistAndReadable(faviconPath))
+				_response.fillGET(faviconPath);
+			else
+				_response.fillError("404", "Not Found " + faviconPath);
+		}
+		else
+			_response.fillGET(_path);
+	}
 	else if (_method == DELETE)
 		_response.fillDELETE(_path);
 	else
@@ -618,6 +640,7 @@ void	Request::_split(std::vector<std::string>& vector)
 		}
 	}
 }
+
 
 // void    Request::printInfo(void)
 // {

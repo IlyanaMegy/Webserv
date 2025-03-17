@@ -4,7 +4,8 @@
 # include <stdexcept>
 
 # include "Socket.hpp"
-# include "Request.hpp"
+# include "../messages/Request.hpp"
+# include "../style.hpp"
 
 # define BUFFER_SIZE 1024
 

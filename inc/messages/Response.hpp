@@ -10,9 +10,13 @@
 # include <sstream>
 # include <unistd.h>
 
+# include "../style.hpp"
+
 # define SERVERNAME "webserv"
-# define ERRORPATH "default/errors/"
+# define ERRORPATH "./www/webserv/error/"
 # define TIMEBUFFERSIZE 100
+
+class ServerConf;
 
 class Response
 {
@@ -23,7 +27,7 @@ class Response
 		void	setStatusCode(std::string statusCode);
 		void	setReasonMessage(std::string reasonMessage);
 		void	setShouldClose(bool shouldClose);
-
+		void	setServerConf(ServerConf* serverConf);
 		std::string	getMessage(void) const;
 		bool		getShouldClose(void) const;
 		bool		getIsComplete(void) const;
@@ -46,7 +50,7 @@ class Response
 		std::string											_reasonMessage;
 		std::map< std::string, std::vector<std::string> >	_fields;
 		std::string											_content;
-
+		ServerConf*											_defaultConf;
 		std::string											_path;
 
 		void	_createStatusLine(void);

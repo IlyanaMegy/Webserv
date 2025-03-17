@@ -15,6 +15,7 @@
 # define MAXBODYOCTETS 2000000000
 
 class	Server;
+class	ServerConf;
 
 class Request
 {
@@ -40,7 +41,7 @@ class Request
 		};
 
 		Request(void);
-		Request(Server* server, std::string leftoverMessage);
+		Request(Server* server, std::string leftoverMessage, ServerConf* defaultConf);
 		~Request(void);
 
 		Response					&getResponse(void);
@@ -61,6 +62,7 @@ class Request
 		Response											_response;
 
 		Server*												_server;
+		ServerConf*											_defaultConf;
 
 		std::string											_untreatedMessage;
 	
