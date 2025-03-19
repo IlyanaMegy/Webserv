@@ -70,7 +70,9 @@ void	CGI::_launch(void)
 			throw std::exception();
 		}
 		close(_pipeFd[WRITE_END]);
-		execve(_program.c_str(), (char*[]){(char *)_program.c_str(), (char *)_cgi.c_str(), NULL}, _envp);
+		if (chdir((char *)_findDirectory(_cgi).c_str()) == -1)
+			throw std::exception();
+		execve(_program.c_str(), (char*[]){(char *)_program.c_str(), (char *)_env["SCRIPT_NAME"].c_str(), NULL}, _envp);
 		throw std::exception();
 	}
 
@@ -97,7 +99,7 @@ void	CGI::_setEnv(void)
 	
 	_env["REQUEST_METHOD"] = _request->getMethod() == Request::GET ? "GET" : "POST";
 	
-	_env["SCRIPT_NAME"] = _cgi;
+	_env["SCRIPT_NAME"] = _findName(_cgi);
 	
 	_env["SERVER_PORT"] = _itos(_request->getServer()->getPort());
 	
@@ -146,6 +148,25 @@ void	CGI::_fillVar(char** varp, std::string key, std::string value)
 	(*varp)[var.length()] = 0;
 }
 
+std::string	CGI::_findDirectory(std::string path)
+{
+	std::size_t	sepPos;
+
+	sepPos = path.rfind("/");
+	if (sepPos == std::string::npos)
+		return "./";
+	return path.substr(0, sepPos + 1);
+}
+
+std::string	CGI::_findName(std::string path)
+{
+	std::size_t	sepPos;
+
+	sepPos = path.rfind("/");
+	if (sepPos == std::string::npos)
+		return path;
+	return path.substr(sepPos + 1, path.length() - (sepPos + 1));
+}
 
 std::string	CGI::_itos(int value)
 {

@@ -56,6 +56,8 @@ class CGI
 		void		_fillVar(char** varp, std::string key, std::string value);
 		void		_launch(void);
 
+		static std::string	_findDirectory(std::string path);
+		static std::string	_findName(std::string path);
 		static std::string	_itos(int value);
 
 };
