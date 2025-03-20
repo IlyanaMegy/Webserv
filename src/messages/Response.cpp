@@ -149,7 +149,7 @@ void	Response::_fillHeader(void)
 	else
 		_fields["Connection"].push_back("keep-alive");
 	if (!_content.empty())
-		_fields["Content-Length"].push_back(_itos(_content.length()));
+		_fields["Content-Length"].push_back(itos(_content.length()));
 	_updateDate();
 }
 
@@ -181,7 +181,7 @@ void	Response::_updateDate(void)
 	_fields["Date"].push_back(std::string(buffer));
 }
 
-std::string	Response::_itos(int value)
+std::string	Response::itos(int value)
 {
 	std::string			res;
 	std::ostringstream	stream;

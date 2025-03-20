@@ -39,6 +39,8 @@ class Response
 
 		void		fillCGI(std::string content);
 
+		static std::string	itos(int value);
+		
 	private:
 		std::string	_message;
 		bool		_shouldClose;
@@ -65,7 +67,6 @@ class Response
 
 		int		_createTarget(std::string path, std::string body);
 
-		static std::string	_itos(int value);
 
 };
 

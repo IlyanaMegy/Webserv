@@ -109,7 +109,7 @@ void	CGI::_setEnv(void)
 	
 	_env["SCRIPT_NAME"] = _findName(_cgi);
 	
-	_env["SERVER_PORT"] = _itos(_request->getServer()->getPort());
+	_env["SERVER_PORT"] = Response::itos(_request->getServer()->getPort());
 	
 	_env["SERVER_PROTOCOL"] = "HTTP/1.1";
 	
@@ -174,14 +174,4 @@ std::string	CGI::_findName(std::string path)
 	if (sepPos == std::string::npos)
 		return path;
 	return path.substr(sepPos + 1, path.length() - (sepPos + 1));
-}
-
-std::string	CGI::_itos(int value)
-{
-	std::string			res;
-	std::ostringstream	stream;
-
-	stream << value;
-	res = stream.str();
-	return res;
 }
