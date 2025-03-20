@@ -1,21 +1,16 @@
 #include "Signal.hpp"
 #include "Epoll.hpp"
 #include "ServerMonitor.hpp"
+#include "CGI.hpp"
 
 void	runServer(std::string configFile)
 {
 	ServerMonitor 	serverMonitor(configFile);
 	Epoll			epoll(serverMonitor.getServers());
 
-	while (true) {
-		if (Signal::shouldStopServer)
-			return ;
+	while (!Signal::shouldStopServer) {
 
-		try {
-			epoll.wait();
-		} catch (std::exception &e) {
-			std::cout << e.what() << std::endl;
-		}
+		epoll.wait();
 
 		for (int i = 0; i < epoll.getTimeoutFdsNb(); i++) {
 			for (std::map<int, Server*>::iterator it = serverMonitor.getServers().begin(); it != serverMonitor.getServers().end(); it++)
@@ -74,6 +69,8 @@ int	main(int ac, char** av)
 	}
 	catch (std::exception &e)
 	{
+		if (Signal::shouldStopServer)
+			return 0;
 		std::cout << e.what() << std::endl;
 		return 1;
 	}
