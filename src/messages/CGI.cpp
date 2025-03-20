@@ -8,7 +8,7 @@
 CGI::CGI(void) : _envp(NULL), _cpid(-1), _epoll(NULL), _client(NULL), _request(NULL), _hasSucceeded(false) {}
 
 CGI::CGI(Epoll* epoll, Request* request, std::string program, std::string cgi)
-	: _program(program), _cgi(cgi), _envp(NULL), _cpid(-1), _epoll(epoll), _client(request->getClient()), _request(request),_hasSucceeded(false)
+	: _program(program), _cgi(cgi), _envp(NULL), _cpid(-1), _epoll(epoll), _client(request->getClient()), _request(request), _hasSucceeded(false), _wasWaitedFor(false)
 {
 	_setEnv();
 	_convertEnv();
@@ -26,6 +26,11 @@ CGI::~CGI(void)
 	}
 
 	close(_pipeFd[READ_END]);
+
+	if (!_wasWaitedFor) {
+		kill(_cpid, SIGKILL);
+		waitpid(_cpid, NULL, 0);
+	}
 }
 
 int	CGI::getFd(void)
@@ -53,6 +58,9 @@ void	CGI::wait(void)
 	int	wstatus;
 
 	_hasSucceeded = waitpid(_cpid, &wstatus, 0) != - 1 && WIFEXITED(wstatus) && WEXITSTATUS(wstatus) == 0;
+	_wasWaitedFor = true;
+}
+
 
 }
 

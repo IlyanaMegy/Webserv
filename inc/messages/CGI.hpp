@@ -48,6 +48,7 @@ class CGI
 		Request*	_request;
 
 		bool		_hasSucceeded;
+		bool		_wasWaitedFor;
 		std::string	_output;
 
 		void		_setEnv(void);
