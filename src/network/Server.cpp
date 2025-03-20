@@ -91,6 +91,7 @@ void	Server::readFrom(int cgiFd, Epoll* epoll, Request* request)
 	if (res == 0) {
 		epoll->deleteFd(cgiFd);
 		request->getCGI()->wait();
+		request->getCGI()->parse();
 		request->treatCGI();
 		return ;
 	}

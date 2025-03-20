@@ -125,7 +125,7 @@ void	Request::treatCGI(void)
 		_stage = DONE;
 		return;
 	}
-	_response.fillCGI(_cgi->getOutput());
+	_response.fillCGI(_cgi);
 	_stage = DONE;
 }
 
@@ -346,7 +346,7 @@ int	Request::_findTransferEncoding(void)
 	if (_fields.find("transfer-encoding") == _fields.end())
 		return 0;
 	if (_fields["transfer-encoding"].size() != 1
-		|| _toLower(_fields["transfer-encoding"][0]) != "chunked") {
+		|| toLower(_fields["transfer-encoding"][0]) != "chunked") {
 		_response.fillError("400", "Bad Request");
 		_stage = DONE;
 		return 1;
@@ -419,16 +419,16 @@ int	Request::_parseFieldLine(std::string fieldLine)
 		fieldValue = fieldLine.substr(delimiterPos + 1, fieldLine.length() - (delimiterPos + 1) - 1);
 	else
 		fieldValue = fieldLine.substr(delimiterPos + 1, fieldLine.length() - (delimiterPos + 1));
-	if (_parseFieldName(fieldName) || _parseFieldValue(fieldValue)) {
+	if (parseFieldName(fieldName) || parseFieldValue(fieldValue)) {
 		_response.fillError("400", "Bad Request");
 		_stage = DONE;
 		return 1;
 	}
-	_fields[_toLower(fieldName)].push_back(_toLower(fieldValue));
+	_fields[toLower(fieldName)].push_back(toLower(fieldValue));
 	return 0;
 }
 
-int	Request::_parseFieldName(std::string fieldName)
+int	Request::parseFieldName(std::string fieldName)
 {
 	for (std::string::iterator it = fieldName.begin(); it != fieldName.end(); it++) {
 		if (!_isVChar(*it) || _isDelimiter(*it))
@@ -437,7 +437,7 @@ int	Request::_parseFieldName(std::string fieldName)
 	return 0;
 }
 
-int	Request::_parseFieldValue(std::string fieldValue)
+int	Request::parseFieldValue(std::string fieldValue)
 {
 	if (fieldValue.empty())
 		return 0;
@@ -633,7 +633,7 @@ int	Request::_parseHTTPVer(std::string HTTPVerString)
 	return 0;
 }
 
-std::string	Request::_toLower(std::string s)
+std::string	Request::toLower(std::string s)
 {
 	std::string	lowerS;
 

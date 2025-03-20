@@ -28,10 +28,13 @@ class CGI
 
 		int			getFd(void);
 		bool		getHasSucceeded(void);
-		std::string	getOutput(void);
+
+		std::map<std::string, std::string>	getFields(void);
+		std::string							getBody(void);
 
 		void	addOutput(std::string buffer);
 		void	wait(void);
+		void	parse(void);
 
 	private:
 		std::string	_program;
@@ -51,11 +54,17 @@ class CGI
 		bool		_wasWaitedFor;
 		std::string	_output;
 
+		std::map<std::string, std::string>	_fields;
+		std::string							_body;
+
 		void		_setEnv(void);
 		std::string	_createCookieString(std::vector<std::string> cookies);
 		void		_convertEnv(void);
 		void		_fillVar(char** varp, std::string key, std::string value);
 		void		_launch(void);
+
+		int			_parseHeaderFields(std::string header);
+		int			_parseFieldLine(std::string fieldLine);
 
 		static std::string	_findDirectory(std::string path);
 		static std::string	_findName(std::string path);

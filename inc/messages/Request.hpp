@@ -66,6 +66,11 @@ class Request
 
 		void						treat(void);
 		void						treatCGI(void);
+		
+		static int					parseFieldName(std::string fieldName);
+		static int					parseFieldValue(std::string fieldValue);
+		
+		static std::string			toLower(std::string s);
 
 	private:
 
@@ -93,7 +98,7 @@ class Request
 		unsigned int										_bodyLength;
 	
 		std::string											_body;
-
+		
 		void						_parseStartLine(void);
 		std::string					_findStartLine(void);
 		int							_parseRequestLine(std::string startLine);
@@ -111,8 +116,6 @@ class Request
 		std::string					_findHeader(void);
 		int							_parseHeaderFields(std::string header);
 		int							_parseFieldLine(std::string fieldLine);
-		int							_parseFieldName(std::string fieldName);
-		int							_parseFieldValue(std::string fieldValue);
 		int							_parseCompletedFields(void);
 		int							_findTransferEncoding(void);
 		int							_findContentLength(void);
@@ -131,7 +134,6 @@ class Request
 
 
 
-		static std::string			_toLower(std::string s);
 		static bool					_isDelimiter(unsigned char c);
 		static bool					_isVChar(unsigned char c);
 		static bool					_isObsText(unsigned char c);

@@ -1,5 +1,7 @@
 #include "Response.hpp"
 
+#include "CGI.hpp"
+
 Response::Response(void) : _message(""), _shouldClose(false), _isComplete(false), _statusCode(""), _reasonMessage(""), _content(""), _path("") {}
 
 Response::~Response(void) {}
@@ -75,11 +77,11 @@ void	Response::fillError(std::string statusCode, std::string reasonMessage)
 	_isComplete = true;
 }
 
-void	Response::fillCGI(std::string content)
+void	Response::fillCGI(CGI* cgi)
 {
-	_content = content;
+	_content = cgi->getBody();
 	_fillStatusLine("200", "OK");
-	_fillHeader();
+	_fillHeader(cgi->getFields());
 	_isComplete = true;
 }
 
@@ -141,7 +143,7 @@ void	Response::_fillStatusLine(std::string statusCode, std::string reasonMessage
 	_reasonMessage = reasonMessage;
 }
 
-void	Response::_fillHeader(void)
+void	Response::_fillHeader(std::map<std::string, std::string> fields)
 {
 	_fields["Server"].push_back(SERVERNAME);
 	if (_shouldClose)
@@ -151,6 +153,11 @@ void	Response::_fillHeader(void)
 	if (!_content.empty())
 		_fields["Content-Length"].push_back(itos(_content.length()));
 	_updateDate();
+
+	if (!fields.empty())
+		for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
+			if (_fields.find(it->first) != _fields.end())
+				_fields[it->first].push_back(it->second);
 }
 
 int	Response::_fillContent(std::string path)

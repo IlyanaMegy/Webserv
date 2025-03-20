@@ -14,6 +14,8 @@
 # define ERRORPATH "default/errors/"
 # define TIMEBUFFERSIZE 100
 
+class	CGI;
+
 class Response
 {
 	public:
@@ -37,7 +39,7 @@ class Response
 		void		fillDELETE(std::string path);
 		void		fillPOST(std::string path, std::string body);
 
-		void		fillCGI(std::string content);
+		void		fillCGI(CGI* cgi);
 
 		static std::string	itos(int value);
 		
@@ -60,7 +62,7 @@ class Response
 		void	_updateDate(void);
 
 		void	_fillStatusLine(std::string statusCode, std::string reasonMessage);
-		void	_fillHeader(void);
+		void	_fillHeader(std::map<std::string, std::string> fields = std::map<std::string, std::string>());
 		int		_fillContent(std::string path);
 
 		int		_deleteTarget(std::string path);

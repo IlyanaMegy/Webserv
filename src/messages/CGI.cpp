@@ -43,9 +43,14 @@ bool	CGI::getHasSucceeded(void)
 	return _hasSucceeded;
 }
 
-std::string	CGI::getOutput(void)
+std::map<std::string, std::string>	CGI::getFields(void)
 {
-	return _output;
+	return _fields;
+}
+
+std::string	CGI::getBody(void)
+{
+	return _body;
 }
 
 void	CGI::addOutput(std::string buffer)
@@ -61,7 +66,62 @@ void	CGI::wait(void)
 	_wasWaitedFor = true;
 }
 
+void	CGI::parse(void)
+{
+	std::string::size_type	lfLfPos;
 
+	lfLfPos = _output.find("\n\n");
+	if (lfLfPos == std::string::npos || _parseHeaderFields(_output.substr(0, lfLfPos + 1))) {
+		_hasSucceeded = false;
+		return ;
+	}
+	_body = _output.substr(lfLfPos + 2, _output.length() - (lfLfPos + 2));
+}
+
+int	CGI::_parseHeaderFields(std::string header)
+{
+	std::string::size_type	lfPos;
+	std::string				fieldLine;
+
+	lfPos = header.find("\n");
+	while (!header.empty() && lfPos != std::string::npos) {
+		fieldLine = header.substr(0, lfPos);
+		if (_parseFieldLine(fieldLine))
+			return 1;
+		header = header.substr(lfPos + 1, header.length() - (lfPos + 1));
+		lfPos = header.find("\n");
+	}
+	if (_fields.find("content-type") == _fields.end()
+			&& _fields.find("location") == _fields.end()
+			&& _fields.find("status") == _fields.end())
+		return 1;
+	return 0;
+}
+
+int	CGI::_parseFieldLine(std::string fieldLine)
+{
+	std::string				fieldName;
+	std::string				fieldValue;
+	std::string::size_type	delimiterPos;
+
+	if (fieldLine.empty())
+		return 1;
+	delimiterPos = fieldLine.find(":");
+	if (delimiterPos == std::string::npos)
+		return 1;
+	fieldName = fieldLine.substr(0, delimiterPos);
+	if (std::isspace(fieldLine[delimiterPos + 1]))
+		delimiterPos++;
+	if (std::isspace(fieldLine[fieldLine.length() - 1]))
+		fieldValue = fieldLine.substr(delimiterPos + 1, fieldLine.length() - (delimiterPos + 1) - 1);
+	else
+		fieldValue = fieldLine.substr(delimiterPos + 1, fieldLine.length() - (delimiterPos + 1));
+	if (Request::parseFieldName(fieldName) || Request::parseFieldValue(fieldValue))
+		return 1;
+	if (_fields.find(Request::toLower(fieldName)) != _fields.end())
+		return 1;
+	_fields[Request::toLower(fieldName)] = Request::toLower(fieldValue);
+	return 0;
 }
 
 void	CGI::_launch(void)
