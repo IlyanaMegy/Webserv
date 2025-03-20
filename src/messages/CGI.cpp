@@ -12,7 +12,6 @@ CGI::CGI(Epoll* epoll, Request* request, std::string program, std::string cgi)
 {
 	_setEnv();
 	_convertEnv();
-	(void) _env;
 	_launch();
 }
 
