@@ -191,15 +191,16 @@ std::string	Response::_itos(int value)
 
 std::string    Response::_fixPath(std::string path)
 {
+	std::cout << PINK << "path: " << path << RESET << std::endl;
 	if (path.empty())
         return path;
     if (path[0] == '/') {
+		std::cout << "index location: " << _defaultConf->getIndexLocation(path) << std::endl;
 		if (path.length() == 1)
 			return _defaultConf->getIndexLocation(path);
 		if (_defaultConf->isCgi(path))
 			return _defaultConf->getCgiPathForScript(path);
-		return _defaultConf->getLocationCompletePath(path) + path.substr(1, path.length() - 1);
-		// return path.substr(1, path.length() - 1);
+		return _defaultConf->getLocationCompletePath(path);
 	}
     return path;
 }

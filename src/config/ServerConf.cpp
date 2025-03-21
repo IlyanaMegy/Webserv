@@ -170,7 +170,11 @@ void ServerConf::setLocation(std::string path,  std::vector<std::string> params)
 			new_loca.setIndexLocation(params[i]);
 		} else if (params[i] == "cgi_ext" && (i + 1) < params.size()) {
 			if (findChar(params[++i], ';') >= 1)
-					new_loca.setCgiExtension(params[i]);
+			{
+				if (!params[i].empty() && params[i][params[i].size() - 1] == ';')
+					params[i].erase(params[i].size() - 1);
+				new_loca.setCgiExtension(params[i]);
+			}
 			else
 				throw std::runtime_error("[CONFIG] Error : cgi_ext is invalid");
 		} else if (params[i] == "cgi_path" && (i + 1) < params.size()) {
@@ -244,8 +248,8 @@ int ServerConf::isValidLocation(Location &location) {
 		else
 			return (1);
 	}
-	else if (location.getPath().find("~ .")) {
-		if (std::string::npos && location.getIndexLocation().empty())
+	else {
+		if (location.getIndexLocation().empty())
 			location.setIndexLocation(_index);
 		if (location.getPath()[0] != '/') return (2);
 		if (location.getRootLocation().empty() && _root.empty())
@@ -253,6 +257,8 @@ int ServerConf::isValidLocation(Location &location) {
 		if (location.getRootLocation().empty() && !_root.empty())
 			location.setRootLocation(_root);
 	}
+	if (location.isCgiLocation() && location.getCgiExtension().empty())
+		throw std::runtime_error("No extension found for location: " + location.getPath());
 	return (0);
 }
 
@@ -330,7 +336,7 @@ size_t ServerConf::findMatchingCgiLocation(std::string scriptPath, Location* bes
     size_t bestMatchLength = 0;
     std::string scriptExtension = scriptPath.substr(scriptPath.rfind('.'));
     for (std::vector<Location>::iterator it = _locations.begin(); it != _locations.end(); ++it) {
-        if (it->isCgiLocation() && it->getCgiExtension() == scriptExtension) {
+		if (it->isCgiLocation() && it->getCgiExtension() == scriptExtension) {
 			std::string completePath = it->getRootLocation() + scriptPath;
 			if (completePath.length() > bestMatchLength) {
 				*bestMatch = (*it);
@@ -346,9 +352,7 @@ std::string ServerConf::getCgiPathForScript(std::string scriptPath) {
 
     if (_cgiPathSaves.find(scriptPath) != _cgiPathSaves.end()) 
 		return _cgiPathSaves[scriptPath];
-
     size_t matchLength = findMatchingCgiLocation(scriptPath, &location);
-
     if (matchLength <= 0)
 		throw std::runtime_error("[CONFIG] Error: CGI path not found for script path: " + scriptPath);				//!\ ERROR : CGI path not found for script path
 	_cgiPathSaves[scriptPath] = location.getCgiPath();
