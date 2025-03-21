@@ -9,6 +9,7 @@
 # include <vector>
 
 #define PYTHON_PATH "/usr/bin/python3"
+# define CLOSED -1
 
 class	Epoll;
 class	Client;

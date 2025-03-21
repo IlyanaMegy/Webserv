@@ -25,9 +25,9 @@ CGI::~CGI(void)
 		delete[] _envp;
 	}
 
-	if (_pipeFdOut[READ_END] != -1)
+	if (_pipeFdOut[READ_END] != CLOSED)
 		close(_pipeFdOut[READ_END]);
-	if (_pipeFdIn[WRITE_END] != -1)
+	if (_pipeFdIn[WRITE_END] != CLOSED)
 		close(_pipeFdIn[WRITE_END]);
 
 	if (!_wasWaitedFor) {
@@ -38,10 +38,10 @@ CGI::~CGI(void)
 
 void	CGI::_initPipes(void)
 {
-	_pipeFdOut[READ_END] = -1;
-	_pipeFdOut[WRITE_END] = -1;
-	_pipeFdIn[READ_END] = -1;
-	_pipeFdIn[WRITE_END] = -1;
+	_pipeFdOut[READ_END] = CLOSED;
+	_pipeFdOut[WRITE_END] = CLOSED;
+	_pipeFdIn[READ_END] = CLOSED;
+	_pipeFdIn[WRITE_END] = CLOSED;
 }
 
 int	CGI::getReadFd(void)
@@ -73,7 +73,7 @@ std::string	CGI::getBody(void)
 void	CGI::closeWriteFd(void)
 {
 	close(_pipeFdIn[WRITE_END]);
-	_pipeFdIn[WRITE_END] = -1;
+	_pipeFdIn[WRITE_END] = CLOSED;
 }
 
 void	CGI::addOutput(std::string buffer)
@@ -181,12 +181,12 @@ void	CGI::_launch(void)
 
 	_epoll->addFd(_pipeFdOut[READ_END], EPOLLIN, TIMEOUT);
 	close(_pipeFdOut[WRITE_END]);
-	_pipeFdOut[WRITE_END] = -1;
+	_pipeFdOut[WRITE_END] = CLOSED;
 
 	if (_env["REQUEST_METHOD"] == "POST") {
 		_epoll->addFd(_pipeFdIn[WRITE_END], EPOLLOUT);
 		close(_pipeFdIn[READ_END]);
-		_pipeFdIn[READ_END] = -1;
+		_pipeFdIn[READ_END] = CLOSED;
 	}
 }
 
@@ -194,15 +194,15 @@ void	CGI::_closePipes(std::string method)
 {
 	if (method.empty() || method == "GET") {
 		close(_pipeFdOut[READ_END]);
-		_pipeFdOut[READ_END] = -1;
+		_pipeFdOut[READ_END] = CLOSED;
 		close(_pipeFdOut[WRITE_END]);
-		_pipeFdOut[WRITE_END] = -1;
+		_pipeFdOut[WRITE_END] = CLOSED;
 	}
 	if (method.empty() || method == "POST") {
 		close(_pipeFdIn[READ_END]);
-		_pipeFdIn[READ_END] = -1;
+		_pipeFdIn[READ_END] = CLOSED;
 		close(_pipeFdIn[WRITE_END]);
-		_pipeFdIn[WRITE_END] = -1;
+		_pipeFdIn[WRITE_END] = CLOSED;
 	}
 }
 
