@@ -98,7 +98,15 @@ void	CGI::parse(void)
 		_hasSucceeded = false;
 		return ;
 	}
+
 	_body = _output.substr(lfLfPos + 2, _output.length() - (lfLfPos + 2));
+	if (_fields.find("content-length") != _fields.end()) {
+		if (Request::parseContentLength(_fields["content-length"])) {
+			_hasSucceeded = false;
+			return ;
+		}
+		_body = _body.substr(0, Request::stoi(_fields["content-length"]));
+	}
 }
 
 int	CGI::_parseHeaderFields(std::string header)

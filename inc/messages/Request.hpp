@@ -69,8 +69,10 @@ class Request
 		
 		static int					parseFieldName(std::string fieldName);
 		static int					parseFieldValue(std::string fieldValue);
+		static int					parseContentLength(std::string contentLength);
 		
 		static std::string			toLower(std::string s);
+		static unsigned int			stoi(std::string value);
 
 	private:
 
@@ -122,7 +124,6 @@ class Request
 		int							_findHost(void);
 		void						_findConnection(void);
 		void						_findCookies(void);
-		int							_parseContentLength(std::string contentLength);
 
 		void						_parseBody(void);
 		void						_parseFullBody(void);
@@ -138,7 +139,6 @@ class Request
 		static bool					_isVChar(unsigned char c);
 		static bool					_isObsText(unsigned char c);
 		static bool					_isHex(unsigned char c);
-		static unsigned int			_stoi(std::string value);
 		static unsigned int			_stoh(std::string value);
 		static void					_split(std::vector<std::string>& vector);
 

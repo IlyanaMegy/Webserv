@@ -367,14 +367,14 @@ int	Request::_findContentLength(void)
 		return 1;
 	}
 	if (_fields["content-length"].size() != 1
-			|| _parseContentLength(_fields["content-length"][0])) {
+			|| parseContentLength(_fields["content-length"][0])) {
 		_response.fillError("400", "Bad Request");
 		_stage = DONE;
 		return 1;
 	}
 	if (_isBodyChunked)
 		return 0;
-	_bodyLength = _stoi(_fields["content-length"][0]);
+	_bodyLength = stoi(_fields["content-length"][0]);
 	if (_bodyLength > MAXBODYOCTETS) {
 		_response.fillError("413", "Content Too Large");
 		_stage = DONE;
@@ -383,7 +383,7 @@ int	Request::_findContentLength(void)
 	return 0;
 }
 
-int	Request::_parseContentLength(std::string contentLength)
+int	Request::parseContentLength(std::string contentLength)
 {
 	if (contentLength.empty())
 		return 1;
@@ -603,7 +603,7 @@ int	Request::_parseAuthority(std::string authority)
 	if (portStartPos == 0)
 		return 1;
 	if (portStartPos != std::string::npos
-			&& _stoi(authority.substr(portStartPos + 1, authority.length() - (portStartPos + 1))) != _server->getPort())
+			&& stoi(authority.substr(portStartPos + 1, authority.length() - (portStartPos + 1))) != _server->getPort())
 		return 1;
 	host = authority.substr(0, portStartPos == std::string::npos ? authority.length() : portStartPos);
 	if (!_host.empty() && host != _host)
@@ -666,7 +666,7 @@ bool	Request::_isHex(unsigned char c)
 	return (std::isdigit(c) || c == 'A' || c == 'B' || c == 'C' || c == 'D' || c == 'E' || c == 'F');
 }
 
-unsigned int	Request::_stoi(std::string value)
+unsigned int	Request::stoi(std::string value)
 {
 	unsigned int		res;
 	std::istringstream	stream(value);
