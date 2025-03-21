@@ -1,12 +1,12 @@
 #ifndef CGI_HPP
 # define CGI_HPP
 
-#include <unistd.h>
-#include <string>
-#include <sys/wait.h>
-#include <map>
-#include <string.h>
-#include <vector>
+# include <unistd.h>
+# include <string>
+# include <sys/wait.h>
+# include <map>
+# include <string.h>
+# include <vector>
 
 #define PYTHON_PATH "/usr/bin/python3"
 
