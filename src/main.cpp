@@ -48,7 +48,10 @@ void	runServer(std::string configFile)
 					}
 				}
 				else if (Request* request = it->second->findCGIRequest(epoll.getReadyFd(i))) {
-					it->second->readFrom(epoll.getReadyFd(i), &epoll, request);
+					if (epoll.getReadyFd(i) == request->getCGI()->getReadFd())
+						it->second->readFrom(epoll.getReadyFd(i), &epoll, request);
+					else
+						it->second->sendTo(epoll.getReadyFd(i), &epoll, request);
 				}
 			}
 		}

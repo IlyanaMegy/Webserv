@@ -118,6 +118,17 @@ void	Server::sendTo(int clientFd)
 	std::cout << "Sent to client " << CYAN << clientFd << RESET << std::endl;
 }
 
+void	Server::sendTo(int cgiFd, Epoll* epoll, Request* request)
+{
+	ssize_t	res;
+
+	res = write(cgiFd, request->getBody().c_str(), request->getBodyLength());
+	if (res == -1)
+		throw std::exception();
+	epoll->deleteFd(cgiFd);
+	request->getCGI()->closeWriteFd();
+}
+
 
 // const char *Server::SocketCreationErrException::what() const throw() {
 // 	std::cerr << "Erreur lors de la création du socket" << std::endl;
@@ -142,7 +153,8 @@ Request*	Server::findCGIRequest(int cgiFd)
 {
 	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); it++) {
 		if (it->second->getRequest() && it->second->getRequest()->getCGI()
-				&& it->second->getRequest()->getCGI()->getFd() == cgiFd)
+				&& (it->second->getRequest()->getCGI()->getReadFd() == cgiFd
+				|| it->second->getRequest()->getCGI()->getWriteFd() == cgiFd))
 			return it->second->getRequest();
 	}
 	return NULL;

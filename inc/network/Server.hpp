@@ -38,6 +38,7 @@ class Server
 		void			readFrom(int clientFd, Epoll* epoll);
 		void			readFrom(int cgiFd, Epoll* epoll, Request* request);
 		void			sendTo(int clientFd);
+		void			sendTo(int cgiFd, Epoll* epoll, Request* request);
 		void			closeConnection(int clientFd);
 
 		bool 			isConfigKnown(std::string serverName);

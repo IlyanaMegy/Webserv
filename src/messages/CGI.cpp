@@ -10,6 +10,7 @@ CGI::CGI(void) : _envp(NULL), _cpid(-1), _epoll(NULL), _client(NULL), _request(N
 CGI::CGI(Epoll* epoll, Request* request, std::string program, std::string cgi)
 	: _program(program), _cgi(cgi), _envp(NULL), _cpid(-1), _epoll(epoll), _client(request->getClient()), _request(request), _hasSucceeded(false), _wasWaitedFor(false)
 {
+	_initPipes();
 	_setEnv();
 	_convertEnv();
 	_launch();
@@ -24,7 +25,10 @@ CGI::~CGI(void)
 		delete[] _envp;
 	}
 
-	close(_pipeFd[READ_END]);
+	if (_pipeFdOut[READ_END] != -1)
+		close(_pipeFdOut[READ_END]);
+	if (_pipeFdIn[WRITE_END] != -1)
+		close(_pipeFdIn[WRITE_END]);
 
 	if (!_wasWaitedFor) {
 		kill(_cpid, SIGKILL);
@@ -32,10 +36,24 @@ CGI::~CGI(void)
 	}
 }
 
-int	CGI::getFd(void)
+void	CGI::_initPipes(void)
 {
-	return _pipeFd[READ_END];
+	_pipeFdOut[READ_END] = -1;
+	_pipeFdOut[WRITE_END] = -1;
+	_pipeFdIn[READ_END] = -1;
+	_pipeFdIn[WRITE_END] = -1;
 }
+
+int	CGI::getReadFd(void)
+{
+	return _pipeFdOut[READ_END];
+}
+
+int	CGI::getWriteFd(void)
+{
+	return _pipeFdIn[WRITE_END];
+}
+
 
 bool	CGI::getHasSucceeded(void)
 {
@@ -50,6 +68,12 @@ std::map<std::string, std::string>	CGI::getFields(void)
 std::string	CGI::getBody(void)
 {
 	return _body;
+}
+
+void	CGI::closeWriteFd(void)
+{
+	close(_pipeFdIn[WRITE_END]);
+	_pipeFdIn[WRITE_END] = -1;
 }
 
 void	CGI::addOutput(std::string buffer)
@@ -125,27 +149,61 @@ int	CGI::_parseFieldLine(std::string fieldLine)
 
 void	CGI::_launch(void)
 {
-	if (pipe(_pipeFd) == -1)
+	if (pipe2(_pipeFdOut, O_CLOEXEC) == -1)
 		throw std::exception();
-	if ((_cpid = fork()) == -1)
-		throw std::exception();
-	
-	if (_cpid == 0) {
-		close(_pipeFd[READ_END]);
-		if (dup2(_pipeFd[WRITE_END], STDOUT_FILENO) == -1) {
-			close(_pipeFd[WRITE_END]);
+
+	if (_env["REQUEST_METHOD"] == "POST")
+		if (pipe2(_pipeFdIn, O_CLOEXEC) == -1) {
+			_closePipes("GET");
 			throw std::exception();
 		}
-		close(_pipeFd[WRITE_END]);
+
+	if ((_cpid = fork()) == -1) {
+		_env["REQUEST_METHOD"] == "POST" ? _closePipes("") : _closePipes("GET");
+		throw std::exception();
+	}
+	
+	if (_cpid == 0) {
+		if (_env["REQUEST_METHOD"] == "POST")
+			if (dup2(_pipeFdIn[READ_END], STDIN_FILENO) == -1) {
+				_closePipes("");
+				throw std::exception();
+			}
+		if (dup2(_pipeFdOut[WRITE_END], STDOUT_FILENO) == -1) {
+			_env["REQUEST_METHOD"] == "POST" ? _closePipes("") : _closePipes("GET");
+			throw std::exception();
+		}
 		if (chdir((char *)_findDirectory(_cgi).c_str()) == -1)
 			throw std::exception();
 		execve(_program.c_str(), (char*[]){(char *)_program.c_str(), (char *)_env["SCRIPT_NAME"].c_str(), NULL}, _envp);
 		throw std::exception();
 	}
 
-	close(_pipeFd[WRITE_END]);
+	_epoll->addFd(_pipeFdOut[READ_END], EPOLLIN, TIMEOUT);
+	close(_pipeFdOut[WRITE_END]);
+	_pipeFdOut[WRITE_END] = -1;
 
-	_epoll->addFd(_pipeFd[READ_END], EPOLLIN, TIMEOUT);
+	if (_env["REQUEST_METHOD"] == "POST") {
+		_epoll->addFd(_pipeFdIn[WRITE_END], EPOLLOUT);
+		close(_pipeFdIn[READ_END]);
+		_pipeFdIn[READ_END] = -1;
+	}
+}
+
+void	CGI::_closePipes(std::string method)
+{
+	if (method.empty() || method == "GET") {
+		close(_pipeFdOut[READ_END]);
+		_pipeFdOut[READ_END] = -1;
+		close(_pipeFdOut[WRITE_END]);
+		_pipeFdOut[WRITE_END] = -1;
+	}
+	if (method.empty() || method == "POST") {
+		close(_pipeFdIn[READ_END]);
+		_pipeFdIn[READ_END] = -1;
+		close(_pipeFdIn[WRITE_END]);
+		_pipeFdIn[WRITE_END] = -1;
+	}
 }
 
 void	CGI::_setEnv(void)

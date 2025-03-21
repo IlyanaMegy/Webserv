@@ -26,12 +26,14 @@ class CGI
 			WRITE_END
 		};
 
-		int			getFd(void);
+		int			getReadFd(void);
+		int			getWriteFd(void);
 		bool		getHasSucceeded(void);
-
+		
 		std::map<std::string, std::string>	getFields(void);
 		std::string							getBody(void);
-
+		
+		void	closeWriteFd(void);
 		void	addOutput(std::string buffer);
 		void	wait(void);
 		void	parse(void);
@@ -43,7 +45,8 @@ class CGI
 		std::map<std::string, std::string>	_env;
 		char**								_envp;
 
-		int	_pipeFd[2];
+		int	_pipeFdIn[2];
+		int	_pipeFdOut[2];
 		int	_cpid;
 
 		Epoll*		_epoll;
@@ -57,6 +60,7 @@ class CGI
 		std::map<std::string, std::string>	_fields;
 		std::string							_body;
 
+		void		_initPipes(void);
 		void		_setEnv(void);
 		std::string	_createCookieString(std::vector<std::string> cookies);
 		void		_convertEnv(void);
@@ -68,6 +72,8 @@ class CGI
 
 		static std::string	_findDirectory(std::string path);
 		static std::string	_findName(std::string path);
+
+		void	_closePipes(std::string method);
 
 };
 
