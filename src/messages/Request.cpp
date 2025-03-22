@@ -664,6 +664,8 @@ bool	Request::_isHex(unsigned char c)
 
 bool	Request::isToken(std::string s)
 {
+	if (s.empty())
+		return false;
 	for (std::string::iterator it = s.begin(); it != s.end(); it++) {
 		if (!isVChar(*it) || isDelimiter(*it))
 			return false;
