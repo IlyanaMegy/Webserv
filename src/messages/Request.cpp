@@ -430,27 +430,23 @@ int	Request::_parseFieldLine(std::string fieldLine)
 
 int	Request::parseFieldName(std::string fieldName)
 {
-	for (std::string::iterator it = fieldName.begin(); it != fieldName.end(); it++) {
-		if (!_isVChar(*it) || _isDelimiter(*it))
-			return 1;
-	}
-	return 0;
+	return (!isToken(fieldName));
 }
 
 int	Request::parseFieldValue(std::string fieldValue)
 {
 	if (fieldValue.empty())
 		return 0;
-	if (!_isVChar(fieldValue[0]) && !_isObsText(fieldValue[0]))
+	if (!isVChar(fieldValue[0]) && !_isObsText(fieldValue[0]))
 		return 1;
 	if (fieldValue.length() == 1)
 		return 0;
 	for (size_t i = 1; i < fieldValue.length() - 1; i++) {
-		if (!_isVChar(fieldValue[i]) && !_isObsText(fieldValue[i])
+		if (!isVChar(fieldValue[i]) && !_isObsText(fieldValue[i])
 			&& fieldValue[i] != ' ' && fieldValue[i] != '\t')
 			return 1;
 	}
-	if (!_isVChar(fieldValue[fieldValue.length() - 1]) && !_isObsText(fieldValue[fieldValue.length() - 1]))
+	if (!isVChar(fieldValue[fieldValue.length() - 1]) && !_isObsText(fieldValue[fieldValue.length() - 1]))
 		return 1;
 	return 0;
 }
@@ -644,14 +640,14 @@ std::string	Request::toLower(std::string s)
 	return lowerS;
 }
 
-bool	Request::_isDelimiter(unsigned char c)
+bool	Request::isDelimiter(unsigned char c)
 {
 	static	std::string	delimiters("\"(),/:;<=>?@[\\]{}");
 
 	return (delimiters.find(c) != std::string::npos);
 }
 
-bool	Request::_isVChar(unsigned char c)
+bool	Request::isVChar(unsigned char c)
 {
 	return (32 < c && c < 127);
 }
@@ -664,6 +660,15 @@ bool	Request::_isObsText(unsigned char c)
 bool	Request::_isHex(unsigned char c)
 {
 	return (std::isdigit(c) || c == 'A' || c == 'B' || c == 'C' || c == 'D' || c == 'E' || c == 'F');
+}
+
+bool	Request::isToken(std::string s)
+{
+	for (std::string::iterator it = s.begin(); it != s.end(); it++) {
+		if (!isVChar(*it) || isDelimiter(*it))
+			return false;
+	}
+	return true;
 }
 
 unsigned int	Request::stoi(std::string value)

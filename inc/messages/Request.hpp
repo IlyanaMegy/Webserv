@@ -72,6 +72,9 @@ class Request
 		static int					parseContentLength(std::string contentLength);
 		
 		static std::string			toLower(std::string s);
+		static bool					isToken(std::string s);
+		static bool					isDelimiter(unsigned char c);
+		static bool					isVChar(unsigned char c);
 		static unsigned int			stoi(std::string value);
 
 	private:
@@ -135,8 +138,6 @@ class Request
 
 
 
-		static bool					_isDelimiter(unsigned char c);
-		static bool					_isVChar(unsigned char c);
 		static bool					_isObsText(unsigned char c);
 		static bool					_isHex(unsigned char c);
 		static unsigned int			_stoh(std::string value);
