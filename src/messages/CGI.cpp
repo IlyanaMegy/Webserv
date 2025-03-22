@@ -123,7 +123,6 @@ int	CGI::_parseHeaderFields(std::string header)
 		lfPos = header.find("\n");
 	}
 	if (_fields.find("content-type") == _fields.end()
-			&& _fields.find("location") == _fields.end()
 			&& _fields.find("status") == _fields.end())
 		return 1;
 	return 0;
