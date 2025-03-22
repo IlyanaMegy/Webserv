@@ -71,6 +71,9 @@ class CGI
 		int			_parseHeaderFields(std::string header);
 		int			_parseFieldLine(std::string fieldLine);
 
+		int			_parseContentType(std::string contentType);
+		int			_parseStatus(std::string status);
+
 		static std::string	_findDirectory(std::string path);
 		static std::string	_findName(std::string path);
 

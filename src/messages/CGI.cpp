@@ -125,7 +125,43 @@ int	CGI::_parseHeaderFields(std::string header)
 	if (_fields.find("content-type") == _fields.end()
 			&& _fields.find("status") == _fields.end())
 		return 1;
+	if ((_fields.find("content-type") != _fields.end() && _parseContentType(_fields["content-type"]))
+			|| (_fields.find("status") != _fields.end() && _parseStatus(_fields["status"])))
+		return 1;
 	return 0;
+}
+
+int	CGI::_parseStatus(std::string status)
+{
+	std::string::size_type	sepPos;
+	std::string				statusCode;
+	std::string				reasonMessage;
+
+	sepPos = status.find(" ");
+
+	statusCode = sepPos == std::string::npos ? status : status.substr(0, sepPos);
+	if (statusCode != "200" && statusCode != "400" && statusCode != "501")
+		return 1;
+	if (sepPos == std::string::npos)
+		return 0;
+
+	reasonMessage = status.substr(sepPos + 1, status.length() - (sepPos + 1));
+	for (std::string::iterator it = reasonMessage.begin(); it != reasonMessage.end(); it++)
+		if (!Request::isVChar(*it))
+			return 1;
+	return 0;
+}
+
+int	CGI::_parseContentType(std::string contentType)
+{
+	std::string::size_type	sepPos;
+
+	if (contentType.empty())
+		return 0;
+	if ((sepPos = contentType.find("/")) == std::string::npos)
+		return 1;
+	return !(Request::isToken(contentType.substr(0, sepPos))
+		&& Request::isToken(contentType.substr(sepPos + 1, contentType.length() - (sepPos + 1))));
 }
 
 int	CGI::_parseFieldLine(std::string fieldLine)
