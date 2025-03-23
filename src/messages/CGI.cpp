@@ -128,7 +128,7 @@ int	CGI::_parseHeaderFieldsPostBodyParsing(std::map< std::string, std::vector<st
 	if (fields.find("content-type") != fields.end() && _body == "")
 		return 1;
 	if (fields.find("status") != fields.end())
-		if ((_body.empty() && fields["status"][0] == "200") || (!_body.empty() && fields["status"][0] != "200"))
+		if ((_body.empty() && _statusCode == "200") || (!_body.empty() && _statusCode != "200"))
 			return 1;
 	return 0;
 }
