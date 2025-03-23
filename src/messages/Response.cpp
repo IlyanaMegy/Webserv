@@ -143,7 +143,7 @@ void	Response::_fillStatusLine(std::string statusCode, std::string reasonMessage
 	_reasonMessage = reasonMessage;
 }
 
-void	Response::_fillHeader(std::map<std::string, std::string> fields)
+void	Response::_fillHeader(std::map< std::string, std::vector<std::string> > fields)
 {
 	_fields["Server"].push_back(SERVERNAME);
 	if (_shouldClose)
@@ -155,9 +155,9 @@ void	Response::_fillHeader(std::map<std::string, std::string> fields)
 	_updateDate();
 
 	if (!fields.empty())
-		for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
-				_fields[it->first].push_back(it->second);
+		for (std::map< std::string, std::vector<std::string> >::iterator it = fields.begin(); it != fields.end(); it++)
 			if (_fields.find(it->first) == _fields.end())
+				_fields[it->first] = it->second;
 }
 
 int	Response::_fillContent(std::string path)

@@ -60,7 +60,7 @@ bool	CGI::getHasSucceeded(void)
 	return _hasSucceeded;
 }
 
-std::map<std::string, std::string>	CGI::getFields(void)
+std::map< std::string, std::vector<std::string> >	CGI::getFields(void)
 {
 	return _fields;
 }
@@ -101,11 +101,12 @@ void	CGI::parse(void)
 
 	_body = _output.substr(lfLfPos + 2, _output.length() - (lfLfPos + 2));
 	if (_fields.find("content-length") != _fields.end()) {
-		if (Request::parseContentLength(_fields["content-length"])) {
+		if (_fields["content-length"].size() != 1 
+				|| Request::parseContentLength(_fields["content-length"][0])) {
 			_hasSucceeded = false;
 			return ;
 		}
-		_body = _body.substr(0, Request::stoi(_fields["content-length"]));
+		_body = _body.substr(0, Request::stoi(_fields["content-length"][0]));
 	}
 }
 
@@ -125,8 +126,10 @@ int	CGI::_parseHeaderFields(std::string header)
 	if (_fields.find("content-type") == _fields.end()
 			&& _fields.find("status") == _fields.end())
 		return 1;
-	if ((_fields.find("content-type") != _fields.end() && _parseContentType(_fields["content-type"]))
-			|| (_fields.find("status") != _fields.end() && _parseStatus(_fields["status"])))
+	if ((_fields.find("content-type") != _fields.end() 
+			&& (_fields["content-type"].size() != 1 || _parseContentType(_fields["content-type"][0])))
+		|| (_fields.find("status") != _fields.end() && 
+			(_fields["status"].size() != 1 || _parseStatus(_fields["status"][0]))))
 		return 1;
 	return 0;
 }
@@ -184,9 +187,7 @@ int	CGI::_parseFieldLine(std::string fieldLine)
 		fieldValue = fieldLine.substr(delimiterPos + 1, fieldLine.length() - (delimiterPos + 1));
 	if (Request::parseFieldName(fieldName) || Request::parseFieldValue(fieldValue))
 		return 1;
-	if (_fields.find(Request::toLower(fieldName)) != _fields.end())
-		return 1;
-	_fields[Request::toLower(fieldName)] = Request::toLower(fieldValue);
+	_fields[Request::toLower(fieldName)].push_back(fieldValue);
 	return 0;
 }
 

@@ -62,7 +62,7 @@ class Response
 		void	_updateDate(void);
 
 		void	_fillStatusLine(std::string statusCode, std::string reasonMessage);
-		void	_fillHeader(std::map<std::string, std::string> fields = std::map<std::string, std::string>());
+		void	_fillHeader(std::map< std::string, std::vector<std::string> > fields = std::map< std::string, std::vector<std::string> >());
 		int		_fillContent(std::string path);
 
 		int		_deleteTarget(std::string path);

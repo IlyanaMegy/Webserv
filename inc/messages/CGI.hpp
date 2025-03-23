@@ -31,8 +31,8 @@ class CGI
 		int			getWriteFd(void);
 		bool		getHasSucceeded(void);
 		
-		std::map<std::string, std::string>	getFields(void);
-		std::string							getBody(void);
+		std::map< std::string, std::vector<std::string> >	getFields(void);
+		std::string											getBody(void);
 		
 		void	closeWriteFd(void);
 		void	addOutput(std::string buffer);
@@ -58,7 +58,7 @@ class CGI
 		bool		_wasWaitedFor;
 		std::string	_output;
 
-		std::map<std::string, std::string>	_fields;
+		std::map< std::string, std::vector<std::string> >	_fields;
 		std::string							_body;
 
 		void		_initPipes(void);
