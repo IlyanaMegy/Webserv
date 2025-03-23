@@ -5,10 +5,10 @@
 #include "Server.hpp"
 #include "Socket.hpp"
 
-CGI::CGI(void) : _envp(NULL), _cpid(-1), _epoll(NULL), _client(NULL), _request(NULL), _hasSucceeded(false) {}
+CGI::CGI(void) : _envp(NULL), _cpid(-1), _epoll(NULL), _client(NULL), _request(NULL), _hasSucceeded(false), _statusCode("200") {}
 
 CGI::CGI(Epoll* epoll, Request* request, std::string program, std::string cgi)
-	: _program(program), _cgi(cgi), _envp(NULL), _cpid(-1), _epoll(epoll), _client(request->getClient()), _request(request), _hasSucceeded(false), _wasWaitedFor(false)
+	: _program(program), _cgi(cgi), _envp(NULL), _cpid(-1), _epoll(epoll), _client(request->getClient()), _request(request), _hasSucceeded(false), _wasWaitedFor(false), _statusCode("200")
 {
 	_initPipes();
 	_setEnv();
@@ -60,6 +60,16 @@ bool	CGI::getHasSucceeded(void)
 	return _hasSucceeded;
 }
 
+std::string	CGI::getStatusCode(void)
+{
+	return _statusCode;
+}
+
+std::string	CGI::getReasonMessage(void)
+{
+	return _reasonMessage;
+}
+
 std::map< std::string, std::vector<std::string> >	CGI::getFields(void)
 {
 	return _fields;
@@ -108,6 +118,19 @@ void	CGI::parse(void)
 		}
 		_body = _body.substr(0, Request::stoi(_fields["content-length"][0]));
 	}
+
+	if (_parseHeaderFieldsPostBodyParsing(_fields))
+		_hasSucceeded = false;
+}
+
+int	CGI::_parseHeaderFieldsPostBodyParsing(std::map< std::string, std::vector<std::string> >& fields)
+{
+	if (fields.find("content-type") != fields.end() && _body == "")
+		return 1;
+	if (fields.find("status") != fields.end())
+		if ((_body.empty() && fields["status"][0] == "200") || (!_body.empty() && fields["status"][0] != "200"))
+			return 1;
+	return 0;
 }
 
 int	CGI::_parseHeaderFields(std::string header)
@@ -137,19 +160,17 @@ int	CGI::_parseHeaderFields(std::string header)
 int	CGI::_parseStatus(std::string status)
 {
 	std::string::size_type	sepPos;
-	std::string				statusCode;
-	std::string				reasonMessage;
 
 	sepPos = status.find(" ");
 
-	statusCode = sepPos == std::string::npos ? status : status.substr(0, sepPos);
-	if (statusCode != "200" && statusCode != "400" && statusCode != "501")
+	_statusCode = sepPos == std::string::npos ? status : status.substr(0, sepPos);
+	if (_statusCode != "200" && _statusCode != "400" && _statusCode != "501")
 		return 1;
 	if (sepPos == std::string::npos)
 		return 0;
 
-	reasonMessage = status.substr(sepPos + 1, status.length() - (sepPos + 1));
-	for (std::string::iterator it = reasonMessage.begin(); it != reasonMessage.end(); it++)
+	_reasonMessage = status.substr(sepPos + 1, status.length() - (sepPos + 1));
+	for (std::string::iterator it = _reasonMessage.begin(); it != _reasonMessage.end(); it++)
 		if (!Request::isVChar(*it))
 			return 1;
 	return 0;

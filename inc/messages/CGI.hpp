@@ -31,6 +31,8 @@ class CGI
 		int			getWriteFd(void);
 		bool		getHasSucceeded(void);
 		
+		std::string											getStatusCode(void);
+		std::string											getReasonMessage(void);
 		std::map< std::string, std::vector<std::string> >	getFields(void);
 		std::string											getBody(void);
 		
@@ -54,12 +56,15 @@ class CGI
 		Client*		_client;
 		Request*	_request;
 
+		
 		bool		_hasSucceeded;
 		bool		_wasWaitedFor;
 		std::string	_output;
-
+		
+		std::string											_statusCode;
+		std::string											_reasonMessage;
 		std::map< std::string, std::vector<std::string> >	_fields;
-		std::string							_body;
+		std::string											_body;
 
 		void		_initPipes(void);
 		void		_setEnv(void);
@@ -70,6 +75,7 @@ class CGI
 
 		int			_parseHeaderFields(std::string header);
 		int			_parseFieldLine(std::string fieldLine);
+		int			_parseHeaderFieldsPostBodyParsing(std::map< std::string, std::vector<std::string> >& fields);
 
 		int			_parseContentType(std::string contentType);
 		int			_parseStatus(std::string status);

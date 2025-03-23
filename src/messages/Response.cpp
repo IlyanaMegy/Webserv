@@ -79,9 +79,20 @@ void	Response::fillError(std::string statusCode, std::string reasonMessage)
 
 void	Response::fillCGI(CGI* cgi)
 {
+	std::map< std::string, std::vector<std::string> > fields = cgi->getFields();
+
+	if (fields.find("status") == fields.end())
+		_fillStatusLine("200", "OK");
+	else {
+		if (cgi->getStatusCode() != "200") {
+			fillError(cgi->getStatusCode(), cgi->getReasonMessage());
+			return ;
+		}
+		_fillStatusLine(cgi->getStatusCode(), cgi->getReasonMessage());
+		fields.erase("status");
+	}
 	_content = cgi->getBody();
-	_fillStatusLine("200", "OK");
-	_fillHeader(cgi->getFields());
+	_fillHeader(fields);
 	_isComplete = true;
 }
 
