@@ -156,8 +156,8 @@ void	Response::_fillHeader(std::map<std::string, std::string> fields)
 
 	if (!fields.empty())
 		for (std::map<std::string, std::string>::iterator it = fields.begin(); it != fields.end(); it++)
-			if (_fields.find(it->first) != _fields.end())
 				_fields[it->first].push_back(it->second);
+			if (_fields.find(it->first) == _fields.end())
 }
 
 int	Response::_fillContent(std::string path)
