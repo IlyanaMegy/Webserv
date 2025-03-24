@@ -239,7 +239,7 @@ int ServerConf::isValidLocation(Location &location) const {
 		if (checkFile(location.getIndexLocation(), 4) < 0) {
 			std::string path = location.getRootLocation() + location.getPath() + "/" + location.getIndexLocation();
 			if (getTypePath(path) != 1) {
-				std::string root = getcwd(NULL, 0);
+				std::string root = "./";
 				location.setRootLocation(root);
 				path = root + location.getPath() + "/" + location.getIndexLocation();
 			}
@@ -272,7 +272,7 @@ int ServerConf::isValidLocation(Location &location) const {
 	} else {
 		if (location.getPath()[0] != '/') return (2);
 		if (location.getRootLocation().empty() && _root.empty())
-			location.setRootLocation(getcwd(NULL, 0));
+			location.setRootLocation("./");
 		if (location.getRootLocation().empty() && !_root.empty())
 			location.setRootLocation(_root);
 		if (isFileExistAndReadable( location.getRootLocation() + location.getPath(), location.getIndexLocation()))
