@@ -6,8 +6,10 @@
 
 class ServerConf;
 class Server;
+class ConfigParser;
 class ServerMonitor {
    private:
+	ConfigParser data;
 	std::vector<ServerConf *> _confs;
 	std::map<int, Server*>	_servers;
 

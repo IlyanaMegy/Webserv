@@ -3,7 +3,13 @@
 #include "ParserTools.hpp"
 
 ConfigParser::~ConfigParser()
-{}
+{
+	for (std::vector<ServerConf*>::iterator it = _servers.begin(); it != _servers.end(); it++)
+		if (*it) {
+			std::cerr << RED << (*it)->getServerName() << " deleted" << RESET << std::endl;
+			delete *it;
+		}
+}
 
 static std::string readFile(std::string path) {
 	if (path.empty() || path.length() == 0) return (NULL);

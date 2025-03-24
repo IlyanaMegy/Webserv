@@ -2,8 +2,6 @@
 
 ServerMonitor::ServerMonitor(std::string configFile)
 {
-	ConfigParser data;
-
 	data.createCluster(configFile);
 	_confs = data.getServers();
 
@@ -44,10 +42,6 @@ ServerMonitor::~ServerMonitor()
 	for (std::map<int, Server*>::iterator it = _servers.begin(); it != _servers.end(); it++)
 		if (it->second)
 			delete it->second;
-
-	for (std::vector<ServerConf*>::iterator it = _confs.begin(); it != _confs.end(); it++)
-		if (*it)
-			delete *it;
 }
 
 
