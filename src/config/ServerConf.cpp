@@ -325,11 +325,19 @@ const std::vector<Location>::iterator ServerConf::getLocationFromUri(std::string
 }
 
 bool ServerConf::isValidMethod(std::string uri, Request::Method method) {
-	std::vector<Request::Method> locationMethods = getLocationFromUri(uri)->getMethods();
+    Location    location;
+    findMatchingLocation(uri, &location);
+    std::vector<Request::Method> locationMethods = location.getMethods();
+    if (std::find(locationMethods.begin(), locationMethods.end(), method) != locationMethods.end())
+        return (true);
+    return (false);
+}
 
-	if (std::find(locationMethods.begin(), locationMethods.end(), method) != locationMethods.end())
-		return (true);
-	return (false);
+std::vector<Request::Method>	ServerConf::getValidMethods(std::string path)
+{
+	Location	location;
+	findMatchingLocation(path, &location);
+	return location.getMethods();
 }
 
 void ServerConf::addRootToLocations(std::string root) {

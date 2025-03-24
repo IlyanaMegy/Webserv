@@ -68,6 +68,7 @@ class Response
 
 		void	_fillStatusLine(std::string statusCode, std::string reasonMessage);
 		void	_fillHeader(std::map< std::string, std::vector<std::string> > fields = std::map< std::string, std::vector<std::string> >());
+		void	_fillErrorHeader(void);
 		int		_fillContent(std::string path);
 
 		int		_deleteTarget(std::string path);

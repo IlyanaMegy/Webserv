@@ -56,6 +56,7 @@ class ServerConf {
 	bool is_setted_loca_root;
 
 	bool isValidMethod(std::string uri, Request::Method method);
+	std::vector<Request::Method>	getValidMethods(std::string path);
 
 	void addRootToLocations(std::string root);
 

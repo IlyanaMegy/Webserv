@@ -176,11 +176,24 @@ void	Response::_fillHeader(std::map< std::string, std::vector<std::string> > fie
 	if (!_content.empty())
 		_fields["Content-Length"].push_back(itos(_content.length()));
 	_updateDate();
+	_fillErrorHeader();
 
 	if (!fields.empty())
 		for (std::map< std::string, std::vector<std::string> >::iterator it = fields.begin(); it != fields.end(); it++)
 			if (_fields.find(it->first) == _fields.end())
 				_fields[it->first] = it->second;
+}
+
+void	Response::_fillErrorHeader(void)
+{
+	if (_statusCode == "405") {
+		std::string						validMethodsString;
+		std::vector<Request::Method>	validMethods = _conf->getValidMethods(_virtualPath);
+		for (std::vector<Request::Method>::iterator it = validMethods.begin(); it != validMethods.end(); it++)
+			validMethodsString+=(*it == Request::GET ? "GET" : (*it == Request::POST ? "POST" : "DELETE"))+std::string(", ");
+		validMethodsString = validMethodsString.empty() ? validMethodsString : validMethodsString.substr(0, validMethodsString.length() - 2);
+		_fields["Allow"].push_back(validMethodsString);
+	}
 }
 
 int	Response::_fillContent(std::string path)
