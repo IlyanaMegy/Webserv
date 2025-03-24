@@ -52,6 +52,11 @@ Client*	Request::getClient(void)
 	return _client;
 }
 
+ServerConf*	Request::getConf(void)
+{
+	return _conf;
+}
+
 Request::Method	Request::getMethod(void)
 {
 	return _method;
@@ -233,7 +238,7 @@ unsigned int	Request::_findChunkLength(void)
 		}
 	}
 	chunkLength = _stoh(line);
-	if (chunkLength + _bodyLength > MAXBODYOCTETS) {
+	if (chunkLength + _bodyLength > _conf->getMaxBodySize()) {
 		_response.fillError("413", "Content Too Large");
 		_stage = DONE;
 		return 0;
@@ -378,7 +383,7 @@ int	Request::_findContentLength(void)
 	if (_isBodyChunked)
 		return 0;
 	_bodyLength = stoi(_fields["content-length"][0]);
-	if (_bodyLength > MAXBODYOCTETS) {
+	if (_bodyLength > _conf->getMaxBodySize()) {
 		_response.fillError("413", "Content Too Large");
 		_stage = DONE;
 		return 1;

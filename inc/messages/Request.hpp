@@ -54,6 +54,7 @@ class Request
 		CGI*												getCGI(void);
 		Server*												getServer(void);
 		Client*												getClient(void);
+		ServerConf*											getConf(void);
 		Method												getMethod(void);
 		std::string											getPath(void);
 		std::string											getQuery(void);

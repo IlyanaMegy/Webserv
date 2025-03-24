@@ -77,7 +77,7 @@ void	Response::_createBody(void)
 
 void	Response::fillError(std::string statusCode, std::string reasonMessage)
 {
-	_fillContent(ERRORPATH+statusCode+".html");
+	_fillContent(_conf->getPathErrorPage(statusCode));
 	_fillStatusLine(statusCode, reasonMessage);
 	_shouldClose = true;
 	_fillHeader();

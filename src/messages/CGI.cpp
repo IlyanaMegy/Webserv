@@ -3,6 +3,7 @@
 #include "Epoll.hpp"
 #include "Request.hpp"
 #include "Server.hpp"
+#include "ServerConf.hpp"
 #include "Socket.hpp"
 
 CGI::CGI(void) : _envp(NULL), _cpid(-1), _epoll(NULL), _client(NULL), _request(NULL), _hasSucceeded(false), _statusCode("200") {}
@@ -290,6 +291,8 @@ void	CGI::_setEnv(void)
 	_env["REQUEST_METHOD"] = _request->getMethod() == Request::GET ? "GET" : "POST";
 	
 	_env["SCRIPT_NAME"] = _findName(_cgi);
+	
+	_env["SERVER_NAME"] = _request->getConf()->getServerName();
 	
 	_env["SERVER_PORT"] = Response::itos(_request->getServer()->getPort());
 	
