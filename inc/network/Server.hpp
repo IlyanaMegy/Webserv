@@ -31,6 +31,7 @@ class Server
 		~Server(void);
 
 		unsigned int	getPort(void);
+		ServerConf*		getDefaultConf(void);
 		Socket			&getSocket(void);
 		Client			*getClient(int clientFd);
 		ServerConf*		getConfig(std::string host);

@@ -9,7 +9,7 @@ Request::Request(void)
 	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _server(NULL), _conf(NULL), _client(NULL), _epoll(NULL), _cgi(NULL), _untreatedMessage("") , _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
 
 Request::Request(Server* server, Client* client, Epoll* epoll, std::string leftoverMessage)
-	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _server(server), _conf(NULL), _client(client), _epoll(epoll), _cgi(NULL), _untreatedMessage(leftoverMessage), _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
+	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _server(server), _conf(server->getDefaultConf()), _client(client), _epoll(epoll), _cgi(NULL), _untreatedMessage(leftoverMessage), _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
 
 Request::~Request(void)
 {

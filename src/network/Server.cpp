@@ -54,6 +54,11 @@ ServerConf	*Server::getConfig(std::string host)
 	return it->second;
 }
 
+ServerConf	*Server::getDefaultConf(void)
+{
+	return _defaultConf;
+}
+
 void	Server::acceptClient(Epoll &epoll)
 {
 	int		clientSocket;
