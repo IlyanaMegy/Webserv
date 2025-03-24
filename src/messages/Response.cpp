@@ -4,7 +4,7 @@
 
 #include "CGI.hpp"
 
-Response::Response(void) : _message(""), _shouldClose(false), _isComplete(false), _statusCode(""), _reasonMessage(""), _content(""), _path("") {}
+Response::Response(void) : _message(""), _shouldClose(false), _isComplete(false), _statusCode(""), _reasonMessage(""), _content("") {}
 
 Response::~Response(void) {}
 
@@ -21,6 +21,11 @@ void	Response::setReasonMessage(std::string reasonMessage)
 void	Response::setShouldClose(bool shouldClose)
 {
 	_shouldClose = shouldClose;
+}
+
+void	Response::setVirtualPath(std::string virtualPath)
+{
+	_virtualPath = virtualPath;
 }
 
 void	Response::setConf(ServerConf* conf)

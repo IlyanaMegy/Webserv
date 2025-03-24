@@ -558,6 +558,7 @@ int	Request::_parseUri(std::string uri)
 	}
 	queryStartPos = uri.find('?', pathStartPos + 1);
 	_path = uri.substr(pathStartPos, queryStartPos == std::string::npos ? uri.length() - pathStartPos : queryStartPos - pathStartPos);
+	_response.setVirtualPath(_path);
 	if (queryStartPos != std::string::npos && _parseQuery(uri.substr(queryStartPos + 1, uri.length() - (queryStartPos + 1)))) {
 		_response.fillError("400", "Bad Request");
 		_stage = DONE;

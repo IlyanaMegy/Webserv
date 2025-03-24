@@ -26,6 +26,7 @@ class Response
 		void	setStatusCode(std::string statusCode);
 		void	setReasonMessage(std::string reasonMessage);
 		void	setShouldClose(bool shouldClose);
+		void	setVirtualPath(std::string virtualPath);
 		void	setConf(ServerConf* conf);
 
 		std::string	getMessage(void) const;
@@ -57,7 +58,7 @@ class Response
 		std::map< std::string, std::vector<std::string> >	_fields;
 		std::string											_content;
 
-		std::string											_path;
+		std::string											_virtualPath;
 
 		void	_createStatusLine(void);
 		void	_createHeader(void);
