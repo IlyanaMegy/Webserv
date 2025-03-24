@@ -1,5 +1,7 @@
 #include "Response.hpp"
 
+#include "ServerConf.hpp"
+
 #include "CGI.hpp"
 
 Response::Response(void) : _message(""), _shouldClose(false), _isComplete(false), _statusCode(""), _reasonMessage(""), _content(""), _path("") {}
@@ -19,6 +21,11 @@ void	Response::setReasonMessage(std::string reasonMessage)
 void	Response::setShouldClose(bool shouldClose)
 {
 	_shouldClose = shouldClose;
+}
+
+void	Response::setConf(ServerConf* conf)
+{
+	_conf = conf;
 }
 
 std::string	Response::getMessage(void) const

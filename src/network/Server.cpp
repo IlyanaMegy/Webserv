@@ -44,6 +44,16 @@ Client	*Server::getClient(int clientFd)
 	return _clients[clientFd];
 }
 
+ServerConf	*Server::getConfig(std::string host)
+{
+	std::map<std::string, ServerConf *>::iterator	it;
+
+	it = _confs.find(host);
+	if (it == _confs.end())
+		return _defaultConf;
+	return it->second;
+}
+
 void	Server::acceptClient(Epoll &epoll)
 {
 	int		clientSocket;

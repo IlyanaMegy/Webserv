@@ -33,6 +33,7 @@ class Server
 		unsigned int	getPort(void);
 		Socket			&getSocket(void);
 		Client			*getClient(int clientFd);
+		ServerConf*		getConfig(std::string host);
 
 		void			acceptClient(Epoll &epoll);
 		void			readFrom(int clientFd, Epoll* epoll);

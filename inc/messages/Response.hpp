@@ -14,6 +14,7 @@
 # define ERRORPATH "default/errors/"
 # define TIMEBUFFERSIZE 100
 
+class	ServerConf;
 class	CGI;
 
 class Response
@@ -25,6 +26,7 @@ class Response
 		void	setStatusCode(std::string statusCode);
 		void	setReasonMessage(std::string reasonMessage);
 		void	setShouldClose(bool shouldClose);
+		void	setConf(ServerConf* conf);
 
 		std::string	getMessage(void) const;
 		bool		getShouldClose(void) const;
@@ -47,6 +49,8 @@ class Response
 		std::string	_message;
 		bool		_shouldClose;
 		bool		_isComplete;
+
+		ServerConf*											_conf;
 
 		std::string											_statusCode;
 		std::string											_reasonMessage;

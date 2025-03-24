@@ -18,6 +18,7 @@ class	Server;
 class	CGI;
 class	Epoll;
 class	Client;
+class	ServerConf;
 
 class Request
 {
@@ -86,6 +87,7 @@ class Request
 		Response											_response;
 
 		Server*												_server;
+		ServerConf*											_conf;
 		Client*												_client;
 		Epoll*												_epoll;
 		CGI*												_cgi;
