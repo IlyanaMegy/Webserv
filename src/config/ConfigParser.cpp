@@ -58,8 +58,8 @@ void ConfigParser::createCluster(const std::string &config_file) {
 		if (!server)
 			throw std::runtime_error("Error: Couldn't create server");
 
-		createServer(_servers_config[i], server);
 		_servers.push_back(server);
+		createServer(_servers_config[i], server);
 	}
 }
 
