@@ -159,6 +159,7 @@ void ServerConf::setLocation(std::string path,  std::vector<std::string> params)
 			if (flag_autoindex)
 				throw std::runtime_error("[CONFIG] Error : autoindex of location is duplicated");
 			checkToken(params[++i]);
+			std::cout << GREEN << "setLocation:\nautoindex = " << params[i] << RESET << std::endl;
 			new_loca.setAutoindex(params[i]);
 			flag_autoindex = true;
 		} else if (params[i] == "index" && (i + 1) < params.size()) {
@@ -267,19 +268,25 @@ std::vector<std::string> ServerConf::getValidMethod(std::string uri) {
 	Location	location;
 	findMatchingLocation(uri, &location);
 	std::vector<Request::Method> locationMethods = location.getMethods();
+	std::vector<std::string> validMethods;
 
     if (locationMethods.empty())
-        return {"GET", "POST", "DELETE"};
-
-    std::vector<std::string> validMethods;
-    for (std::vector<Request::Method>::const_iterator it = locationMethods.begin(); it != locationMethods.end(); ++it) {
-        switch (*it) {
-            case Request::GET: validMethods.push_back("GET"); break;
-            case Request::POST: validMethods.push_back("POST"); break;
-            case Request::DELETE: validMethods.push_back("DELETE"); break;
-            default: break;
-        }
-    }
+	{
+		validMethods.push_back("GET");
+		validMethods.push_back("POST");
+		validMethods.push_back("DELETE");
+	}
+    else
+	{
+		for (std::vector<Request::Method>::const_iterator it = locationMethods.begin(); it != locationMethods.end(); ++it) {
+			switch (*it) {
+				case Request::GET: validMethods.push_back("GET"); break;
+				case Request::POST: validMethods.push_back("POST"); break;
+				case Request::DELETE: validMethods.push_back("DELETE"); break;
+				default: break;
+			}
+		}
+	}
     return validMethods;
 }
 
