@@ -5,11 +5,11 @@ SRCS_DIR		:=	src
 
 SRCS_CONFIG		:=	ConfigParser.cpp \
 					Location.cpp \
-					ParserTools.cpp \
-					ServerConf.cpp
+					ParserTools.cpp
 
 SRCS_MESSAGES	:=	Request.cpp \
-					Response.cpp
+					Response.cpp \
+					ServerConf.cpp
 
 SRCS_NETWORK	:=	Client.cpp \
 					Epoll.cpp \

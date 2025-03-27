@@ -358,3 +358,12 @@ std::string ServerConf::getCgiPathForScript(std::string scriptPath) {
 	_cgiPathSaves[scriptPath] = location.getCgiPath();
 	return location.getCgiPath();   
 }
+
+bool ServerConf::isAutoindexOn(std::string path) const {
+    // Parcourir les blocs location pour trouver celui correspondant au chemin donné
+    for (std::vector<Location>::const_iterator it = _locations.begin(); it != _locations.end(); ++it) {
+        if (it->getPath() == path)
+            return it->getAutoindex();
+    }
+	return false;
+}

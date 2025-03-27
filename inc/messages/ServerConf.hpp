@@ -55,6 +55,7 @@ class ServerConf {
 
 	bool 		is_setted_loca_root;
 
+	bool isAutoindexOn(std::string path) const;
 	bool		isValidMethod(std::string uri, Request::Method method);
 	int			isValidLocation(Location& location);
 	// bool 		isLocationCgi(std::vector<Location>::iterator location) const;
