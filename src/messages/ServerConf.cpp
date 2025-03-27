@@ -220,6 +220,7 @@ void ServerConf::setLocation(std::string path,  std::vector<std::string> params)
 			throw std::runtime_error("[CONFIG] Error : parameter in location is invalid : " + params[i]);
 	}
 	if (!flag_max_size) new_loca.setMaxBodySize(_max_body_size);
+	// if (!flag_methods) new_loca.setMethods(std::vector<std::string>({"GET", "POST", "DELETE"}));
 	if (isValidLocation(new_loca)) throw std::runtime_error("No extension found in path after '~ '");
 	if (checkLocationsDuplicate()) throw std::runtime_error("[CONFIG] Error : location is duplicated");
 	_locations.push_back(new_loca);
@@ -254,9 +255,32 @@ bool ServerConf::isValidMethod(std::string uri, Request::Method method) {
 	Location	location;
 	findMatchingLocation(uri, &location);
 	std::vector<Request::Method> locationMethods = location.getMethods();
+
+	if (locationMethods.empty())
+		return (true);
 	if (std::find(locationMethods.begin(), locationMethods.end(), method) != locationMethods.end())
 		return (true);
 	return (false);
+}
+
+std::vector<std::string> ServerConf::getValidMethod(std::string uri) {
+	Location	location;
+	findMatchingLocation(uri, &location);
+	std::vector<Request::Method> locationMethods = location.getMethods();
+
+    if (locationMethods.empty())
+        return {"GET", "POST", "DELETE"};
+
+    std::vector<std::string> validMethods;
+    for (std::vector<Request::Method>::const_iterator it = locationMethods.begin(); it != locationMethods.end(); ++it) {
+        switch (*it) {
+            case Request::GET: validMethods.push_back("GET"); break;
+            case Request::POST: validMethods.push_back("POST"); break;
+            case Request::DELETE: validMethods.push_back("DELETE"); break;
+            default: break;
+        }
+    }
+    return validMethods;
 }
 
 int ServerConf::isValidLocation(Location &location) {

@@ -14,14 +14,14 @@
 
 class ServerConf {
    private:
-	std::string _configFile;
-	unsigned int _port;
-	in_addr_t _host;
-	std::string _server_name;
-	std::string _root;
-	unsigned int _max_body_size;
-	std::string _index;
-	bool _autoindex;
+	std::string 		_configFile;
+	unsigned int 		_port;
+	in_addr_t 			_host;
+	std::string 		_server_name;
+	std::string 		_root;
+	unsigned int 		_max_body_size;
+	std::string 		_index;
+	bool 				_autoindex;
 	std::vector<Location> _locations;
 	std::map<std::string, std::string> _error_pages;
 	std::map<std::string, std::string> _cgiPathSaves;
@@ -30,50 +30,49 @@ class ServerConf {
 	ServerConf(void);
 	~ServerConf(void) {};
 
-	void initializeErrorPages();
+	void 							initializeErrorPages();
 
-	void setServerName(std::string server_name);
-	void setHost(std::string param);
-	void setRoot(std::string root);
-	void setPort(std::string params);
-	void setClientMaxBodySize(std::string params);
-	void setIndex(std::string index);
-	void setLocation(std::string path, std::vector<std::string> params);
-	void setAutoindex(std::string autoindex);
-	void setErrorPage(std::string err_code, std::string err_page);
+	void 							setServerName(std::string server_name);
+	void 							setHost(std::string param);
+	void 							setRoot(std::string root);
+	void 							setPort(std::string params);
+	void 							setClientMaxBodySize(std::string params);
+	void 							setIndex(std::string index);
+	void 							setLocation(std::string path, std::vector<std::string> params);
+	void 							setAutoindex(std::string autoindex);
+	void 							setErrorPage(std::string err_code, std::string err_page);
 
-	std::string 		getServerName(void) const;
-	unsigned int getPort(void) const;
-	in_addr_t getHost(void) const;
-	unsigned int getMaxBodySize(void) const;
-	std::vector<Location> getLocations(void) const;
-	std::string getRoot(void) const;
-	std::string getIndex(void) const;
-	bool 		getAutoindex(void) const;
+	std::string 					getServerName(void) const;
+	unsigned int					getPort(void) const;
+	in_addr_t 						getHost(void) const;
+	unsigned int 					getMaxBodySize(void) const;
+	std::vector<Location> 			getLocations(void) const;
+	std::string 					getRoot(void) const;
+	std::string 					getIndex(void) const;
+	bool 							getAutoindex(void) const;
 	
 	const std::vector<Location>::iterator getLocationFromUri(std::string uri);
 
-	bool 		is_setted_loca_root;
+	bool 							is_setted_loca_root;
 
-	bool isAutoindexOn(std::string path) const;
-	bool		isValidMethod(std::string uri, Request::Method method);
-	int			isValidLocation(Location& location);
-	// bool 		isLocationCgi(std::vector<Location>::iterator location) const;
-	bool 		isCgi(std::string scriptPath);
-	bool		checkLocationsDuplicate();
+	bool 							isAutoindexOn(std::string path) const;
+	bool							isValidMethod(std::string uri, Request::Method method);
+	std::vector<std::string>		getValidMethod(std::string uri);
+	int								isValidLocation(Location& location);
+	// bool 						isLocationCgi(std::vector<Location>::iterator location) const;
+	bool 							isCgi(std::string scriptPath);
+	bool							checkLocationsDuplicate();
 
-	void	addRootToLocations(std::string root);
+	void							addRootToLocations(std::string root);
 
-	size_t 	findMatchingLocation(const std::string& uri, Location* bestMatch);
-	std::string getLocationCompletePath(std::string uri);
-	std::string getIndexLocation(std::string uri);
+	size_t 							findMatchingLocation(const std::string& uri, Location* bestMatch);
+	std::string 					getLocationCompletePath(std::string uri);
+	std::string 					getIndexLocation(std::string uri);
 
-	size_t findMatchingCgiLocation(std::string scriptPath, Location* bestMatch);
-	std::string getCgiPathForScript(std::string scriptPath);
+	size_t							findMatchingCgiLocation(std::string scriptPath, Location* bestMatch);
+	std::string 					getCgiPathForScript(std::string scriptPath);
 
-	// !TODO: Implement these functions
-	// const std::map<short, std::string> getErrorPages(void);
-	std::string getPathErrorPage(std::string key);
+	std::string 					getPathErrorPage(std::string key);
 };
 
 #endif
