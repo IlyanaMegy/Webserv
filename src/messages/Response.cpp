@@ -115,7 +115,22 @@ int	Response::_createTarget(std::string path, std::string body)
 	std::ofstream	ofs(path.c_str());
 
 	if (ofs.fail())
-		return 1;
+	{
+		if (_defaultConf->isCgi(path)) {
+			std::string redir = _defaultConf->getCgiCompletePath(path);
+			std::cout << MAGENTA << "redir = " << redir << RESET << std::endl;
+			ofs.open(redir.c_str());
+			if (ofs.fail())
+				return 1;
+		}
+		else {
+			std::string redir = _defaultConf->getLocationCompletePath(path);
+			std::cout << MAGENTA << "redir = " << redir << RESET << std::endl;
+			ofs.open(redir.c_str());
+			if (ofs.fail())
+				return 1;
+		}
+	}
 	ofs << body;
 	return 0;
 }
@@ -191,13 +206,11 @@ std::string	Response::_itos(int value)
 
 std::string    Response::_fixPath(std::string path)
 {
-	std::cout << PINK << "path: " << path << RESET << std::endl;
 	if (path.empty())
         return path;
     if (path[0] == '/') {
-		std::cout << "index location: " << _defaultConf->getIndexLocation(path) << std::endl;
 		if (path.length() == 1)
-			return _defaultConf->getIndexLocation(path);
+			path = _defaultConf->getIndexLocation(path);
 		if (_defaultConf->isCgi(path))
 			return _defaultConf->getCgiPathForScript(path);
 		return _defaultConf->getLocationCompletePath(path);

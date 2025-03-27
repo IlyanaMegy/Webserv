@@ -70,6 +70,7 @@ class ServerConf {
 	std::string 					getIndexLocation(std::string uri);
 
 	size_t							findMatchingCgiLocation(std::string scriptPath, Location* bestMatch);
+	std::string 					getCgiCompletePath(std::string scriptPath);
 	std::string 					getCgiPathForScript(std::string scriptPath);
 
 	std::string 					getPathErrorPage(std::string key);
