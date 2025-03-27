@@ -178,8 +178,6 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 		}
 		else if (params[i] == "autoindex" && (i + 1) < params.size())
 		{
-			if (findChar(params[i+1], ';') < 1)
-				break;
 			if (flag_autoindex)
 				throw std::runtime_error("Autoindex of server is duplicated");
 			server->setAutoindex(params[++i]);
@@ -202,7 +200,7 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 	if (!server->getPort())
 		throw std::runtime_error("[CONFIG] Error : port not found or unreadable");
 	if (server->getHost() == 0)
-		server->setHost("localhost");
+		server->setHost("localhost;");
 	if (server->getIndex().empty())
 		server->setIndex("index.html");
 	if (isFileExistAndReadable(server->getRoot(), server->getIndex()))

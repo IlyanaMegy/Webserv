@@ -95,8 +95,7 @@ int findChar(const std::string &str, char ch)
 
 void checkToken(std::string &param)
 {
-	int pos = findChar(param, ';');
-	if (pos != -1 && pos != (int)param.size() - 1)
+	if (param.empty() || param[param.size() - 1] != ';')
 		throw std::runtime_error("Token is invalid : " + param);
 }
 

@@ -30,8 +30,10 @@ void Location::setIndexLocation(std::string param)
 }
 
 void Location::setAutoindex(std::string param) {
-	if (param == "on;" || param == "off;")
-		_autoindex = (param == "on");
+	if (param == "on;")
+		_autoindex = true;
+	else if (param == "off;")
+		_autoindex = false;
 	else
 		throw std::runtime_error("[CONFIG] Error : autoindex is invalid");
 }

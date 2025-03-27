@@ -39,7 +39,6 @@ void ServerConf::setHost(std::string param) {
 	if (!param.empty() && param[param.size() - 1] == ';')
 		param.erase(param.size() - 1);
 	if (param == "localhost") param = "127.0.0.1";
-
 	struct sockaddr_in hostBinary;
 	if (!(inet_pton(AF_INET, param.c_str(), &(hostBinary.sin_addr))))
 		throw std::runtime_error("Wrong syntax: host");
@@ -102,7 +101,7 @@ void ServerConf::setIndex(std::string index) {
 
 void ServerConf::setAutoindex(std::string autoindex) {
 	checkToken(autoindex);
-	if (!autoindex.empty() && autoindex	[autoindex.size() - 1] == ';')
+	if (!autoindex.empty() && autoindex[autoindex.size() - 1] == ';')
 		autoindex.erase(autoindex.size() - 1);
 	if (autoindex != "on" && autoindex != "off")
 		throw std::runtime_error("Wrong syntax: autoindex");
@@ -159,7 +158,6 @@ void ServerConf::setLocation(std::string path,  std::vector<std::string> params)
 			if (flag_autoindex)
 				throw std::runtime_error("[CONFIG] Error : autoindex of location is duplicated");
 			checkToken(params[++i]);
-			std::cout << GREEN << "setLocation:\nautoindex = " << params[i] << RESET << std::endl;
 			new_loca.setAutoindex(params[i]);
 			flag_autoindex = true;
 		} else if (params[i] == "index" && (i + 1) < params.size()) {
@@ -409,7 +407,7 @@ std::string ServerConf::getCgiPathForScript(std::string scriptPath) {
 	return location.getCgiPath();   
 }
 
-bool ServerConf::isAutoindexOn(std::string path) const {
+bool ServerConf::isAutoindexOnInLocation(std::string path) const {
     // Parcourir les blocs location pour trouver celui correspondant au chemin donné
     for (std::vector<Location>::const_iterator it = _locations.begin(); it != _locations.end(); ++it) {
         if (it->getPath() == path)
