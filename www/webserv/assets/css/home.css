@@ -56,6 +56,10 @@
 	height: 700px;
 }
 
+.description {
+	background-color: rgba(133, 233, 211, 0.205);
+}
+
 .footer {
 	position: fixed;
 	left: 0;
