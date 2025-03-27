@@ -1,6 +1,6 @@
 #include "../../inc/messages/Request.hpp"
 #include "../../inc/network/Server.hpp"	
-#include "../../inc/messages/ServerConf.hpp"
+#include "../../inc/config/ServerConf.hpp"
 
 #include <fstream>
 

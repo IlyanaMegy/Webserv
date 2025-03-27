@@ -210,4 +210,3 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 	// if (!server->isValidErrorPages())
 	// 	throw std::runtime_error("Incorrect path for error page or number of error");
 }
-

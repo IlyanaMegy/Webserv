@@ -1,5 +1,5 @@
 #include "../../inc/messages/Response.hpp"
-#include "../../inc/messages/ServerConf.hpp"
+#include "../../inc/config/ServerConf.hpp"
 
 Response::Response(void) : _message(""), _shouldClose(false), _isComplete(false), _statusCode(""), _reasonMessage(""), _content(""), _path("") {}
 Response::~Response(void)
