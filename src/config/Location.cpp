@@ -68,6 +68,7 @@ void Location::setMaxBodySize(std::string param) {
 
 void Location::setMaxBodySize(unsigned long param) { _clientMBS = param; }
 void Location::setIsCgiLocation(bool isCgiLocation) { _isCgiLocation = isCgiLocation; }
+void Location::setReturn(int code, std::string uri) { _return = std::make_pair(code, uri); }
 std::string Location::getPath() const {return _path; }
 std::string Location::getRootLocation() const {return _root; }
 bool Location::getAutoindex() const {return _autoindex; }
@@ -77,4 +78,5 @@ std::string Location::getCgiExtension() const {return _cgiExt; }
 std::map<std::string, std::string> Location::getExtensionPath() const {return _extPath; }
 std::vector<Request::Method> Location::getMethods() const {return _methods; }
 unsigned long Location::getClientMBS() const {return _clientMBS; }
+std::pair<int, std::string> Location::getReturn() const { return _return; }
 bool Location::isCgiLocation() const {return _isCgiLocation; }

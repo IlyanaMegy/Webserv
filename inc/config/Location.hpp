@@ -27,6 +27,7 @@ class Location {
 	void setMaxBodySize(std::string param);
 	void setMaxBodySize(unsigned long param);
 	void setIsCgiLocation(bool isCgiLocation);
+	void setReturn(int code, std::string uri);
 
 	std::string getPath() const;
 	std::string getRootLocation() const;
@@ -37,6 +38,7 @@ class Location {
 	std::string getCgiExtension() const;
 	std::map<std::string, std::string> getExtensionPath() const;
 	unsigned long getClientMBS() const;
+	std::pair<int, std::string> getReturn() const;
 	bool isCgiLocation() const;
 
    private:
@@ -49,6 +51,7 @@ class Location {
 	std::string _cgiExt;
 	unsigned long _clientMBS;
 	bool _isCgiLocation;
+	std::pair<int, std::string> _return;
 };
 
 #endif

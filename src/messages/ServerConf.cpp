@@ -197,6 +197,25 @@ void ServerConf::setLocation(std::string path,  std::vector<std::string> params)
 			checkToken(params[++i]);
 			new_loca.setMaxBodySize(params[i]);
 			flag_max_size = true;
+		} else if (params[i] == "return" && (i + 1) < params.size()) {
+			int statusCode = 0;
+            std::string uri;
+
+            if (std::isdigit(params[i + 1][0])) {
+				i++;
+				if (!params[i].empty() && params[i][params[i].size() - 1] == ';')
+					params[i].erase(params[i].size() - 1);
+                statusCode = ft_stoi(params[i]);
+            } else
+                throw std::runtime_error("[CONFIG] Error: Invalid status code in return directive");
+
+            if ((i + 1) < params.size() && params[i + 1] != "}") {
+				i++;
+				if (!params[i].empty() && params[i][params[i].size() - 1] == ';')
+					params[i].erase(params[i].size() - 1);
+                uri = params[i];
+            }
+            new_loca.setReturn(statusCode, uri);
 		} else if (i < params.size())
 			throw std::runtime_error("[CONFIG] Error : parameter in location is invalid : " + params[i]);
 	}
