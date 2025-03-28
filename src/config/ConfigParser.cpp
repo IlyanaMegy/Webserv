@@ -178,6 +178,8 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 		}
 		else if (params[i] == "autoindex" && (i + 1) < params.size())
 		{
+			if (findChar(params[i+1], ';') < 1)
+				throw std::runtime_error("[CONFIG] Error : Unsupported directive");
 			if (flag_autoindex)
 				throw std::runtime_error("Autoindex of server is duplicated");
 			server->setAutoindex(params[++i]);

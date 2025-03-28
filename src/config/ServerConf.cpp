@@ -100,7 +100,6 @@ void ServerConf::setIndex(std::string index) {
 }
 
 void ServerConf::setAutoindex(std::string autoindex) {
-	checkToken(autoindex);
 	if (!autoindex.empty() && autoindex[autoindex.size() - 1] == ';')
 		autoindex.erase(autoindex.size() - 1);
 	if (autoindex != "on" && autoindex != "off")
@@ -334,16 +333,26 @@ size_t ServerConf::findMatchingLocation(const std::string& path, Location* bestM
 	}
 	return bestMatch->getPath().length();
 }
-		
-bool ServerConf::isAutoindexOnInLocation(std::string path) const {
-	// Parcourir les blocs location pour trouver celui correspondant au chemin donné
-	for (std::vector<Location>::const_iterator it = _locations.begin(); it != _locations.end(); ++it) {
-		if (it->getPath() == path)
-			return it->getAutoindex();
+
+bool	ServerConf::isAutoindexOn(std::string path)
+{
+	Location									location;
+	std::map<std::string, Location*>::iterator	it;
+
+	it = _pathToLocation.find(path);
+	if (it != _pathToLocation.end()) {
+		if (!it->second)
+			return _autoindex;
+		return it->second->getAutoindex();
 	}
-	return false;
+	if (!findMatchingLocation(path, &location)) {
+		_pathToLocation[path] = NULL;
+		return _autoindex;
+	}
+	_pathToLocation[path] = &location;
+	return location.getAutoindex();
 }
-		
+
 std::string	ServerConf::getCompletePath(std::string path)
 {
 	Location									location;
