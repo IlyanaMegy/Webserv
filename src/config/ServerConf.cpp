@@ -220,7 +220,7 @@ void ServerConf::setLocation(std::string path,  std::vector<std::string> params,
 			throw std::runtime_error("[CONFIG] Error : parameter in location is invalid : " + params[i]);
 	}
 	if (!flag_max_size) new_loca.setMaxBodySize(_max_body_size);
-	// if (!flag_methods) new_loca.setMethods(std::vector<std::string>({"GET", "POST", "DELETE"}));
+	if (!flag_methods) new_loca.setMethods(std::vector<std::string>({"GET", "POST", "DELETE"}));
 	if (isValidLocation(new_loca)) throw std::runtime_error("No extension found in path after '~ '");
 	if (checkLocationsDuplicate()) throw std::runtime_error("[CONFIG] Error : location is duplicated");
 	_locations.push_back(new_loca);
