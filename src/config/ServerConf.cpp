@@ -208,7 +208,13 @@ void ServerConf::setLocation(std::string path,  std::vector<std::string> params,
 			throw std::runtime_error("[CONFIG] Error : parameter in location is invalid : " + params[i]);
 	}
 	if (!flag_max_size) new_loca.setMaxBodySize(_max_body_size);
-	if (!flag_methods) new_loca.setMethods(std::vector<std::string>({"GET", "POST", "DELETE"}));
+	if (!flag_methods) {
+		std::vector<std::string> vector;
+		vector.push_back("GET");
+		vector.push_back("POST");
+		vector.push_back("DELETE");
+		new_loca.setMethods(vector);
+	}
 	if (checkLocationsDuplicate()) throw std::runtime_error("[CONFIG] Error : location is duplicated");
 	_locations.push_back(new_loca);
 }

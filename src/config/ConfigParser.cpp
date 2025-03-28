@@ -225,8 +225,8 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 	if (server->getHost() == 0)
 		server->setHost("localhost;");
 	server->addIndexToLocations(server->getIndex());
-	if (!server->getRedirStatusCode().empty())
-		server->addRedirToLocations(server->getRedirStatusCode(), server->getRedirHostname());
+	if (!server->getDefaultRedirStatusCode().empty())
+		server->addRedirToLocations(server->getDefaultRedirStatusCode(), server->getDefaultRedirHostname());
 	if (isFileExistAndReadable(server->getRoot(), server->getIndex()))
 		throw std::runtime_error("[CONFIG] Error : index not found or unreadable");
 	if (server->checkLocationsDuplicate())
