@@ -13,16 +13,23 @@
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
 
 	<script>
-		document.addEventListener("DOMContentLoaded", function() {
-			fetch('/cgi-bin/get_user.py')
-				.then(response => response.json())
-				.then(data => {
-					var header = document.getElementById("username");
-					header.textContent = data.userName || "Stranger";
-					document.getElementById("greetings").classList.add("animate-grow");
-				})
-				.catch(error => console.error('Error fetching user data:', error));
-		});
+    document.addEventListener("DOMContentLoaded", function() {
+        // Fonction pour récupérer les paramètres de l'URL
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Récupérer le pseudo depuis l'URL
+        const pseudo = getQueryParam('pseudo');
+        console.log("Pseudo:", pseudo);
+
+        // Si un pseudo est fourni, afficher un message personnalisé
+        if (pseudo)
+            document.getElementById('username').textContent = pseudo;
+        else
+            document.getElementById('username').textContent = "Stranger";
+    });
 	</script>
 </head>
 <body>
@@ -38,6 +45,7 @@
 	</nav>
 	<div class="bgimg w3-display-container w3-animate-opacity w3-text-white">
 		<div class="w3-display-middle">
+			<!-- <h1 class="w3-jumbo w3-animate-top greetings">Hello <span id="username"> !</span></h1> -->
 			<h1 class="w3-jumbo w3-animate-top greetings">Hello <span id="username"> !</span></h1>
 			<hr class="w3-border-grey" style="margin:auto;width:40%">
 		</div>

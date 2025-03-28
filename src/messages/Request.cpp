@@ -63,6 +63,11 @@ void	Request::_treat(void)
 {
 	if (_method == GET)
 	{
+		if (!_arguments.empty()) {
+			std::cout << PINK << "\nREQUEST\nFirst element: " << _arguments.begin()->first << " = " << _arguments.begin()->second << RESET << std::endl;
+		} else {
+			std::cout << PINK << "\nREQUEST\nno request : _arguments is empty." << RESET << std::endl;
+		}
 		if (_path == "/favicon.ico")
 		{
 			std::string faviconPath = _defaultConf->getLocationCompletePath("/favicon.ico") + _path;
