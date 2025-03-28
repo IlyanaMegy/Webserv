@@ -70,6 +70,7 @@ class ServerConf {
 	bool							checkLocationsDuplicate();
 
 	void							addRootToLocations(std::string root);
+	void 							addIndexToLocations(std::string index);
 	void							addRedirToLocations(std::string statusCode, std::string hostname);
 
 	size_t 							findMatchingLocation(const std::string& uri, Location* bestMatch);

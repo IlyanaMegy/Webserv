@@ -8,7 +8,7 @@ ServerConf::ServerConf() {
 	_server_name = "";
 	_root = "";
 	_max_body_size = MAXBODYOCTETS;
-	_index = "";
+	_index = "index.html";
 	_autoindex = false;
 	is_setted_loca_root = 0;
 	initializeErrorPages();
@@ -343,6 +343,13 @@ void ServerConf::addRootToLocations(std::string root) {
 		if (it->getRootLocation().empty())
 			it->setRootLocation(root);
 	is_setted_loca_root = 1;
+}
+
+void ServerConf::addIndexToLocations(std::string index) {
+	std::vector<Location>::iterator it;
+	for (it = _locations.begin(); it != _locations.end(); it++)
+		if (it->getIndexLocation().empty())
+			it->setIndexLocation(index);
 }
 
 void	ServerConf::addRedirToLocations(std::string statusCode, std::string hostname)

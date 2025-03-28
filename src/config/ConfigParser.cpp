@@ -222,8 +222,7 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 		throw std::runtime_error("[CONFIG] Error : port not found or unreadable");
 	if (server->getHost() == 0)
 		server->setHost("localhost;");
-	if (server->getIndex().empty())
-		server->setIndex("index.html");
+	server->addIndexToLocations(server->getIndex());
 	if (!server->getRedirStatusCode().empty())
 		server->addRedirToLocations(server->getRedirStatusCode(), server->getRedirHostname());
 	if (isFileExistAndReadable(server->getRoot(), server->getIndex()))
