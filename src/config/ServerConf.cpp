@@ -153,8 +153,6 @@ void ServerConf::setLocation(std::string path,  std::vector<std::string> params,
 		} else if (params[i] == "autoindex" && (i + 1) < params.size()) {
 			if (findChar(params[i+1], ';') < 1)
 				throw std::runtime_error("[CONFIG] Error : Unsupported directive in location");
-			if (new_loca.isCgiLocation())
-				throw std::runtime_error("[CONFIG] Error : autoindex not allow for CGI");
 			if (flag_autoindex)
 				throw std::runtime_error("[CONFIG] Error : autoindex of location is duplicated");
 			checkToken(params[++i]);
