@@ -246,42 +246,49 @@ const std::vector<Location>::iterator ServerConf::getLocationFromUri(std::string
 	throw std::runtime_error("Error: path to location not found");
 }
 
-bool ServerConf::isValidMethod(std::string uri, Request::Method method) {
-	Location	location;
-	findMatchingLocation(uri, &location);
-	std::vector<Request::Method> locationMethods = location.getMethods();
+bool ServerConf::isValidMethod(std::string path, Request::Method method) {
+	Location									location;
+	std::map<std::string, Location*>::iterator	it;
+	std::vector<Request::Method>				validMethods;
 
-	if (locationMethods.empty())
-		return (true);
-	if (std::find(locationMethods.begin(), locationMethods.end(), method) != locationMethods.end())
-		return (true);
-	return (false);
+	it = _pathToLocation.find(path);
+	if (it != _pathToLocation.end()) {
+		if (!it->second)
+			return true;
+		validMethods = it->second->getMethods();
+		return std::find(validMethods.begin(), validMethods.end(), method) != validMethods.end();
+	}
+	if (!findMatchingLocation(path, &location)) {
+		_pathToLocation[path] = NULL;
+		return true;
+	}
+	_pathToLocation[path] = &location;
+	validMethods = location.getMethods();
+	return std::find(validMethods.begin(), validMethods.end(), method) != validMethods.end();
 }
 
-std::vector<std::string> ServerConf::getValidMethod(std::string uri) {
-	Location	location;
-	findMatchingLocation(uri, &location);
-	std::vector<Request::Method> locationMethods = location.getMethods();
-	std::vector<std::string> validMethods;
+std::vector<Request::Method>	ServerConf::getValidMethods(std::string path)
+{
+	Location									location;
+	std::map<std::string, Location*>::iterator	it;
+	std::vector<Request::Method>				defaultMethods;
 
-    if (locationMethods.empty())
-	{
-		validMethods.push_back("GET");
-		validMethods.push_back("POST");
-		validMethods.push_back("DELETE");
+	defaultMethods.push_back(Request::GET);
+	defaultMethods.push_back(Request::POST);
+	defaultMethods.push_back(Request::DELETE);
+
+	it = _pathToLocation.find(path);
+	if (it != _pathToLocation.end()) {
+		if (!it->second)
+			return defaultMethods;
+		return it->second->getMethods();
 	}
-    else
-	{
-		for (std::vector<Request::Method>::const_iterator it = locationMethods.begin(); it != locationMethods.end(); ++it) {
-			switch (*it) {
-				case Request::GET: validMethods.push_back("GET"); break;
-				case Request::POST: validMethods.push_back("POST"); break;
-				case Request::DELETE: validMethods.push_back("DELETE"); break;
-				default: break;
-			}
-		}
+	if (!findMatchingLocation(path, &location)) {
+		_pathToLocation[path] = NULL;
+		return defaultMethods;
 	}
-    return validMethods;
+	_pathToLocation[path] = &location;
+	return location.getMethods();
 }
 
 bool ServerConf::checkLocationsDuplicate() {
@@ -296,12 +303,6 @@ bool ServerConf::checkLocationsDuplicate() {
 	return (false);
 }
 
-std::vector<Request::Method>	ServerConf::getValidMethods(std::string path)
-{
-	Location	location;
-	findMatchingLocation(path, &location);
-	return location.getMethods();
-}
 
 void ServerConf::addRootToLocations(std::string root) {
 	std::vector<Location>::iterator it;

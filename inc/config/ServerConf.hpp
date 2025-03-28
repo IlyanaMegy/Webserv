@@ -68,7 +68,7 @@ class ServerConf {
 
 	bool							isAutoindexOn(std::string path);
 	bool							isValidMethod(std::string uri, Request::Method method);
-	std::vector<std::string>		getValidMethod(std::string uri);
+	std::vector<Request::Method>	getValidMethods(std::string uri);
 	bool 							isCgi(std::string scriptPath);
 	bool							checkLocationsDuplicate();
 
