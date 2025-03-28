@@ -1,0 +1,72 @@
+:root {
+	--primary-color: hsla(158, 33%, 68%, 0.575);
+	--secondary-color: hsla(158, 33%, 68%, 0.575);;
+	--background-color: hsla(159, 39%, 56%, 0.611);;
+	--text-color: #fdfffa;
+	--input-border-color: lightgrey;
+	--input-focus-border-color: #aad5cc;
+	--input-placeholder-color: #999;
+	--button-hover-color: #d3a4cfb9;
+}
+
+.body_index {
+	height: 100%;
+    padding: 5px;
+	padding-top: 0px;
+    background: var(--background-color);
+}
+
+.bgimg {
+	background-image: url('../images/bg.jpg');
+	margin-top: 0px;
+	opacity: 0.9;
+	background-position: center;
+	background-size: cover;
+	width: 100%;
+	height: 60vh;
+}
+
+.navbar {
+	background: rgba(255, 255, 255, 0.189);
+}
+
+#greetings{
+	margin-left: 2%;
+	font-size: 45px;
+	color: rgb(7, 44, 25);
+}
+
+@keyframes grow {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.animate-grow {
+    animation: grow 1s ease-in-out;
+}
+
+.wrapper {
+	height: 700px;
+}
+
+.description {
+	background-color: rgba(133, 233, 211, 0.205);
+}
+
+.footer {
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	padding-top: 10px;
+	width: 100%;
+	background-color: #e0f4f09f;
+	color: rgb(1, 61, 76);
+	text-align: center;
+}

@@ -29,6 +29,7 @@ void	runServer(std::string configFile)
 			for (std::map<int, Server*>::iterator it = serverMonitor.getServers().begin(); it != serverMonitor.getServers().end(); it++) {
 				if (epoll.getReadyFd(i) == it->first) {
 					try {
+						std::cout << TEAL << "\n[MAIN] Dealing with the server, trying to accept a client" << RESET << std::endl;
 						it->second->acceptClient(epoll);
 					} catch (std::exception &e) {
 						std::cout << e.what() << std::endl;

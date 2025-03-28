@@ -1,12 +1,14 @@
-#include "ParserTools.hpp"
+#include "../../inc/config/ParserTools.hpp"
+#include "../../inc/style.hpp"
+#include <iostream>
 
 int getTypePath(std::string const path) {
 	struct stat buff;
 	std::string modified_path = path;
 
-    if (!modified_path.empty() && modified_path[modified_path.size() - 1] == ';') {
+    if (!modified_path.empty() && modified_path[modified_path.size() - 1] == ';')
 		modified_path.erase(modified_path.size() - 1);
-    }
+
 	int res = stat(modified_path.c_str(), &buff);
 	if (!res) {
 		if (buff.st_mode & S_IFREG)
@@ -93,8 +95,7 @@ int findChar(const std::string &str, char ch)
 
 void checkToken(std::string &param)
 {
-	int pos = findChar(param, ';');
-	if (pos != -1 && pos != (int)param.size() - 1)
+	if (param.empty() || param[param.size() - 1] != ';')
 		throw std::runtime_error("Token is invalid : " + param);
 }
 

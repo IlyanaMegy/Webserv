@@ -130,7 +130,7 @@ void	Server::sendTo(int clientFd)
 	if (send(clientFd, responseMessage.c_str(), responseMessage.length(), 0) == -1)
 		throw std::exception();
 	_clients[clientFd]->deleteRequest();
-	std::cout << "Sent to client " << CYAN << clientFd << RESET << std::endl;
+	std::cout << GOLD << "[SERVER] Response sent to client " << BOLD << clientFd << RESET << std::endl;
 }
 
 void	Server::sendTo(int cgiFd, Epoll* epoll, Request* request)
@@ -175,6 +175,3 @@ Request*	Server::findCGIRequest(int cgiFd)
 	return NULL;
 }
 
-// const char *Server::SocketCreationErrException::what() const throw() {
-// 	std::cerr << "Erreur lors de la création du socket" << std::endl;
-// }

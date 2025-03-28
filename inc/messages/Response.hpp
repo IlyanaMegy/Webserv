@@ -10,8 +10,10 @@
 # include <sstream>
 # include <unistd.h>
 
+# include "../style.hpp"
+
 # define SERVERNAME "webserv"
-# define ERRORPATH "default/errors/"
+# define ERRORPATH "./www/webserv/error/"
 # define TIMEBUFFERSIZE 100
 
 class	ServerConf;

@@ -18,7 +18,6 @@ class ConfigParser {
 	void createServer(std::string &config, ServerConf *server);
 
 	std::vector<ServerConf *> &getServers() { return _servers; }
-	size_t getNbServer() const;
 };
 
 int isFileExistAndReadable(std::string const path, std::string const index);

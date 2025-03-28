@@ -5,8 +5,8 @@ SRCS_DIR		:=	src
 
 SRCS_CONFIG		:=	ConfigParser.cpp \
 					Location.cpp \
-					ParserTools.cpp \
-					ServerConf.cpp
+					ServerConf.cpp \
+					ParserTools.cpp
 
 SRCS_MESSAGES	:=	Request.cpp \
 					Response.cpp \

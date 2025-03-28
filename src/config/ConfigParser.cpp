@@ -99,52 +99,69 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 	{
 		if (params[i] == "listen" && (i + 1) < params.size())
 		{
+			if (findChar(params[++i], ';') < 1)
+				throw std::runtime_error("[CONFIG] Error : Unsupported directive");
 			if (server->getPort())
 				throw std::runtime_error("Port is duplicated");
-			server->setPort(params[++i]);
+			server->setPort(params[i]);
 		}
 		else if (params[i] == "location" && (i + 1) < params.size())
 		{
 			std::string	path;
-			i++;
-			if (params[i] == "{" || params[i] == "}")
+			bool		isTilde = false;
+
+			if (params[++i] == "{" || params[i] == "}")
 				throw std::runtime_error("Wrong character in server scope{}");
-			path = params[i];
+			if (params[i] == "~") {
+				path = params[i++] + " ";
+				isTilde = true;
+			}
+			path += params[i];
 			std::vector<std::string> codes;
 			if (params[++i] != "{")
 				throw std::runtime_error("Wrong character in server scope{}");
 			i++;
 			while (i < params.size() && params[i] != "}")
 				codes.push_back(params[i++]);
-			server->setLocation(path, codes);
+			server->setLocation(path, codes, isTilde);
 			if (i < params.size() && params[i] != "}")
 				throw std::runtime_error("Wrong character in server scope{}");
 		}
 		else if (params[i] == "host" && (i + 1) < params.size())
 		{
+			if (findChar(params[i+1], ';') < 1)
+				throw std::runtime_error("[CONFIG] Error : Unsupported directive");
 			if (server->getHost())
 				throw std::runtime_error("Host is duplicated");
 			server->setHost(params[++i]);
 		}
 		else if (params[i] == "root" && (i + 1) < params.size())
 		{
+			if (findChar(params[i+1], ';') < 1)
+				throw std::runtime_error("[CONFIG] Error : Unsupported directive");
 			if (!server->getRoot().empty())
 				throw std::runtime_error("Root is duplicated");
-			server->setRoot(params[++i]);
+			i++;
+			server->setRoot((params[i][params[i].size() - 1] == '/') ? params[i] : params[i]+"/");
 		}
 		else if (params[i] == "error_page" && (i + 1) < params.size())
 		{
-			while (++i < params.size())
+			int j = -1;
+            std::string error_path = "";
+			while (++j < 3)
 			{
-				error_codes.push_back(params[i]);
-				if (params[i].find(';') != std::string::npos)
-					break ;
-				if (i + 1 >= params.size())
-					throw std::runtime_error("Wrong character out of server scope{}");
+				if (findChar(params[i], ';') != -1)
+                    throw std::runtime_error("[CONFIG] Error : Unsupported directive");
+                error_codes.push_back(params[i++]);
 			}
+            if (error_path.empty())
+                throw std::runtime_error("Error page path must end with ';'");
+            for (size_t j = 0; j < error_codes.size(); j++)
+                server->setErrorPage(error_codes[j], error_path);
 		}
-		else if (params[i] == "client_max_body_size" && (i + 1) < params.size())
-		{
+		else if (params[i] == "client_max_body_size" && (i + 1) < params.size()) {
+			if (findChar(params[i+1], ';') < 1)
+				throw std::runtime_error("[CONFIG] Error : Unsupported directive");
 			if (flag_max_size)
 				throw std::runtime_error("Client_max_body_size is duplicated");
 			server->setClientMaxBodySize(params[++i]);
@@ -152,22 +169,49 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 		}
 		else if (params[i] == "server_name" && (i + 1) < params.size())
 		{
+			if (findChar(params[i+1], ';') < 1)
+				throw std::runtime_error("[CONFIG] Error : Unsupported directive");
 			if (!server->getServerName().empty())
 				throw std::runtime_error("Server_name is duplicated");
 			server->setServerName(params[++i]);
 		}
 		else if (params[i] == "index" && (i + 1) < params.size())
 		{
+			if (findChar(params[i+1], ';') < 1)
+				throw std::runtime_error("[CONFIG] Error : Unsupported directive");
 			if (!server->getIndex().empty())
 				throw std::runtime_error("Index is duplicated");
 			server->setIndex(params[++i]);
 		}
 		else if (params[i] == "autoindex" && (i + 1) < params.size())
 		{
+			if (findChar(params[i+1], ';') < 1)
+				throw std::runtime_error("[CONFIG] Error : Unsupported directive");
 			if (flag_autoindex)
 				throw std::runtime_error("Autoindex of server is duplicated");
 			server->setAutoindex(params[++i]);
 			flag_autoindex = true;
+		}
+		else if (params[i] == "return" && (i + 1) < params.size())
+		{
+			std::string statusCode;
+            std::string hostname;
+
+			if (!(params[i + 1] == "300" || params[i + 1] == "301" || params[i + 1] == "302" || params[i + 1] == "303"
+					|| params[i + 1] == "304" || params[i + 1] == "307" || params[i + 1] == "308"))
+				throw std::runtime_error("[CONFIG] Error: Invalid status code in return directive");
+			statusCode = params[i + 1];
+			i++;
+
+            if ((i + 1) < params.size() && params[i + 1] != "}") {
+				i++;
+				if (!params[i].empty() && params[i][params[i].size() - 1] == ';')
+					params[i].erase(params[i].size() - 1);
+                hostname = params[i];
+            }
+
+			server->setDefaultRedirStatusCode(statusCode);
+			server->setDefaultRedirHostname(hostname);
 		}
 		else if (params[i] != "}" && params[i] != "{")
 		{
@@ -177,26 +221,23 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 			throw std::runtime_error("Unsupported directive");
 		}
 	}
-	if(!server->is_setted_loca_root && !server->getRoot().empty())
+	if (server->getServerName().empty())
+		server->setServerName("[CONFIG] Error : server_name not found or unreadable");
+	if (server->getRoot().empty())
+		server->setRoot("./");
+	if(!server->is_setted_loca_root)
 		server->addRootToLocations(server->getRoot());
 	if (!server->getPort())
-		throw std::runtime_error("Port not found");
-	if (server->getRoot().empty())
-		server->setRoot("/;");
+		throw std::runtime_error("[CONFIG] Error : port not found or unreadable");
 	if (server->getHost() == 0)
 		server->setHost("localhost;");
-	if (server->getIndex().empty())
-		server->setIndex("index.html;");
+	server->addIndexToLocations(server->getIndex());
+	if (!server->getDefaultRedirStatusCode().empty())
+		server->addRedirToLocations(server->getDefaultRedirStatusCode(), server->getDefaultRedirHostname());
 	if (isFileExistAndReadable(server->getRoot(), server->getIndex()))
-		throw std::runtime_error("Index from config file not found or unreadable");
-	if (server->checkLocations())
-		throw std::runtime_error("Location is duplicated");
-
-	// server->setErrorPages(error_codes);
+		throw std::runtime_error("[CONFIG] Error : index not found or unreadable");
+	if (server->checkLocationsDuplicate())
+		throw std::runtime_error("[CONFIG] Error : location is duplicated");
 	// if (!server->isValidErrorPages())
 	// 	throw std::runtime_error("Incorrect path for error page or number of error");
-}
-
-size_t	ConfigParser::getNbServer() const {
-	return _nb_server;
 }

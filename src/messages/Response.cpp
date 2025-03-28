@@ -1,4 +1,5 @@
-#include "Response.hpp"
+#include "../../inc/messages/Response.hpp"
+#include "../../inc/config/ServerConf.hpp"
 
 #include "ServerConf.hpp"
 
@@ -142,7 +143,22 @@ int	Response::_createTarget(std::string path, std::string body)
 	std::ofstream	ofs(path.c_str());
 
 	if (ofs.fail())
-		return 1;
+	{
+		if (_defaultConf->isCgi(path)) {
+			std::string redir = _defaultConf->getCgiCompletePath(path);
+			std::cout << MAGENTA << "redir = " << redir << RESET << std::endl;
+			ofs.open(redir.c_str());
+			if (ofs.fail())
+				return 1;
+		}
+		else {
+			std::string redir = _defaultConf->getLocationCompletePath(path);
+			std::cout << MAGENTA << "redir = " << redir << RESET << std::endl;
+			ofs.open(redir.c_str());
+			if (ofs.fail())
+				return 1;
+		}
+	}
 	ofs << body;
 	return 0;
 }
@@ -199,7 +215,7 @@ void	Response::_fillErrorHeader(void)
 int	Response::_fillContent(std::string path)
 {
 	std::string		line;
-	std::ifstream	ifs(path.c_str());
+	std::ifstream	ifs(_fixPath(path).c_str());
 
 	if (ifs.fail()) {
 		fillError("404", "Not found");
@@ -232,4 +248,18 @@ std::string	Response::itos(int value)
 	stream << value;
 	res = stream.str();
 	return res;
+}
+
+std::string    Response::_fixPath(std::string path)
+{
+	if (path.empty())
+        return path;
+    if (path[0] == '/') {
+		if (path.length() == 1)
+			path = _defaultConf->getIndexLocation(path);
+		if (_defaultConf->isCgi(path))
+			return _defaultConf->getCgiPathForScript(path);
+		return _defaultConf->getLocationCompletePath(path);
+	}
+    return path;
 }

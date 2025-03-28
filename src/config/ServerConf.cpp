@@ -1,5 +1,4 @@
 #include "../../inc/config/ServerConf.hpp"
-
 #include "../../inc/messages/Request.hpp"
 #include "../../inc/config/ParserTools.hpp"
 
@@ -9,7 +8,7 @@ ServerConf::ServerConf() {
 	_server_name = "";
 	_root = "";
 	_max_body_size = MAXBODYOCTETS;
-	_index = "";
+	_index = "index.html";
 	_autoindex = false;
 	is_setted_loca_root = 0;
 	initializeErrorPages();
@@ -37,8 +36,9 @@ void ServerConf::setServerName(std::string server_name) {
 
 void ServerConf::setHost(std::string param) {
 	checkToken(param);
-	if (param == "localhost" || param == "localhost;") param = "127.0.0.1";
-
+	if (!param.empty() && param[param.size() - 1] == ';')
+		param.erase(param.size() - 1);
+	if (param == "localhost") param = "127.0.0.1";
 	struct sockaddr_in hostBinary;
 	if (!(inet_pton(AF_INET, param.c_str(), &(hostBinary.sin_addr))))
 		throw std::runtime_error("Wrong syntax: host");
@@ -69,6 +69,8 @@ void ServerConf::setPort(std::string params) {
 	unsigned int port = 0;
 
 	checkToken(params);
+	if (!params.empty() && params[params.size() - 1] == ';')
+		params.erase(params.size() - 1);
 	for (size_t i = 0; i < params.length(); i++)
 		if (!std::isdigit(params[i]))
 			throw std::runtime_error("Wrong syntax: port");
@@ -80,10 +82,11 @@ void ServerConf::setPort(std::string params) {
 
 void ServerConf::setClientMaxBodySize(std::string params) {
 	checkToken(params);
+	if (!params.empty() && params[params.size() - 1] == ';')
+		params.erase(params.size() - 1);
 	for (size_t i = 0; i < params.length(); i++)
 		if (params[i] < '0' || params[i] > '9')
 			throw std::runtime_error("Wrong syntax: client_max_body_size");
-
 	if (!ft_stoi(params))
 		throw std::runtime_error("Wrong syntax: client_max_body_size");
 	_max_body_size = ft_stoi(params);
@@ -97,42 +100,42 @@ void ServerConf::setIndex(std::string index) {
 }
 
 void ServerConf::setAutoindex(std::string autoindex) {
-	checkToken(autoindex);
-	if (!autoindex.empty() && autoindex	[autoindex.size() - 1] == ';')
+	if (!autoindex.empty() && autoindex[autoindex.size() - 1] == ';')
 		autoindex.erase(autoindex.size() - 1);
 	if (autoindex != "on" && autoindex != "off")
 		throw std::runtime_error("Wrong syntax: autoindex");
 	if (autoindex == "on") _autoindex = true;
 }
 
-void ServerConf::setLocation(std::string path,  std::vector<std::string> params)
+void ServerConf::setDefaultRedirStatusCode(std::string code) {_redirStatusCode = code;};
+void ServerConf::setDefaultRedirHostname(std::string hostname) {_redirHostname = hostname;};
+
+void ServerConf::setErrorPage(std::string err_code, std::string err_page) { _error_pages[err_code] = err_page; }
+
+void ServerConf::setLocation(std::string path,  std::vector<std::string> params, bool isTilde)
 {
-	Location new_loca;
+	Location new_loca(isTilde);
 	std::vector<std::string> methods;
 	bool flag_methods = false;
 	bool flag_autoindex = false;
 	bool flag_max_size = false;
-	int valid;
 
 	new_loca.setPath(path);
 	for (size_t i = 0; i < params.size(); i++) {
 		if (params[i] == "root" && (i + 1) < params.size()) {
+			if (findChar(params[i+1], ';') < 1)
+				throw std::runtime_error("[CONFIG] Error : Unsupported directive in location");
 			if (!new_loca.getRootLocation().empty())
-				throw std::runtime_error("Root of location is duplicated");
-			checkToken(params[++i]);
-			if (getTypePath(params[i]) == 2)
-				new_loca.setRootLocation(params[i]);
-			else
-				new_loca.setRootLocation(_root + params[i]);
+				throw std::runtime_error("Root is duplicated");
+			i++;
+			new_loca.setRootLocation((params[i][params[i].size() - 1] == '/') ? params[i] : params[i]+"/");
 
-		} else if ((params[i] == "allow_methods" || params[i] == "methods") &&
-				   (i + 1) < params.size()) {
+		} else if ((params[i] == "allow_methods" || params[i] == "methods") && (i + 1) < params.size()) {
 			if (flag_methods)
-				throw std::runtime_error(
-					"Allow_methods of location is duplicated");
+				throw std::runtime_error("[CONFIG] Error : allow_methods of location is duplicated");
 			std::vector<std::string> methods;
 			while (++i < params.size()) {
-				if (findChar(params[i], ';') != -1) {
+				if (findChar(params[i], ';') >= 1) {
 					checkToken(params[i]);
 					if (!params[i].empty() && params[i][params[i].size() - 1] == ';')
 						params[i].erase(params[i].size() - 1);
@@ -141,161 +144,79 @@ void ServerConf::setLocation(std::string path,  std::vector<std::string> params)
 				} else {
 					methods.push_back(params[i]);
 					if (i + 1 >= params.size())
-						throw std::runtime_error("Token is invalid");
+						throw std::runtime_error("[CONFIG] Error : allow_methods is invalid");
 				}
 			}
 			new_loca.setMethods(methods);
 			flag_methods = true;
 		} else if (params[i] == "autoindex" && (i + 1) < params.size()) {
-			if (path == "/cgi-bin")
-				throw std::runtime_error("params autoindex not allow for CGI");
+			if (findChar(params[i+1], ';') < 1)
+				throw std::runtime_error("[CONFIG] Error : Unsupported directive in location");
 			if (flag_autoindex)
-				throw std::runtime_error("Autoindex of location is duplicated");
+				throw std::runtime_error("[CONFIG] Error : autoindex of location is duplicated");
 			checkToken(params[++i]);
 			new_loca.setAutoindex(params[i]);
 			flag_autoindex = true;
 		} else if (params[i] == "index" && (i + 1) < params.size()) {
+			if (findChar(params[i+1], ';') < 1)
+				throw std::runtime_error("[CONFIG] Error : Unsupported directive in location");
 			if (!new_loca.getIndexLocation().empty())
-				throw std::runtime_error("Index of location is duplicated");
+				throw std::runtime_error("[CONFIG] Error : index of location is duplicated");
 			checkToken(params[++i]);
 			new_loca.setIndexLocation(params[i]);
-		} else if (params[i] == "return" && (i + 1) < params.size()) {
-			if (path == "/cgi-bin")
-				throw std::runtime_error("params return not allow for CGI");
-			if (!new_loca.getReturn().empty())
-				throw std::runtime_error("Return of location is duplicated");
-			checkToken(params[++i]);
-			new_loca.setReturn(params[i]);
-		} else if (params[i] == "alias" && (i + 1) < params.size()) {
-			if (path == "/cgi-bin")
-				throw std::runtime_error("params alias not allow for CGI");
-			if (!new_loca.getAlias().empty())
-				throw std::runtime_error("Alias of location is duplicated");
-			checkToken(params[++i]);
-			new_loca.setAlias(params[i]);
-		} else if (params[i] == "cgi_ext" && (i + 1) < params.size()) {
-			std::vector<std::string> extension;
-			while (++i < params.size()) {
-				if (params[i].find(";") != std::string::npos) {
-					checkToken(params[i]);
-					extension.push_back(params[i]);
-					break;
-				} else {
-					extension.push_back(params[i]);
-					if (i + 1 >= params.size())
-						throw std::runtime_error("Token is invalid");
-				}
-			}
-			new_loca.setCgiExtension(extension);
 		} else if (params[i] == "cgi_path" && (i + 1) < params.size()) {
-			std::vector<std::string> path;
-			while (++i < params.size()) {
-				if (params[i].find(";") != std::string::npos) {
-					checkToken(params[i]);
-					path.push_back(params[i]);
-					break;
-				} else {
-					path.push_back(params[i]);
-					if (i + 1 >= params.size())
-						throw std::runtime_error("Token is invalid");
-				}
-				if (params[i].find("/python") == std::string::npos &&
-					params[i].find("/bash") == std::string::npos)
-					throw std::runtime_error("cgi_path is invalid");
+			if (findChar(params[++i], ';') >= 1) {
+				checkToken(params[i]);
+				if (!params[i].empty() && params[i][params[i].size() - 1] == ';')
+					params[i].erase(params[i].size() - 1);
+				if (params[i].find("/python") == std::string::npos && params[i].find("/bash") == std::string::npos)
+					throw std::runtime_error("[CONFIG] Error : cgi_path is invalid");
 			}
-			new_loca.setCgiPath(path);
-		} else if (params[i] == "client_max_body_size" &&
-				   (i + 1) < params.size()) {
+			else
+				throw std::runtime_error("[CONFIG] Error : cgi_path is invalid" + params[i]);
+			new_loca.setCgiPath(params[i]);
+			new_loca.setIsCgiLocation(true);
+		} else if (params[i] == "client_max_body_size" && (i + 1) < params.size()) {
+			if (findChar(params[i+1], ';') < 1)
+				throw std::runtime_error("[CONFIG] Error : Unsupported directive in location");
 			if (flag_max_size)
-				throw std::runtime_error(
-					"Maxbody_size of location is duplicated");
+				throw std::runtime_error("[CONFIG] Error : client_max_body_size is duplicated");
 			checkToken(params[++i]);
 			new_loca.setMaxBodySize(params[i]);
 			flag_max_size = true;
+		} else if (params[i] == "return" && (i + 1) < params.size()) {
+			std::string statusCode;
+            std::string hostname;
+
+			if (!(params[i + 1] == "300" || params[i + 1] == "301" || params[i + 1] == "302" || params[i + 1] == "303"
+					|| params[i + 1] == "304" || params[i + 1] == "307" || params[i + 1] == "308"))
+				throw std::runtime_error("[CONFIG] Error: Invalid status code in return directive");
+			statusCode = params[i + 1];
+			i++;
+
+            if ((i + 1) < params.size() && params[i + 1] != "}") {
+				i++;
+				if (!params[i].empty() && params[i][params[i].size() - 1] == ';')
+					params[i].erase(params[i].size() - 1);
+                hostname = params[i];
+            }
+
+			new_loca.setRedirStatusCode(statusCode);
+			new_loca.setRedirHostname(hostname);
+
 		} else if (i < params.size())
-			throw std::runtime_error("params in a location is invalid");
+			throw std::runtime_error("[CONFIG] Error : parameter in location is invalid : " + params[i]);
 	}
-	if (new_loca.getPath() != "/cgi-bin" && new_loca.getIndexLocation().empty())
-		new_loca.setIndexLocation(_index);
 	if (!flag_max_size) new_loca.setMaxBodySize(_max_body_size);
-	valid = isValidLocation(new_loca);
-	if (valid == 1)
-		throw std::runtime_error("Failed CGI validation");
-	else if (valid == 2)
-		throw std::runtime_error("Failed path in locaition validation");
-	else if (valid == 3)
-		throw std::runtime_error(
-			"Failed redirection file in locaition validation");
-	else if (valid == 4)
-		throw std::runtime_error("Failed alias file in locaition validation");
-	if (checkLocations()) throw std::runtime_error("Location is duplicated");
-	_locations.push_back(new_loca);
-}
-
-int ServerConf::isValidLocation(Location &location) const {
-	if (location.getPath() == "/cgi-bin") {
-		if (location.getCgiPath().empty() || location.getCgiExtension().empty() || location.getIndexLocation().empty())
-			return (1);
-		if (checkFile(location.getIndexLocation(), 4) < 0) {
-			std::string path = location.getRootLocation() + location.getPath() + "/" + location.getIndexLocation();
-			if (getTypePath(path) != 1) {
-				std::string root = "./";
-				location.setRootLocation(root);
-				path = root + location.getPath() + "/" + location.getIndexLocation();
-			}
-			if (path.empty() || getTypePath(path) != 1 || checkFile(path, 4) < 0)
-				return (1);
-		}
-		if (location.getCgiPath().size() != location.getCgiExtension().size())
-			return (1);
-		std::vector<std::string>::const_iterator it;
-		for (it = location.getCgiPath().begin(); it != location.getCgiPath().end(); ++it)
-			if (getTypePath(*it) < 0)
-				return (1);
-		std::vector<std::string>::const_iterator it_path;
-		for (it = location.getCgiExtension().begin(); it != location.getCgiExtension().end(); ++it) {
-			std::string tmp = *it;
-			if (tmp != ".py" && tmp != ".sh" && tmp != "*.py" && tmp != "*.sh")
-				return (1);
-			for (it_path = location.getCgiPath().begin();  it_path != location.getCgiPath().end(); ++it_path) {
-				std::string tmp_path = *it_path;
-				if (tmp == ".py" || tmp == "*.py") {
-					if (tmp_path.find("python") != std::string::npos)
-						location._extPath.insert(std::make_pair(".py", tmp_path));
-				} else if (tmp == ".sh" || tmp == "*.sh")
-					if (tmp_path.find("bash") != std::string::npos)
-						location._extPath[".sh"] = tmp_path;
-			}
-		}
-		if (location.getCgiPath().size() != location.getExtensionPath().size())
-			return (1);
-	} else {
-		if (location.getPath()[0] != '/') return (2);
-		if (location.getRootLocation().empty() && _root.empty())
-			location.setRootLocation("./");
-		if (location.getRootLocation().empty() && !_root.empty())
-			location.setRootLocation(_root);
-		if (isFileExistAndReadable( location.getRootLocation() + location.getPath(), location.getIndexLocation()))
-			return (5);
-		if (!location.getReturn().empty())
-			if (isFileExistAndReadable(location.getRootLocation(), location.getReturn()))
-				return (3);
-		if (!location.getAlias().empty())
-			if (isFileExistAndReadable(location.getRootLocation(), location.getAlias()))
-				return (4);
+	if (!flag_methods) {
+		std::vector<std::string> vector;
+		vector.push_back("GET");
+		vector.push_back("POST");
+		vector.push_back("DELETE");
+		new_loca.setMethods(vector);
 	}
-	return (0);
-}
-
-bool ServerConf::checkLocations() const {
-	if (_locations.size() < 2) return (false);
-	std::vector<Location>::const_iterator first;
-	std::vector<Location>::const_iterator second;
-	for (first = _locations.begin(); first != _locations.end() - 1; first++)
-		for (second = first + 1; second != _locations.end(); second++)
-			if (first->getPath() == second->getPath())
-				return (true);
-	return (false);
+	if (checkLocationsDuplicate()) throw std::runtime_error("[CONFIG] Error : location is duplicated");
+	_locations.push_back(new_loca);
 }
 
 std::string ServerConf::getServerName() const { return (_server_name); }
@@ -306,14 +227,15 @@ std::vector<Location> ServerConf::getLocations() const { return (_locations); }
 std::string ServerConf::getRoot() const { return (_root); }
 std::string ServerConf::getIndex() const { return (_index); }
 bool ServerConf::getAutoindex() const { return (_autoindex); }
+std::string ServerConf::getDefaultRedirStatusCode() const {return _redirStatusCode;}
+std::string ServerConf::getDefaultRedirHostname() const {return _redirHostname;}
 
 std::string ServerConf::getPathErrorPage(std::string statusCode) {
     std::map<std::string, std::string>::const_iterator it = _error_pages.find(statusCode);
-    if (it != _error_pages.end()) {
+    if (it != _error_pages.end())
 		return (*it).second;
-    } else {
+    else
         throw std::runtime_error("Error page not found for status code: " + statusCode);
-    }
 }
 
 const std::vector<Location>::iterator ServerConf::getLocationFromUri(std::string uri) {
@@ -325,12 +247,53 @@ const std::vector<Location>::iterator ServerConf::getLocationFromUri(std::string
 }
 
 bool ServerConf::isValidMethod(std::string uri, Request::Method method) {
-    Location    location;
-    findMatchingLocation(uri, &location);
-    std::vector<Request::Method> locationMethods = location.getMethods();
-    if (std::find(locationMethods.begin(), locationMethods.end(), method) != locationMethods.end())
-        return (true);
-    return (false);
+	Location	location;
+	findMatchingLocation(uri, &location);
+	std::vector<Request::Method> locationMethods = location.getMethods();
+
+	if (locationMethods.empty())
+		return (true);
+	if (std::find(locationMethods.begin(), locationMethods.end(), method) != locationMethods.end())
+		return (true);
+	return (false);
+}
+
+std::vector<std::string> ServerConf::getValidMethod(std::string uri) {
+	Location	location;
+	findMatchingLocation(uri, &location);
+	std::vector<Request::Method> locationMethods = location.getMethods();
+	std::vector<std::string> validMethods;
+
+    if (locationMethods.empty())
+	{
+		validMethods.push_back("GET");
+		validMethods.push_back("POST");
+		validMethods.push_back("DELETE");
+	}
+    else
+	{
+		for (std::vector<Request::Method>::const_iterator it = locationMethods.begin(); it != locationMethods.end(); ++it) {
+			switch (*it) {
+				case Request::GET: validMethods.push_back("GET"); break;
+				case Request::POST: validMethods.push_back("POST"); break;
+				case Request::DELETE: validMethods.push_back("DELETE"); break;
+				default: break;
+			}
+		}
+	}
+    return validMethods;
+}
+
+bool ServerConf::checkLocationsDuplicate() {
+	std::vector<Location>::iterator first;
+	std::vector<Location>::const_iterator second;
+
+	if (_locations.size() < 2) return (false);
+	for (first = _locations.begin(); first != _locations.end() - 1; first++)
+		for (second = first + 1; second != _locations.end(); second++)
+			if (first->getPath() == second->getPath())
+				return (true);
+	return (false);
 }
 
 std::vector<Request::Method>	ServerConf::getValidMethods(std::string path)
@@ -348,36 +311,195 @@ void ServerConf::addRootToLocations(std::string root) {
 	is_setted_loca_root = 1;
 }
 
-size_t ServerConf::findMatchingLocation(const std::string& uri, const Location*& bestMatch) const {
+void ServerConf::addIndexToLocations(std::string index) {
+	std::vector<Location>::iterator it;
+	for (it = _locations.begin(); it != _locations.end(); it++)
+		if (it->getIndexLocation().empty())
+			it->setIndexLocation(index);
+}
+
+void	ServerConf::addRedirToLocations(std::string statusCode, std::string hostname)
+{
+	std::vector<Location>::iterator it;
+	for (it = _locations.begin(); it != _locations.end(); it++)
+	if (!it->isRedirLocation()) {
+			it->setRedirStatusCode(statusCode);
+			it->setRedirHostname(hostname);		
+	}
+}
+
+size_t ServerConf::findMatchingLocation(const std::string& path, Location* bestMatch) {
     size_t bestMatchLength = 0;
-    bestMatch = NULL;
+    size_t bestMatchLengthTilde = 0;
 
     for (std::vector<Location>::const_iterator it = _locations.begin(); it != _locations.end(); ++it) {
-        if (uri.find(it->getPath()) == 0 && it->getPath().length() > bestMatchLength) {
-            bestMatch = &(*it);
-            bestMatchLength = it->getPath().length();
-        }
-    }
-    return bestMatchLength;
+		if (it->getIsTilde() && bestMatchLength == 0
+				&& path.rfind(it->getPath()) == (path.length() - it->getPath().length())
+				&& it->getPath().length() > bestMatchLengthTilde) {
+			*bestMatch = (*it);
+			bestMatchLengthTilde = it->getPath().length();
+		}	
+		if (!it->getIsTilde() && path.find(it->getPath()) == 0 && it->getPath().length() > bestMatchLength) {
+			*bestMatch = (*it);
+			bestMatchLength = it->getPath().length();
+		}
+	}
+	return bestMatch->getPath().length();
 }
 
-std::string ServerConf::getCompletePath(std::string uri) {
-    const Location* location;
-    size_t matchLength = findMatchingLocation(uri, location);
-    std::string root;
-    std::string relativePath;
+bool	ServerConf::isAutoindexOn(std::string path)
+{
+	Location									location;
+	std::map<std::string, Location*>::iterator	it;
 
-    if (location) {
-		root = location->getRootLocation();
-        relativePath = uri.substr(matchLength);
-    } else {
-		root = _root;
-        relativePath = uri;
-    }
-	if (!root.empty() && root[root.length() - 1] == '/' && !relativePath.empty() && relativePath[0] == '/')
-		return root + relativePath.erase(0, 1);
-    else if (!root.empty() && root[root.length() - 1] != '/' && !relativePath.empty() && relativePath[0] != '/')
-		return root + "/" + relativePath;
-	else
-        return root + relativePath;
+	it = _pathToLocation.find(path);
+	if (it != _pathToLocation.end()) {
+		if (!it->second)
+			return _autoindex;
+		return it->second->getAutoindex();
+	}
+	if (!findMatchingLocation(path, &location)) {
+		_pathToLocation[path] = NULL;
+		return _autoindex;
+	}
+	_pathToLocation[path] = &location;
+	return location.getAutoindex();
 }
+
+std::string	ServerConf::getCompletePath(std::string path)
+{
+	Location									location;
+	std::map<std::string, Location*>::iterator	it;
+
+	it = _pathToLocation.find(path);
+	if (it != _pathToLocation.end()) {
+		if (!it->second)
+			return _root+path;
+		return it->second->getRootLocation()+path;
+	}
+	if (!findMatchingLocation(path, &location)) {
+		_pathToLocation[path] = NULL;
+		return _root+path;
+	}
+	_pathToLocation[path] = &location;
+	return location.getRootLocation()+path;
+}
+
+bool	ServerConf::isCgi(std::string path)
+{
+	Location									location;
+	std::map<std::string, Location*>::iterator	it;
+
+	it = _pathToLocation.find(path);
+	if (it != _pathToLocation.end()) {
+		if (!it->second)
+			return false;
+		return it->second->isCgiLocation();
+	}
+	if (!findMatchingLocation(path, &location)) {
+		_pathToLocation[path] = NULL;
+		return false;
+	}
+	_pathToLocation[path] = &location;
+	return location.isCgiLocation();
+}
+
+std::string	ServerConf::getCgiExecutable(std::string path)
+{
+	Location									location;
+	std::map<std::string, Location*>::iterator	it;
+
+	it = _pathToLocation.find(path);
+	if (it != _pathToLocation.end()) {
+		if (!it->second)
+			return "";
+		return it->second->getCgiPath();
+	}
+	if (!findMatchingLocation(path, &location)) {
+		_pathToLocation[path] = NULL;
+		return "";
+	}
+	_pathToLocation[path] = &location;
+	return location.getCgiPath();
+}
+
+bool	ServerConf::isRedir(std::string path)
+{
+	Location									location;
+	std::map<std::string, Location*>::iterator	it;
+
+	it = _pathToLocation.find(path);
+	if (it != _pathToLocation.end()) {
+		if (!it->second)
+			return (!_redirStatusCode.empty());
+		return it->second->isRedirLocation();
+	}
+
+	if (!findMatchingLocation(path, &location)) {
+		_pathToLocation[path] = NULL;
+		return (!_redirStatusCode.empty());
+	}
+	_pathToLocation[path] = &location;
+	return location.isRedirLocation();
+}
+
+std::string	ServerConf::getRedirStatusCode(std::string path)
+{
+	Location									location;
+	std::map<std::string, Location*>::iterator	it;
+
+	it = _pathToLocation.find(path);
+	if (it != _pathToLocation.end()) {
+		if (!it->second)
+			return _redirStatusCode;
+		return it->second->getRedirStatusCode();
+	}
+
+	if (!findMatchingLocation(path, &location)) {
+		_pathToLocation[path] = NULL;
+		return (_redirStatusCode);
+	}
+	_pathToLocation[path] = &location;
+	return location.getRedirStatusCode();
+}
+
+std::string	ServerConf::getRedirHostname(std::string path)
+{
+	Location									location;
+	std::map<std::string, Location*>::iterator	it;
+
+	it = _pathToLocation.find(path);
+	if (it != _pathToLocation.end()) {
+		if (!it->second)
+			return _redirHostname;
+		return it->second->getRedirHostname();
+	}
+
+	if (!findMatchingLocation(path, &location)) {
+		_pathToLocation[path] = NULL;
+		return (_redirHostname);
+	}
+	_pathToLocation[path] = &location;
+	return location.getRedirHostname();
+}
+
+std::string	ServerConf::getDefaultFile(std::string path)
+{
+	Location									location;
+	std::map<std::string, Location*>::iterator	it;
+
+	it = _pathToLocation.find(path);
+	if (it != _pathToLocation.end()) {
+		if (!it->second)
+			return _root+_index;
+		return it->second->getRootLocation()+it->second->getIndexLocation();
+	}
+
+	if (!findMatchingLocation(path, &location)) {
+		_pathToLocation[path] = NULL;
+		return (_root+_index);
+	}
+	_pathToLocation[path] = &location;
+	return location.getRootLocation()+location.getIndexLocation();
+}
+

@@ -13,7 +13,7 @@ Client::Client(Server* server) : _request(NULL), _shouldClose(false), _server(se
 
 	clientFd = accept4(server->getSocket().getFd(), (struct sockaddr *)&addr, &addrLen, SOCK_CLOEXEC);
 	if (clientFd == -1)
-		throw std::runtime_error("Failed to accept client");
+		throw std::runtime_error("[CLIENT] Error : Failed to accept client");
 	_socket.fill(clientFd, addr);
 }
 
@@ -47,7 +47,7 @@ void	Client::createNewRequest(std::string leftoverMessage, Epoll* epoll)
 {
 	_request = new Request(_server, this, epoll, leftoverMessage);
 	if (!_request)
-		throw std::exception();
+		throw std::runtime_error("[CLIENT] Error : Failed to create new request");
 }
 
 void	Client::deleteRequest(void)

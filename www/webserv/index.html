@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Home</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="assets/css/style.css">
+	<link rel="stylesheet" type="text/css" href="assets/css/home.css">
+	<script src="assets/js/script.js" defer></script>
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+
+	<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Fonction pour récupérer les paramètres de l'URL
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Récupérer le pseudo depuis l'URL
+        const pseudo = getQueryParam('pseudo');
+        console.log("Pseudo:", pseudo);
+
+        // Si un pseudo est fourni, afficher un message personnalisé
+        if (pseudo)
+            document.getElementById('username').textContent = pseudo;
+        else
+            document.getElementById('username').textContent = "Stranger";
+    });
+	</script>
+</head>
+<body>
+<div class="body_index">
+	<nav class="navbar fixed-top">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="#">WEBSERV...</a>
+			<div class="d-flex">
+				<a href="index.html"><img class="navbar_icons" style="margin-right: 15px;" src="assets/images/home.svg" alt="Go Home" class="navbar-icon"></a>
+				<a href="register.html"><img class="navbar_icons" src="assets/images/user.svg" alt="Register" class="navbar-icon"></a>
+			</div>
+		</div>
+	</nav>
+	<div class="bgimg w3-display-container w3-animate-opacity w3-text-white">
+		<div class="w3-display-middle">
+			<!-- <h1 class="w3-jumbo w3-animate-top greetings">Hello <span id="username"> !</span></h1> -->
+			<h1 class="w3-jumbo w3-animate-top greetings">Hello <span id="username"> !</span></h1>
+			<hr class="w3-border-grey" style="margin:auto;width:40%">
+		</div>
+	</div>
+	<div class="container-fluid" style="margin-top:15px; height: 800px;">
+		<div class="container" style="margin-bottom: 25px;">
+			<h2 class="text-center" style="color: antiquewhite;font-size: xx-large; font-weight: 700; letter-spacing: 10px;">...</h2>
+		</div>
+		<div class="container">
+			<div class="row">
+				<div class="col-sm-4 description">
+					<h3>What is Webserv?</h3>
+					<p>Webserv is a simple web server that allows you to host your own website. It is a lightweight and easy-to-use web server that is perfect for hosting small websites or testing your web development projects.</p>
+				</div>
+				<div class="col-sm-4 description">
+					<h3>Why use Webserv?</h3>
+					<p>Webserv is a great tool for web developers who want to test their websites locally before deploying them to a live server. It is also a good option for hosting small websites that don't require a lot of resources.</p>
+				</div>
+				<div class="col-sm-4 description">
+					<h3>How to get started?</h3>
+					<p>To get started with Webserv, simply download the software and install it on your computer. Once installed, you can start the web server and access your website by entering the URL in your web browser.</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+<footer>
+	<div class="footer">
+		<p>&copy; 2025 WebServ</p>
+	</div>
+</footer>
+</html>
