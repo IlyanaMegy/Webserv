@@ -40,7 +40,7 @@ class ServerConf {
 	void 							setPort(std::string params);
 	void 							setClientMaxBodySize(std::string params);
 	void 							setIndex(std::string index);
-	void 							setLocation(std::string path, std::vector<std::string> params);
+	void 							setLocation(std::string path, std::vector<std::string> params, bool isTilde);
 	void 							setAutoindex(std::string autoindex);
 	void 							setDefaultRedirStatusCode(std::string code);
 	void 							setDefaultRedirHostname(std::string hostname);

@@ -1,6 +1,9 @@
 #include "../../inc/config/Location.hpp"
 
-Location::Location(void) {
+Location::Location(void) {}
+
+Location::Location(bool isTilde) {
+	_isTilde = isTilde;
 	_path = "";
 	_root = "";
 	_autoindex = false;
@@ -83,5 +86,6 @@ std::string Location::getCgiExtension() const {return _cgiExt; }
 std::map<std::string, std::string> Location::getExtensionPath() const {return _extPath; }
 std::vector<Request::Method> Location::getMethods() const {return _methods; }
 unsigned long Location::getClientMBS() const {return _clientMBS; }
+bool Location::getIsTilde() const {return _isTilde;}
 bool Location::isCgiLocation() const {return _isCgiLocation; }
 bool Location::isRedirLocation() const {return !_redirStatusCode.empty();}

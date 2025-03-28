@@ -113,9 +113,9 @@ void ServerConf::setDefaultRedirHostname(std::string hostname) {_redirHostname =
 
 void ServerConf::setErrorPage(std::string err_code, std::string err_page) { _error_pages[err_code] = err_page; }
 
-void ServerConf::setLocation(std::string path,  std::vector<std::string> params)
+void ServerConf::setLocation(std::string path,  std::vector<std::string> params, bool isTilde)
 {
-	Location new_loca;
+	Location new_loca(isTilde);
 	std::vector<std::string> methods;
 	bool flag_methods = false;
 	bool flag_autoindex = false;
@@ -360,16 +360,24 @@ void	ServerConf::addRedirToLocations(std::string statusCode, std::string hostnam
 }
 
 
-size_t ServerConf::findMatchingLocation(const std::string& uri, Location* bestMatch) {
+size_t ServerConf::findMatchingLocation(const std::string& path, Location* bestMatch) {
     size_t bestMatchLength = 0;
+    size_t bestMatchLengthTilde = 0;
 
     for (std::vector<Location>::const_iterator it = _locations.begin(); it != _locations.end(); ++it) {
-        if (uri.find(it->getPath()) == 0 && it->getPath().length() > bestMatchLength) {
+		if (it->getIsTilde() && bestMatchLength == 0
+				&& path.rfind(it->getPath()) == (path.length() - it->getPath().length())
+				&& it->getPath().length() > bestMatchLengthTilde) {
+			*bestMatch = (*it);
+			bestMatchLengthTilde = it->getPath().length();
+		}
+
+        if (!it->getIsTilde() && path.find(it->getPath()) == 0 && it->getPath().length() > bestMatchLength) {
             *bestMatch = (*it);
             bestMatchLength = it->getPath().length();
         }
     }
-    return bestMatchLength;
+    return bestMatch->getPath().length();
 }
 
 std::string ServerConf::getIndexLocation(std::string uri) {

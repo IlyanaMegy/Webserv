@@ -101,11 +101,14 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 		else if (params[i] == "location" && (i + 1) < params.size())
 		{
 			std::string	path;
+			bool		isTilde = false;
 
 			if (params[++i] == "{" || params[i] == "}")
 				throw std::runtime_error("Wrong character in server scope{}");
-			if (params[i] == "~")
+			if (params[i] == "~") {
 				path = params[i++] + " ";
+				isTilde = true;
+			}
 			path += params[i];
 			std::vector<std::string> codes;
 			if (params[++i] != "{")
@@ -113,7 +116,7 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 			i++;
 			while (i < params.size() && params[i] != "}")
 				codes.push_back(params[i++]);
-			server->setLocation(path, codes);
+			server->setLocation(path, codes, isTilde);
 			if (i < params.size() && params[i] != "}")
 				throw std::runtime_error("Wrong character in server scope{}");
 		}

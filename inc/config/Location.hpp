@@ -15,6 +15,7 @@ class Location {
 	
 	std::map<std::string, std::string> _extPath;
 	Location(void);
+	Location(bool isTilde);
 	~Location();
 
 	void setPath(std::string param);
@@ -44,8 +45,10 @@ class Location {
 	bool isRedirLocation() const;
 	std::string getRedirStatusCode() const;
 	std::string getRedirHostname() const;
+	bool		getIsTilde() const;
 
    private:
+   	bool		_isTilde;
 	std::string _path;
 	std::string _root;
 	std::string _index;
