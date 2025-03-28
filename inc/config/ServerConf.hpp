@@ -77,7 +77,9 @@ class ServerConf {
 	void							addRedirToLocations(std::string statusCode, std::string hostname);
 
 	size_t 							findMatchingLocation(const std::string& uri, Location* bestMatch);
+	std::string						getCompletePath(std::string path);
 
+	std::string						getCgiExecutable(std::string path);
 
 	std::string 					getPathErrorPage(std::string key);
 };

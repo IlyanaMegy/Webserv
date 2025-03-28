@@ -328,17 +328,79 @@ size_t ServerConf::findMatchingLocation(const std::string& path, Location* bestM
 				&& it->getPath().length() > bestMatchLengthTilde) {
 			*bestMatch = (*it);
 			bestMatchLengthTilde = it->getPath().length();
+		}	
+		if (!it->getIsTilde() && path.find(it->getPath()) == 0 && it->getPath().length() > bestMatchLength) {
+			*bestMatch = (*it);
+			bestMatchLength = it->getPath().length();
 		}
+	}
+	return bestMatch->getPath().length();
 }
 		
+bool ServerConf::isAutoindexOnInLocation(std::string path) const {
+	// Parcourir les blocs location pour trouver celui correspondant au chemin donné
+	for (std::vector<Location>::const_iterator it = _locations.begin(); it != _locations.end(); ++it) {
+		if (it->getPath() == path)
+			return it->getAutoindex();
+	}
+	return false;
+}
+		
+std::string	ServerConf::getCompletePath(std::string path)
+{
+	Location									location;
+	std::map<std::string, Location*>::iterator	it;
+
+	it = _pathToLocation.find(path);
+	if (it != _pathToLocation.end()) {
+		if (!it->second)
+			return _root+path;
+		return it->second->getRootLocation()+path;
+	}
+	if (!findMatchingLocation(path, &location)) {
+		_pathToLocation[path] = NULL;
+		return _root+path;
+	}
+	_pathToLocation[path] = &location;
+	return location.getRootLocation()+path;
 }
 
+bool	ServerConf::isCgi(std::string path)
+{
+	Location									location;
+	std::map<std::string, Location*>::iterator	it;
+
+	it = _pathToLocation.find(path);
+	if (it != _pathToLocation.end()) {
+		if (!it->second)
+			return false;
+		return it->second->isCgiLocation();
+	}
+	if (!findMatchingLocation(path, &location)) {
+		_pathToLocation[path] = NULL;
+		return false;
+	}
+	_pathToLocation[path] = &location;
+	return location.isCgiLocation();
 }
 
+std::string	ServerConf::getCgiExecutable(std::string path)
+{
+	Location									location;
+	std::map<std::string, Location*>::iterator	it;
 
-}
-
-
+	it = _pathToLocation.find(path);
+	if (it != _pathToLocation.end()) {
+		if (!it->second)
+			return "";
+		return it->second->getCgiPath();
+	}
+	if (!findMatchingLocation(path, &location)) {
+		_pathToLocation[path] = NULL;
+		return "";
+	}
+	_pathToLocation[path] = &location;
+	return location.getCgiPath();
 }
 
 bool	ServerConf::isRedir(std::string path)
