@@ -183,6 +183,27 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 			server->setAutoindex(params[++i]);
 			flag_autoindex = true;
 		}
+		else if (params[i] == "return" && (i + 1) < params.size())
+		{
+			std::string statusCode;
+            std::string hostname;
+
+			if (!(params[i + 1] == "300" || params[i + 1] == "301" || params[i + 1] == "302" || params[i + 1] == "303"
+					|| params[i + 1] == "304" || params[i + 1] == "307" || params[i + 1] == "308"))
+				throw std::runtime_error("[CONFIG] Error: Invalid status code in return directive");
+			statusCode = params[i + 1];
+			i++;
+
+            if ((i + 1) < params.size() && params[i + 1] != "}") {
+				i++;
+				if (!params[i].empty() && params[i][params[i].size() - 1] == ';')
+					params[i].erase(params[i].size() - 1);
+                hostname = params[i];
+            }
+
+			server->setRedirStatusCode(statusCode);
+			server->setRedirHostname(hostname);
+		}
 		else if (params[i] != "}" && params[i] != "{")
 		{
 			// if (!flag_loca)
@@ -195,7 +216,7 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 		server->setServerName("[CONFIG] Error : server_name not found or unreadable");
 	if (server->getRoot().empty())
 		server->setRoot("/");
-	if(!server->is_setted_loca_root && !server->getRoot().empty())
+	if(!server->is_setted_loca_root)
 		server->addRootToLocations(server->getRoot());
 	if (!server->getPort())
 		throw std::runtime_error("[CONFIG] Error : port not found or unreadable");
@@ -203,6 +224,8 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 		server->setHost("localhost;");
 	if (server->getIndex().empty())
 		server->setIndex("index.html");
+	if (!server->getRedirStatusCode().empty())
+		server->addRedirToLocations(server->getRedirStatusCode(), server->getRedirHostname());
 	if (isFileExistAndReadable(server->getRoot(), server->getIndex()))
 		throw std::runtime_error("[CONFIG] Error : index not found or unreadable");
 	if (server->checkLocationsDuplicate())

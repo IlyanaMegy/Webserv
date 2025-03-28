@@ -22,6 +22,8 @@ class ServerConf {
 	unsigned int 		_max_body_size;
 	std::string 		_index;
 	bool 				_autoindex;
+	std::string			_redirStatusCode;
+	std::string			_redirHostname;
 	std::vector<Location> _locations;
 	std::map<std::string, std::string> _error_pages;
 	std::map<std::string, std::string> _cgiPathSaves;
@@ -40,6 +42,8 @@ class ServerConf {
 	void 							setIndex(std::string index);
 	void 							setLocation(std::string path, std::vector<std::string> params);
 	void 							setAutoindex(std::string autoindex);
+	void 							setRedirStatusCode(std::string code);
+	void 							setRedirHostname(std::string hostname);
 	void 							setErrorPage(std::string err_code, std::string err_page);
 
 	std::string 					getServerName(void) const;
@@ -50,6 +54,8 @@ class ServerConf {
 	std::string 					getRoot(void) const;
 	std::string 					getIndex(void) const;
 	bool 							getAutoindex(void) const;
+	std::string 					getRedirStatusCode() const;
+	std::string 					getRedirHostname() const;
 	
 	const std::vector<Location>::iterator getLocationFromUri(std::string uri);
 
@@ -64,6 +70,7 @@ class ServerConf {
 	bool							checkLocationsDuplicate();
 
 	void							addRootToLocations(std::string root);
+	void							addRedirToLocations(std::string statusCode, std::string hostname);
 
 	size_t 							findMatchingLocation(const std::string& uri, Location* bestMatch);
 	std::string 					getLocationCompletePath(std::string uri);

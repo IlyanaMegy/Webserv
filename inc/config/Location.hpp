@@ -27,7 +27,8 @@ class Location {
 	void setMaxBodySize(std::string param);
 	void setMaxBodySize(unsigned long param);
 	void setIsCgiLocation(bool isCgiLocation);
-	void setReturn(int code, std::string uri);
+	void setRedirStatusCode(std::string code);
+	void setRedirHostname(std::string hostname);
 
 	std::string getPath() const;
 	std::string getRootLocation() const;
@@ -40,6 +41,9 @@ class Location {
 	unsigned long getClientMBS() const;
 	std::pair<int, std::string> getReturn() const;
 	bool isCgiLocation() const;
+	bool isRedirLocation() const;
+	std::string getRedirStatusCode() const;
+	std::string getRedirHostname() const;
 
    private:
 	std::string _path;
@@ -51,7 +55,9 @@ class Location {
 	std::string _cgiExt;
 	unsigned long _clientMBS;
 	bool _isCgiLocation;
-	std::pair<int, std::string> _return;
+	// std::pair<int, std::string> _return;
+	std::string					_redirStatusCode;
+	std::string					_redirHostname;
 };
 
 #endif

@@ -108,6 +108,9 @@ void ServerConf::setAutoindex(std::string autoindex) {
 	if (autoindex == "on") _autoindex = true;
 }
 
+void ServerConf::setRedirStatusCode(std::string code) {_redirStatusCode = code;};
+void ServerConf::setRedirHostname(std::string hostname) {_redirHostname = hostname;};
+
 void ServerConf::setErrorPage(std::string err_code, std::string err_page) { _error_pages[err_code] = err_page; }
 
 void ServerConf::setLocation(std::string path,  std::vector<std::string> params)
@@ -197,24 +200,25 @@ void ServerConf::setLocation(std::string path,  std::vector<std::string> params)
 			new_loca.setMaxBodySize(params[i]);
 			flag_max_size = true;
 		} else if (params[i] == "return" && (i + 1) < params.size()) {
-			int statusCode = 0;
-            std::string uri;
+			std::string statusCode;
+            std::string hostname;
 
-            if (std::isdigit(params[i + 1][0])) {
-				i++;
-				if (!params[i].empty() && params[i][params[i].size() - 1] == ';')
-					params[i].erase(params[i].size() - 1);
-                statusCode = ft_stoi(params[i]);
-            } else
-                throw std::runtime_error("[CONFIG] Error: Invalid status code in return directive");
+			if (!(params[i + 1] == "300" || params[i + 1] == "301" || params[i + 1] == "302" || params[i + 1] == "303"
+					|| params[i + 1] == "304" || params[i + 1] == "307" || params[i + 1] == "308"))
+				throw std::runtime_error("[CONFIG] Error: Invalid status code in return directive");
+			statusCode = params[i + 1];
+			i++;
 
             if ((i + 1) < params.size() && params[i + 1] != "}") {
 				i++;
 				if (!params[i].empty() && params[i][params[i].size() - 1] == ';')
 					params[i].erase(params[i].size() - 1);
-                uri = params[i];
+                hostname = params[i];
             }
-            new_loca.setReturn(statusCode, uri);
+
+			new_loca.setRedirStatusCode(statusCode);
+			new_loca.setRedirHostname(hostname);
+
 		} else if (i < params.size())
 			throw std::runtime_error("[CONFIG] Error : parameter in location is invalid : " + params[i]);
 	}
@@ -233,6 +237,8 @@ std::vector<Location> ServerConf::getLocations() const { return (_locations); }
 std::string ServerConf::getRoot() const { return (_root); }
 std::string ServerConf::getIndex() const { return (_index); }
 bool ServerConf::getAutoindex() const { return (_autoindex); }
+std::string ServerConf::getRedirStatusCode() const {return _redirStatusCode;}
+std::string ServerConf::getRedirHostname() const {return _redirHostname;}
 
 std::string ServerConf::getPathErrorPage(std::string statusCode) {
     std::map<std::string, std::string>::const_iterator it = _error_pages.find(statusCode);
@@ -338,6 +344,17 @@ void ServerConf::addRootToLocations(std::string root) {
 			it->setRootLocation(root);
 	is_setted_loca_root = 1;
 }
+
+void	ServerConf::addRedirToLocations(std::string statusCode, std::string hostname)
+{
+	std::vector<Location>::iterator it;
+	for (it = _locations.begin(); it != _locations.end(); it++)
+	if (!it->isRedirLocation()) {
+			it->setRedirStatusCode(statusCode);
+			it->setRedirHostname(hostname);		
+	}
+}
+
 
 size_t ServerConf::findMatchingLocation(const std::string& uri, Location* bestMatch) {
     size_t bestMatchLength = 0;
