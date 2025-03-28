@@ -108,8 +108,8 @@ void ServerConf::setAutoindex(std::string autoindex) {
 	if (autoindex == "on") _autoindex = true;
 }
 
-void ServerConf::setRedirStatusCode(std::string code) {_redirStatusCode = code;};
-void ServerConf::setRedirHostname(std::string hostname) {_redirHostname = hostname;};
+void ServerConf::setDefaultRedirStatusCode(std::string code) {_redirStatusCode = code;};
+void ServerConf::setDefaultRedirHostname(std::string hostname) {_redirHostname = hostname;};
 
 void ServerConf::setErrorPage(std::string err_code, std::string err_page) { _error_pages[err_code] = err_page; }
 
@@ -237,8 +237,8 @@ std::vector<Location> ServerConf::getLocations() const { return (_locations); }
 std::string ServerConf::getRoot() const { return (_root); }
 std::string ServerConf::getIndex() const { return (_index); }
 bool ServerConf::getAutoindex() const { return (_autoindex); }
-std::string ServerConf::getRedirStatusCode() const {return _redirStatusCode;}
-std::string ServerConf::getRedirHostname() const {return _redirHostname;}
+std::string ServerConf::getDefaultRedirStatusCode() const {return _redirStatusCode;}
+std::string ServerConf::getDefaultRedirHostname() const {return _redirHostname;}
 
 std::string ServerConf::getPathErrorPage(std::string statusCode) {
     std::map<std::string, std::string>::const_iterator it = _error_pages.find(statusCode);
@@ -449,4 +449,64 @@ bool ServerConf::isAutoindexOnInLocation(std::string path) const {
             return it->getAutoindex();
     }
 	return false;
+}
+
+bool	ServerConf::isRedir(std::string path)
+{
+	Location									location;
+	std::map<std::string, Location*>::iterator	it;
+
+	it = _pathToLocation.find(path);
+	if (it != _pathToLocation.end()) {
+		if (!it->second)
+			return (!_redirStatusCode.empty());
+		return it->second->isRedirLocation();
+	}
+
+	if (!findMatchingLocation(path, &location)) {
+		_pathToLocation[path] = NULL;
+		return (!_redirStatusCode.empty());
+	}
+	_pathToLocation[path] = &location;
+	return location.isRedirLocation();
+}
+
+std::string	ServerConf::getRedirStatusCode(std::string path)
+{
+	Location									location;
+	std::map<std::string, Location*>::iterator	it;
+
+	it = _pathToLocation.find(path);
+	if (it != _pathToLocation.end()) {
+		if (!it->second)
+			return _redirStatusCode;
+		return it->second->getRedirStatusCode();
+	}
+
+	if (!findMatchingLocation(path, &location)) {
+		_pathToLocation[path] = NULL;
+		return (_redirStatusCode);
+	}
+	_pathToLocation[path] = &location;
+	return location.getRedirStatusCode();
+}
+
+std::string	ServerConf::getRedirHostname(std::string path)
+{
+	Location									location;
+	std::map<std::string, Location*>::iterator	it;
+
+	it = _pathToLocation.find(path);
+	if (it != _pathToLocation.end()) {
+		if (!it->second)
+			return _redirHostname;
+		return it->second->getRedirHostname();
+	}
+
+	if (!findMatchingLocation(path, &location)) {
+		_pathToLocation[path] = NULL;
+		return (_redirHostname);
+	}
+	_pathToLocation[path] = &location;
+	return location.getRedirHostname();
 }

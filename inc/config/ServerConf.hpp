@@ -26,7 +26,7 @@ class ServerConf {
 	std::string			_redirHostname;
 	std::vector<Location> _locations;
 	std::map<std::string, std::string> _error_pages;
-	std::map<std::string, std::string> _cgiPathSaves;
+	std::map<std::string, Location*>	_pathToLocation;
 
    public:
 	ServerConf(void);
@@ -42,8 +42,8 @@ class ServerConf {
 	void 							setIndex(std::string index);
 	void 							setLocation(std::string path, std::vector<std::string> params);
 	void 							setAutoindex(std::string autoindex);
-	void 							setRedirStatusCode(std::string code);
-	void 							setRedirHostname(std::string hostname);
+	void 							setDefaultRedirStatusCode(std::string code);
+	void 							setDefaultRedirHostname(std::string hostname);
 	void 							setErrorPage(std::string err_code, std::string err_page);
 
 	std::string 					getServerName(void) const;
@@ -54,8 +54,12 @@ class ServerConf {
 	std::string 					getRoot(void) const;
 	std::string 					getIndex(void) const;
 	bool 							getAutoindex(void) const;
-	std::string 					getRedirStatusCode() const;
-	std::string 					getRedirHostname() const;
+	std::string 					getDefaultRedirStatusCode() const;
+	std::string 					getDefaultRedirHostname() const;
+
+	bool							isRedir(std::string path);
+	std::string						getRedirStatusCode(std::string path);
+	std::string						getRedirHostname(std::string path);
 	
 	const std::vector<Location>::iterator getLocationFromUri(std::string uri);
 
