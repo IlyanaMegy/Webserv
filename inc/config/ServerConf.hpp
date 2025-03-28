@@ -69,8 +69,6 @@ class ServerConf {
 	bool 							isAutoindexOnInLocation(std::string path) const;
 	bool							isValidMethod(std::string uri, Request::Method method);
 	std::vector<std::string>		getValidMethod(std::string uri);
-	int								isValidLocation(Location& location);
-	// bool 						isLocationCgi(std::vector<Location>::iterator location) const;
 	bool 							isCgi(std::string scriptPath);
 	bool							checkLocationsDuplicate();
 
@@ -79,12 +77,7 @@ class ServerConf {
 	void							addRedirToLocations(std::string statusCode, std::string hostname);
 
 	size_t 							findMatchingLocation(const std::string& uri, Location* bestMatch);
-	std::string 					getLocationCompletePath(std::string uri);
-	std::string 					getIndexLocation(std::string uri);
 
-	size_t							findMatchingCgiLocation(std::string scriptPath, Location* bestMatch);
-	std::string 					getCgiCompletePath(std::string scriptPath);
-	std::string 					getCgiPathForScript(std::string scriptPath);
 
 	std::string 					getPathErrorPage(std::string key);
 };

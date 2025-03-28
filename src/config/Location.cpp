@@ -57,7 +57,6 @@ void Location::setMethods(std::vector<std::string> methods) {
 }
 
 void Location::setCgiPath(std::string path) { _cgiPath = path; }
-void Location::setCgiExtension(std::string extension) { _cgiExt = extension; }
 
 void Location::setMaxBodySize(std::string param) {
 	unsigned long body_size = 0;
@@ -82,7 +81,6 @@ std::string Location::getIndexLocation() const {return _index; }
 std::string Location::getRedirStatusCode(void) const { return _redirStatusCode; }
 std::string Location::getRedirHostname(void) const { return _redirHostname; }
 std::string Location::getCgiPath() const {return _cgiPath; }
-std::string Location::getCgiExtension() const {return _cgiExt; }
 std::map<std::string, std::string> Location::getExtensionPath() const {return _extPath; }
 std::vector<Request::Method> Location::getMethods() const {return _methods; }
 unsigned long Location::getClientMBS() const {return _clientMBS; }

@@ -24,7 +24,6 @@ class Location {
 	void setAutoindex(std::string param);
 	void setMethods(std::vector<std::string> methods);
 	void setCgiPath(std::string path);
-	void setCgiExtension(std::string extension);
 	void setMaxBodySize(std::string param);
 	void setMaxBodySize(unsigned long param);
 	void setIsCgiLocation(bool isCgiLocation);
@@ -37,7 +36,6 @@ class Location {
 	bool getAutoindex() const;
 	std::string getIndexLocation() const;
 	std::string getCgiPath() const;
-	std::string getCgiExtension() const;
 	std::map<std::string, std::string> getExtensionPath() const;
 	unsigned long getClientMBS() const;
 	std::pair<int, std::string> getReturn() const;
@@ -55,7 +53,6 @@ class Location {
 	bool _autoindex;
 	std::vector<Request::Method> _methods;
 	std::string _cgiPath;
-	std::string _cgiExt;
 	unsigned long _clientMBS;
 	bool _isCgiLocation;
 	// std::pair<int, std::string> _return;
