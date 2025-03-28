@@ -60,6 +60,7 @@ class ServerConf {
 	bool							isRedir(std::string path);
 	std::string						getRedirStatusCode(std::string path);
 	std::string						getRedirHostname(std::string path);
+	std::string						getDefaultFile(std::string path);
 	
 	const std::vector<Location>::iterator getLocationFromUri(std::string uri);
 

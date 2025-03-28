@@ -127,12 +127,9 @@ void ServerConf::setLocation(std::string path,  std::vector<std::string> params)
 			if (findChar(params[i+1], ';') < 1)
 				throw std::runtime_error("[CONFIG] Error : Unsupported directive in location");
 			if (!new_loca.getRootLocation().empty())
-				throw std::runtime_error("[CONFIG] Error : root of location is duplicated");
-			checkToken(params[++i]);
-			if (getTypePath(params[i]) == 2)
-				new_loca.setRootLocation(params[i]);
-			else
-				new_loca.setRootLocation(_root + params[i]);
+				throw std::runtime_error("Root is duplicated");
+			i++;
+			new_loca.setRootLocation((params[i][params[i].size() - 1] == '/') ? params[i] : params[i]+"/");
 
 		} else if ((params[i] == "allow_methods" || params[i] == "methods") && (i + 1) < params.size()) {
 			if (flag_methods)
@@ -510,3 +507,24 @@ std::string	ServerConf::getRedirHostname(std::string path)
 	_pathToLocation[path] = &location;
 	return location.getRedirHostname();
 }
+
+std::string	ServerConf::getDefaultFile(std::string path)
+{
+	Location									location;
+	std::map<std::string, Location*>::iterator	it;
+
+	it = _pathToLocation.find(path);
+	if (it != _pathToLocation.end()) {
+		if (!it->second)
+			return _root+_index;
+		return it->second->getRootLocation()+it->second->getIndexLocation();
+	}
+
+	if (!findMatchingLocation(path, &location)) {
+		_pathToLocation[path] = NULL;
+		return (_root+_index);
+	}
+	_pathToLocation[path] = &location;
+	return location.getRootLocation()+location.getIndexLocation();
+}
+

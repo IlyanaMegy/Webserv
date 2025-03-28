@@ -131,7 +131,8 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 				throw std::runtime_error("[CONFIG] Error : Unsupported directive");
 			if (!server->getRoot().empty())
 				throw std::runtime_error("Root is duplicated");
-			server->setRoot(params[++i]);
+			i++;
+			server->setRoot((params[i][params[i].size() - 1] == '/') ? params[i] : params[i]+"/");
 		}
 		else if (params[i] == "error_page" && (i + 1) < params.size())
 		{
@@ -197,8 +198,8 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
                 hostname = params[i];
             }
 
-			server->setRedirStatusCode(statusCode);
-			server->setRedirHostname(hostname);
+			server->setDefaultRedirStatusCode(statusCode);
+			server->setDefaultRedirHostname(hostname);
 		}
 		else if (params[i] != "}" && params[i] != "{")
 		{
@@ -211,7 +212,7 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 	if (server->getServerName().empty())
 		server->setServerName("[CONFIG] Error : server_name not found or unreadable");
 	if (server->getRoot().empty())
-		server->setRoot("/");
+		server->setRoot("./");
 	if(!server->is_setted_loca_root)
 		server->addRootToLocations(server->getRoot());
 	if (!server->getPort())
