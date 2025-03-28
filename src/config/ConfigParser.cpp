@@ -93,7 +93,7 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 		if (params[i] == "listen" && (i + 1) < params.size())
 		{
 			if (findChar(params[++i], ';') < 1)
-				break;
+				throw std::runtime_error("[CONFIG] Error : Unsupported directive");
 			if (server->getPort())
 				throw std::runtime_error("Port is duplicated");
 			server->setPort(params[i]);
@@ -120,7 +120,7 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 		else if (params[i] == "host" && (i + 1) < params.size())
 		{
 			if (findChar(params[i+1], ';') < 1)
-				break;
+				throw std::runtime_error("[CONFIG] Error : Unsupported directive");
 			if (server->getHost())
 				throw std::runtime_error("Host is duplicated");
 			server->setHost(params[++i]);
@@ -128,7 +128,7 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 		else if (params[i] == "root" && (i + 1) < params.size())
 		{
 			if (findChar(params[i+1], ';') < 1)
-				break;
+				throw std::runtime_error("[CONFIG] Error : Unsupported directive");
 			if (!server->getRoot().empty())
 				throw std::runtime_error("Root is duplicated");
 			server->setRoot(params[++i]);
@@ -140,11 +140,7 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 			while (++j < 3)
 			{
 				if (findChar(params[i], ';') != -1)
-                {
-                    error_path = params[i];
-                    error_path.erase(error_path.find(';'));
-                    break;
-                }
+                    throw std::runtime_error("[CONFIG] Error : Unsupported directive");
                 error_codes.push_back(params[i++]);
 			}
             if (error_path.empty())
@@ -154,7 +150,7 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 		}
 		else if (params[i] == "client_max_body_size" && (i + 1) < params.size()) {
 			if (findChar(params[i+1], ';') < 1)
-				break;
+				throw std::runtime_error("[CONFIG] Error : Unsupported directive");
 			if (flag_max_size)
 				throw std::runtime_error("Client_max_body_size is duplicated");
 			server->setClientMaxBodySize(params[++i]);
@@ -163,7 +159,7 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 		else if (params[i] == "server_name" && (i + 1) < params.size())
 		{
 			if (findChar(params[i+1], ';') < 1)
-				break;
+				throw std::runtime_error("[CONFIG] Error : Unsupported directive");
 			if (!server->getServerName().empty())
 				throw std::runtime_error("Server_name is duplicated");
 			server->setServerName(params[++i]);
@@ -171,7 +167,7 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 		else if (params[i] == "index" && (i + 1) < params.size())
 		{
 			if (findChar(params[i+1], ';') < 1)
-				break;
+				throw std::runtime_error("[CONFIG] Error : Unsupported directive");
 			if (!server->getIndex().empty())
 				throw std::runtime_error("Index is duplicated");
 			server->setIndex(params[++i]);
