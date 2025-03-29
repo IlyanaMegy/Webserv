@@ -28,14 +28,10 @@ void ServerConf::initializeErrorPages() {
 }
 
 void ServerConf::setServerName(std::string server_name) {
-	checkToken(server_name);
-	server_name.erase(server_name.size() - 1);
 	_server_name = server_name;
 }
 
 void ServerConf::setHost(std::string param) {
-	checkToken(param);
-	param.erase(param.size() - 1);
 	if (param == "localhost") param = "127.0.0.1";
 	struct sockaddr_in hostBinary;
 	if (!(inet_pton(AF_INET, param.c_str(), &(hostBinary.sin_addr))))
@@ -44,8 +40,6 @@ void ServerConf::setHost(std::string param) {
 }
 
 void ServerConf::setRoot(std::string root) {
-	checkToken(root);
-	root.erase(root.size() - 1);
 	if (root[root.size() - 1] == '/')
 		root.erase(root.size() - 1);
 	_root = root;
@@ -54,8 +48,6 @@ void ServerConf::setRoot(std::string root) {
 void ServerConf::setPort(std::string params) {
 	unsigned int port = 0;
 
-	checkToken(params);
-	params.erase(params.size() - 1);
 	for (size_t i = 0; i < params.length(); i++)
 		if (!std::isdigit(params[i]))
 			throw std::runtime_error("Wrong syntax: port");
@@ -66,8 +58,6 @@ void ServerConf::setPort(std::string params) {
 }
 
 void ServerConf::setClientMaxBodySize(std::string params) {
-	checkToken(params);
-	params.erase(params.size() - 1);
 	for (size_t i = 0; i < params.length(); i++)
 		if (params[i] < '0' || params[i] > '9')
 			throw std::runtime_error("Wrong syntax: client_max_body_size");
@@ -77,14 +67,10 @@ void ServerConf::setClientMaxBodySize(std::string params) {
 }
 
 void ServerConf::setIndex(std::string index) {
-	checkToken(index);
-	index.erase(index.size() - 1);
 	_index = index;
 }
 
 void ServerConf::setAutoindex(std::string autoindex) {
-	checkToken(autoindex);
-	autoindex.erase(autoindex.size() - 1);
 	if (autoindex != "on" && autoindex != "off")
 		throw std::runtime_error("Wrong syntax: autoindex");
 	if (autoindex == "on") _autoindex = true;

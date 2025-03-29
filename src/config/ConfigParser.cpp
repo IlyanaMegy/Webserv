@@ -103,6 +103,8 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 			if (server->getPort())
 				throw std::runtime_error("Port is duplicated");
 			i++;
+			checkToken(params[i]);
+			params[i].erase(params[i].size() - 1);
 			server->setPort(params[i]);
 		}
 		else if (params[i] == "location" && (i + 1) < params.size())
@@ -131,13 +133,18 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 		{
 			if (server->getHost())
 				throw std::runtime_error("Host is duplicated");
-			server->setHost(params[++i]);
+			i++;
+			checkToken(params[i]);
+			params[i].erase(params[i].size() - 1);
+			server->setHost(params[i]);
 		}
 		else if (params[i] == "root" && (i + 1) < params.size())
 		{
 			if (!server->getRoot().empty())
 				throw std::runtime_error("Root is duplicated");
 			i++;
+			checkToken(params[i]);
+			params[i].erase(params[i].size() - 1);
 			server->setRoot(params[i]);
 		}
 		else if (params[i] == "error_page" && (i + 1) < params.size() && (i + 2) < params.size())
@@ -151,26 +158,38 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 		else if (params[i] == "client_max_body_size" && (i + 1) < params.size()) {
 			if (flag_max_size)
 				throw std::runtime_error("Client_max_body_size is duplicated");
-			server->setClientMaxBodySize(params[++i]);
+			i++;
+			checkToken(params[i]);
+			params[i].erase(params[i].size() - 1);
+			server->setClientMaxBodySize(params[i]);
 			flag_max_size = true;
 		}
 		else if (params[i] == "server_name" && (i + 1) < params.size())
 		{
 			if (!server->getServerName().empty())
 				throw std::runtime_error("Server_name is duplicated");
-			server->setServerName(params[++i]);
+			i++;
+			checkToken(params[i]);
+			params[i].erase(params[i].size() - 1);
+			server->setServerName(params[i]);
 		}
 		else if (params[i] == "index" && (i + 1) < params.size())
 		{
 			if (!server->getIndex().empty())
 				throw std::runtime_error("Index is duplicated");
-			server->setIndex(params[++i]);
+			i++;
+			checkToken(params[i]);
+			params[i].erase(params[i].size() - 1);
+			server->setIndex(params[i]);
 		}
 		else if (params[i] == "autoindex" && (i + 1) < params.size())
 		{
 			if (flag_autoindex)
 				throw std::runtime_error("Autoindex of server is duplicated");
-			server->setAutoindex(params[++i]);
+			i++;
+			checkToken(params[i]);
+			params[i].erase(params[i].size() - 1);
+			server->setAutoindex(params[i]);
 			flag_autoindex = true;
 		}
 		else if (params[i] == "return" && (i + 1) < params.size())
@@ -208,7 +227,7 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 	if (!server->getPort())
 		throw std::runtime_error("[CONFIG] Error : port not found or unreadable");
 	if (server->getHost() == 0)
-		server->setHost("localhost;");
+		server->setHost("localhost");
 	server->addIndexToLocations(server->getIndex());
 	if (!server->getDefaultRedirStatusCode().empty())
 		server->addRedirToLocations(server->getDefaultRedirStatusCode(), server->getDefaultRedirHostname());
