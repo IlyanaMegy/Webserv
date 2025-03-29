@@ -137,9 +137,7 @@ class Request
 		unsigned int				_findChunkLength(void);
 		std::string					_findChunk(unsigned int chunkLength);
 
-		int							_launchCGI(std::string path);
-
-
+		int							_launchCGI(std::string physicalPath);
 
 		static bool					_isObsText(unsigned char c);
 		static bool					_isHex(unsigned char c);

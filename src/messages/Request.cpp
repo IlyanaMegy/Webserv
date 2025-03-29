@@ -110,22 +110,22 @@ void	Request::treat(void)
 		_stage = DONE;
 		return ;
 	}
-	if (_isCGI(_path) && _method != DELETE)
+	if (_conf->isCgi(_path) && _method != DELETE)
 		return (treatCGI());
 
 	if (_method == GET)
-		_response.fillGET(_path);
+		_response.fillGET(_conf->getCompletePath(_path));
 	else if (_method == DELETE)
-		_response.fillDELETE(_path);
+		_response.fillDELETE(_conf->getCompletePath(_path));
 	else
-		_response.fillPOST(_path, _body);
+		_response.fillPOST(_conf->getCompletePath(_path), _body);
 	_stage = DONE;
 }
 
 void	Request::treatCGI(void)
 {
 	if (!_cgi) {
-		if (_launchCGI(_fixPath(_path))) {
+		if (_launchCGI(_conf->getCompletePath(_path))) {
 			_response.fillError("502", "Bad Gateway");
 			_stage = DONE;
 		}
@@ -140,13 +140,14 @@ void	Request::treatCGI(void)
 	_stage = DONE;
 }
 
-int	Request::_launchCGI(std::string path)
+int	Request::_launchCGI(std::string physicalPath)
 {
-	if (access(PYTHON_PATH, X_OK) || access(path.c_str(), R_OK))
+	std::string	executablePath;
+
+	executablePath = _conf->getCgiExecutable(_path);
+	if (access(executablePath.c_str(), X_OK) || access(physicalPath.c_str(), R_OK))
 		return 1;
-	_cgi = new CGI(_epoll, this, PYTHON_PATH, path);
-	if (!_cgi)
-		throw std::exception();
+	_cgi = new CGI(_epoll, this, executablePath, physicalPath);
 	return 0;
 }
 
