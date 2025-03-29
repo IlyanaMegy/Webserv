@@ -23,6 +23,7 @@ class Response
 {
 	public:
 		Response(void);
+		Response(ServerConf* conf);
 		~Response(void);
 
 		void	setStatusCode(std::string statusCode);

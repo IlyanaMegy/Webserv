@@ -4,7 +4,9 @@
 
 #include "CGI.hpp"
 
-Response::Response(void) : _message(""), _shouldClose(false), _isComplete(false), _statusCode(""), _reasonMessage(""), _content("") {}
+Response::Response(void) : _message(""), _shouldClose(false), _isComplete(false), _conf(NULL), _statusCode(""), _reasonMessage(""), _content("") {}
+
+Response::Response(ServerConf* conf) : _message(""), _shouldClose(false), _isComplete(false), _conf(conf), _statusCode(""), _reasonMessage(""), _content("") {}
 
 Response::~Response(void) {}
 
