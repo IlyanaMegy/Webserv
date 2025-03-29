@@ -115,7 +115,7 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 			if (params[++i] == "{" || params[i] == "}")
 				throw std::runtime_error("Wrong character in server scope{}");
 			if (params[i] == "~") {
-				path = params[i++] + " ";
+				i++;
 				isTilde = true;
 			}
 			path += params[i];
