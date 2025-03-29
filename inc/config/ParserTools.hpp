@@ -8,7 +8,6 @@
 #include <stdexcept>
 #include <sstream>
 
-int findChar(const std::string &str, char ch);
 int getTypePath(std::string const path);
 int checkFile(std::string const path, int mode);
 int isFileExistAndReadable(std::string const path, std::string const index);

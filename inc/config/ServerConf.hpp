@@ -46,16 +46,17 @@ class ServerConf {
 	void 							setDefaultRedirHostname(std::string hostname);
 	void 							setErrorPage(std::string err_code, std::string err_page);
 
-	std::string 					getServerName(void) const;
-	unsigned int					getPort(void) const;
-	in_addr_t 						getHost(void) const;
-	unsigned int 					getMaxBodySize(void) const;
-	std::vector<Location> 			getLocations(void) const;
-	std::string 					getRoot(void) const;
-	std::string 					getIndex(void) const;
-	bool 							getAutoindex(void) const;
-	std::string 					getDefaultRedirStatusCode() const;
-	std::string 					getDefaultRedirHostname() const;
+	std::string 						getServerName(void) const;
+	unsigned int						getPort(void) const;
+	in_addr_t 							getHost(void) const;
+	unsigned int 						getMaxBodySize(void) const;
+	std::vector<Location> 				getLocations(void) const;
+	std::string 						getRoot(void) const;
+	std::string 						getIndex(void) const;
+	bool 								getAutoindex(void) const;
+	std::string 						getDefaultRedirStatusCode() const;
+	std::string 						getDefaultRedirHostname() const;
+
 
 	bool							isRedir(std::string path);
 	std::string						getRedirStatusCode(std::string path);

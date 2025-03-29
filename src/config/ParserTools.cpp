@@ -85,14 +85,6 @@ void removeWhiteSpace(std::string &content) {
 	content = content.substr(0, i + 1);
 }
 
-int findChar(const std::string &str, char ch)
-{
-    for (size_t i = 0; i < str.size(); ++i)
-        if (str[i] == ch) 
-            return i;
-    return -1;
-}
-
 void checkToken(std::string &param)
 {
 	if (param.empty() || param[param.size() - 1] != ';')

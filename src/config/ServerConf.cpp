@@ -8,7 +8,7 @@ ServerConf::ServerConf() {
 	_server_name = "";
 	_root = "";
 	_max_body_size = MAXBODYOCTETS;
-	_index = "index.html";
+	_index = "";
 	_autoindex = false;
 	is_setted_loca_root = 0;
 	initializeErrorPages();
@@ -29,15 +29,13 @@ void ServerConf::initializeErrorPages() {
 
 void ServerConf::setServerName(std::string server_name) {
 	checkToken(server_name);
-	if (!server_name.empty() && server_name[server_name.size() - 1] == ';')
-		server_name.erase(server_name.size() - 1);
+	server_name.erase(server_name.size() - 1);
 	_server_name = server_name;
 }
 
 void ServerConf::setHost(std::string param) {
 	checkToken(param);
-	if (!param.empty() && param[param.size() - 1] == ';')
-		param.erase(param.size() - 1);
+	param.erase(param.size() - 1);
 	if (param == "localhost") param = "127.0.0.1";
 	struct sockaddr_in hostBinary;
 	if (!(inet_pton(AF_INET, param.c_str(), &(hostBinary.sin_addr))))
@@ -47,30 +45,17 @@ void ServerConf::setHost(std::string param) {
 
 void ServerConf::setRoot(std::string root) {
 	checkToken(root);
-	if (!root.empty() && root[root.size() - 1] == ';')
+	root.erase(root.size() - 1);
+	if (root[root.size() - 1] == '/')
 		root.erase(root.size() - 1);
-	if (getTypePath(root) == 2) {
-		_root = root;
-		return;
-	}
-	if (root.length() >= 2 && root[0] == '.' && root[1] == '/')
-		root.erase(0, 1);
-	else if (root[0] != '/')
-		root = root + "/";
-	char dir[1024];
-	getcwd(dir, 1024);
-	std::string complete_root = dir + root;
-	if (getTypePath(complete_root) != 2)
-		throw std::runtime_error("Error: Wrong syntax: root");
-	_root = complete_root;
+	_root = root;
 }
 
 void ServerConf::setPort(std::string params) {
 	unsigned int port = 0;
 
 	checkToken(params);
-	if (!params.empty() && params[params.size() - 1] == ';')
-		params.erase(params.size() - 1);
+	params.erase(params.size() - 1);
 	for (size_t i = 0; i < params.length(); i++)
 		if (!std::isdigit(params[i]))
 			throw std::runtime_error("Wrong syntax: port");
@@ -82,8 +67,7 @@ void ServerConf::setPort(std::string params) {
 
 void ServerConf::setClientMaxBodySize(std::string params) {
 	checkToken(params);
-	if (!params.empty() && params[params.size() - 1] == ';')
-		params.erase(params.size() - 1);
+	params.erase(params.size() - 1);
 	for (size_t i = 0; i < params.length(); i++)
 		if (params[i] < '0' || params[i] > '9')
 			throw std::runtime_error("Wrong syntax: client_max_body_size");
@@ -94,14 +78,13 @@ void ServerConf::setClientMaxBodySize(std::string params) {
 
 void ServerConf::setIndex(std::string index) {
 	checkToken(index);
-	if (!index.empty() && index[index.size() - 1] == ';')
-		index.erase(index.size() - 1);
+	index.erase(index.size() - 1);
 	_index = index;
 }
 
 void ServerConf::setAutoindex(std::string autoindex) {
-	if (!autoindex.empty() && autoindex[autoindex.size() - 1] == ';')
-		autoindex.erase(autoindex.size() - 1);
+	checkToken(autoindex);
+	autoindex.erase(autoindex.size() - 1);
 	if (autoindex != "on" && autoindex != "off")
 		throw std::runtime_error("Wrong syntax: autoindex");
 	if (autoindex == "on") _autoindex = true;
@@ -123,22 +106,20 @@ void ServerConf::setLocation(std::string path,  std::vector<std::string> params,
 	new_loca.setPath(path);
 	for (size_t i = 0; i < params.size(); i++) {
 		if (params[i] == "root" && (i + 1) < params.size()) {
-			if (findChar(params[i+1], ';') < 1)
-				throw std::runtime_error("[CONFIG] Error : Unsupported directive in location");
 			if (!new_loca.getRootLocation().empty())
 				throw std::runtime_error("Root is duplicated");
 			i++;
-			new_loca.setRootLocation((params[i][params[i].size() - 1] == '/') ? params[i] : params[i]+"/");
-
+			checkToken(params[i]);
+			params[i].erase(params[i].size() - 1);
+			new_loca.setRootLocation(params[i]);
 		} else if ((params[i] == "allow_methods" || params[i] == "methods") && (i + 1) < params.size()) {
 			if (flag_methods)
 				throw std::runtime_error("[CONFIG] Error : allow_methods of location is duplicated");
 			std::vector<std::string> methods;
 			while (++i < params.size()) {
-				if (findChar(params[i], ';') >= 1) {
+				if (params[i].find(";") != std::string::npos) {
 					checkToken(params[i]);
-					if (!params[i].empty() && params[i][params[i].size() - 1] == ';')
-						params[i].erase(params[i].size() - 1);
+					params[i].erase(params[i].size() - 1);
 					methods.push_back(params[i]);
 					break;
 				} else {
@@ -150,56 +131,51 @@ void ServerConf::setLocation(std::string path,  std::vector<std::string> params,
 			new_loca.setMethods(methods);
 			flag_methods = true;
 		} else if (params[i] == "autoindex" && (i + 1) < params.size()) {
-			if (findChar(params[i+1], ';') < 1)
-				throw std::runtime_error("[CONFIG] Error : Unsupported directive in location");
 			if (flag_autoindex)
 				throw std::runtime_error("[CONFIG] Error : autoindex of location is duplicated");
 			checkToken(params[++i]);
+			params[i].erase(params[i].size() - 1);
 			new_loca.setAutoindex(params[i]);
 			flag_autoindex = true;
 		} else if (params[i] == "index" && (i + 1) < params.size()) {
-			if (findChar(params[i+1], ';') < 1)
-				throw std::runtime_error("[CONFIG] Error : Unsupported directive in location");
 			if (!new_loca.getIndexLocation().empty())
 				throw std::runtime_error("[CONFIG] Error : index of location is duplicated");
 			checkToken(params[++i]);
+			params[i].erase(params[i].size() - 1);
 			new_loca.setIndexLocation(params[i]);
 		} else if (params[i] == "cgi_path" && (i + 1) < params.size()) {
-			if (findChar(params[++i], ';') >= 1) {
-				checkToken(params[i]);
-				if (!params[i].empty() && params[i][params[i].size() - 1] == ';')
-					params[i].erase(params[i].size() - 1);
-				if (params[i].find("/python") == std::string::npos && params[i].find("/bash") == std::string::npos)
-					throw std::runtime_error("[CONFIG] Error : cgi_path is invalid");
-			}
-			else
-				throw std::runtime_error("[CONFIG] Error : cgi_path is invalid" + params[i]);
+			i++;
+			checkToken(params[i]);
+			params[i].erase(params[i].size() - 1);
 			new_loca.setCgiPath(params[i]);
 			new_loca.setIsCgiLocation(true);
 		} else if (params[i] == "client_max_body_size" && (i + 1) < params.size()) {
-			if (findChar(params[i+1], ';') < 1)
-				throw std::runtime_error("[CONFIG] Error : Unsupported directive in location");
 			if (flag_max_size)
 				throw std::runtime_error("[CONFIG] Error : client_max_body_size is duplicated");
 			checkToken(params[++i]);
+			params[i].erase(params[i].size() - 1);
 			new_loca.setMaxBodySize(params[i]);
 			flag_max_size = true;
-		} else if (params[i] == "return" && (i + 1) < params.size()) {
+		} else if (params[i] == "return" && (i + 1) < params.size() && (i + 2) < params.size()) {
 			std::string statusCode;
             std::string hostname;
-
-			if (!(params[i + 1] == "300" || params[i + 1] == "301" || params[i + 1] == "302" || params[i + 1] == "303"
-					|| params[i + 1] == "304" || params[i + 1] == "307" || params[i + 1] == "308"))
-				throw std::runtime_error("[CONFIG] Error: Invalid status code in return directive");
-			statusCode = params[i + 1];
 			i++;
 
-            if ((i + 1) < params.size() && params[i + 1] != "}") {
-				i++;
-				if (!params[i].empty() && params[i][params[i].size() - 1] == ';')
-					params[i].erase(params[i].size() - 1);
-                hostname = params[i];
-            }
+			if (i < params.size() && params[i] == "}")
+				throw std::runtime_error("[CONFIG] Error: Invalid config");
+
+			if (!(params[i] == "300" || params[i] == "301" || params[i] == "302" || params[i] == "303"
+					|| params[i] == "304" || params[i] == "307" || params[i] == "308"))
+				throw std::runtime_error("[CONFIG] Error: Invalid status code in return directive");
+			statusCode = params[i];
+			i++;
+
+			if (i < params.size() && params[i] == "}")
+				throw std::runtime_error("[CONFIG] Error: Invalid config");
+
+			checkToken(params[i]);
+			params[i].erase(params[i].size() - 1);
+            hostname = params[i];
 
 			new_loca.setRedirStatusCode(statusCode);
 			new_loca.setRedirHostname(hostname);
@@ -235,7 +211,7 @@ std::string ServerConf::getPathErrorPage(std::string statusCode) {
     if (it != _error_pages.end())
 		return (*it).second;
     else
-        throw std::runtime_error("Error page not found for status code: " + statusCode);
+        return "";
 }
 
 const std::vector<Location>::iterator ServerConf::getLocationFromUri(std::string uri) {

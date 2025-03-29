@@ -16,10 +16,6 @@ Location::~Location() {}
 void Location::setPath(std::string param) { _path = param; }
 
 void Location::setRootLocation(std::string param) {
-	if (!param.empty() && param[param.size() - 1] == ';')
-        param.erase(param.size() - 1);
-	if (getTypePath(param) != 2)
-		throw std::runtime_error("[CONFIG] Error : Invalid IP address format for host");
 	if (!param.empty() && param[param.size() - 1] == '/')
         param.erase(param.size() - 1);
 	_root = param;
@@ -27,15 +23,13 @@ void Location::setRootLocation(std::string param) {
 
 void Location::setIndexLocation(std::string param)
 {
-	if (!param.empty() && param[param.size() - 1] == ';')
-        param.erase(param.size() - 1);
 	_index = param;
 }
 
 void Location::setAutoindex(std::string param) {
-	if (param == "on;")
+	if (param == "on")
 		_autoindex = true;
-	else if (param == "off;")
+	else if (param == "off")
 		_autoindex = false;
 	else
 		throw std::runtime_error("[CONFIG] Error : autoindex is invalid");
