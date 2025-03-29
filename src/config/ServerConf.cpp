@@ -468,13 +468,13 @@ std::string	ServerConf::getDefaultFile(std::string path)
 	it = _pathToLocation.find(path);
 	if (it != _pathToLocation.end()) {
 		if (!it->second)
-			return _root+_index;
+			return _root+"/"+_index;
 		return it->second->getRootLocation()+it->second->getIndexLocation();
 	}
 
 	if (!findMatchingLocation(path, &location)) {
 		_pathToLocation[path] = NULL;
-		return (_root+_index);
+		return (_root+"/"+_index);
 	}
 	_pathToLocation[path] = &location;
 	return location.getRootLocation()+location.getIndexLocation();
