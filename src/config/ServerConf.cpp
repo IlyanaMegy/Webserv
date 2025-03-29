@@ -223,7 +223,7 @@ const std::vector<Location>::iterator ServerConf::getLocationFromUri(std::string
 }
 
 bool ServerConf::isValidMethod(std::string path, Request::Method method) {
-	Location									location;
+	Location									*location;
 	std::map<std::string, Location*>::iterator	it;
 	std::vector<Request::Method>				validMethods;
 
@@ -234,18 +234,18 @@ bool ServerConf::isValidMethod(std::string path, Request::Method method) {
 		validMethods = it->second->getMethods();
 		return std::find(validMethods.begin(), validMethods.end(), method) != validMethods.end();
 	}
-	if (!findMatchingLocation(path, &location)) {
+	if (!(location = findMatchingLocation(path))) {
 		_pathToLocation[path] = NULL;
 		return true;
 	}
-	_pathToLocation[path] = &location;
-	validMethods = location.getMethods();
+	_pathToLocation[path] = location;
+	validMethods = location->getMethods();
 	return std::find(validMethods.begin(), validMethods.end(), method) != validMethods.end();
 }
 
 std::vector<Request::Method>	ServerConf::getValidMethods(std::string path)
 {
-	Location									location;
+	Location									*location;
 	std::map<std::string, Location*>::iterator	it;
 	std::vector<Request::Method>				defaultMethods;
 
@@ -259,12 +259,12 @@ std::vector<Request::Method>	ServerConf::getValidMethods(std::string path)
 			return defaultMethods;
 		return it->second->getMethods();
 	}
-	if (!findMatchingLocation(path, &location)) {
+	if (!(location = findMatchingLocation(path))) {
 		_pathToLocation[path] = NULL;
 		return defaultMethods;
 	}
-	_pathToLocation[path] = &location;
-	return location.getMethods();
+	_pathToLocation[path] = location;
+	return location->getMethods();
 }
 
 bool ServerConf::checkLocationsDuplicate() {
@@ -305,28 +305,29 @@ void	ServerConf::addRedirToLocations(std::string statusCode, std::string hostnam
 	}
 }
 
-size_t ServerConf::findMatchingLocation(const std::string& path, Location* bestMatch) {
-	size_t bestMatchLength = 0;
-	size_t bestMatchLengthTilde = 0;
+Location* ServerConf::findMatchingLocation(const std::string& path) {
+	Location	*location = NULL;
+	size_t 		bestMatchLength = 0;
+	size_t 		bestMatchLengthTilde = 0;
 
-	for (std::vector<Location>::const_iterator it = _locations.begin(); it != _locations.end(); ++it) {
+	for (std::vector<Location>::iterator it = _locations.begin(); it != _locations.end(); ++it) {
 		if (it->getIsTilde() && bestMatchLength == 0
 				&& path.rfind(it->getPath()) == (path.length() - it->getPath().length())
 				&& it->getPath().length() > bestMatchLengthTilde) {
-			*bestMatch = (*it);
+			location = &(*it);
 			bestMatchLengthTilde = it->getPath().length();
 		}	
 		if (!it->getIsTilde() && path.find(it->getPath()) == 0 && it->getPath().length() > bestMatchLength) {
-			*bestMatch = (*it);
+			location = &(*it);
 			bestMatchLength = it->getPath().length();
 		}
 	}
-	return bestMatch->getPath().length();
+	return location;
 }
 
 bool	ServerConf::isAutoindexOn(std::string path)
 {
-	Location									location;
+	Location*									location;
 	std::map<std::string, Location*>::iterator	it;
 
 	it = _pathToLocation.find(path);
@@ -335,17 +336,17 @@ bool	ServerConf::isAutoindexOn(std::string path)
 			return _autoindex;
 		return it->second->getAutoindex();
 	}
-	if (!findMatchingLocation(path, &location)) {
+	if (!(location = findMatchingLocation(path))) {
 		_pathToLocation[path] = NULL;
 		return _autoindex;
 	}
-	_pathToLocation[path] = &location;
-	return location.getAutoindex();
+	_pathToLocation[path] = location;
+	return location->getAutoindex();
 }
 
 std::string	ServerConf::getCompletePath(std::string path)
 {
-	Location									location;
+	Location*									location;
 	std::map<std::string, Location*>::iterator	it;
 
 	it = _pathToLocation.find(path);
@@ -354,17 +355,17 @@ std::string	ServerConf::getCompletePath(std::string path)
 			return _root+path;
 		return it->second->getRootLocation()+path;
 	}
-	if (!findMatchingLocation(path, &location)) {
+	if (!(location = findMatchingLocation(path))) {
 		_pathToLocation[path] = NULL;
 		return _root+path;
 	}
-	_pathToLocation[path] = &location;
-	return location.getRootLocation()+path;
+	_pathToLocation[path] = location;
+	return location->getRootLocation()+path;
 }
 
 bool	ServerConf::isCgi(std::string path)
 {
-	Location									location;
+	Location*									location;
 	std::map<std::string, Location*>::iterator	it;
 
 	it = _pathToLocation.find(path);
@@ -373,17 +374,17 @@ bool	ServerConf::isCgi(std::string path)
 			return false;
 		return it->second->isCgiLocation();
 	}
-	if (!findMatchingLocation(path, &location)) {
+	if (!(location = findMatchingLocation(path))) {
 		_pathToLocation[path] = NULL;
 		return false;
 	}
-	_pathToLocation[path] = &location;
-	return location.isCgiLocation();
+	_pathToLocation[path] = location;
+	return location->isCgiLocation();
 }
 
 std::string	ServerConf::getCgiExecutable(std::string path)
 {
-	Location									location;
+	Location*									location;
 	std::map<std::string, Location*>::iterator	it;
 
 	it = _pathToLocation.find(path);
@@ -392,17 +393,17 @@ std::string	ServerConf::getCgiExecutable(std::string path)
 			return "";
 		return it->second->getCgiPath();
 	}
-	if (!findMatchingLocation(path, &location)) {
+	if (!(location = findMatchingLocation(path))) {
 		_pathToLocation[path] = NULL;
 		return "";
 	}
-	_pathToLocation[path] = &location;
-	return location.getCgiPath();
+	_pathToLocation[path] = location;
+	return location->getCgiPath();
 }
 
 bool	ServerConf::isRedir(std::string path)
 {
-	Location									location;
+	Location*									location;
 	std::map<std::string, Location*>::iterator	it;
 
 	it = _pathToLocation.find(path);
@@ -412,17 +413,17 @@ bool	ServerConf::isRedir(std::string path)
 		return it->second->isRedirLocation();
 	}
 
-	if (!findMatchingLocation(path, &location)) {
+	if (!(location = findMatchingLocation(path))) {
 		_pathToLocation[path] = NULL;
 		return (!_redirStatusCode.empty());
 	}
-	_pathToLocation[path] = &location;
-	return location.isRedirLocation();
+	_pathToLocation[path] = location;
+	return location->isRedirLocation();
 }
 
 std::string	ServerConf::getRedirStatusCode(std::string path)
 {
-	Location									location;
+	Location*									location;
 	std::map<std::string, Location*>::iterator	it;
 
 	it = _pathToLocation.find(path);
@@ -432,17 +433,17 @@ std::string	ServerConf::getRedirStatusCode(std::string path)
 		return it->second->getRedirStatusCode();
 	}
 
-	if (!findMatchingLocation(path, &location)) {
+	if (!(location = findMatchingLocation(path))) {
 		_pathToLocation[path] = NULL;
 		return (_redirStatusCode);
 	}
-	_pathToLocation[path] = &location;
-	return location.getRedirStatusCode();
+	_pathToLocation[path] = location;
+	return location->getRedirStatusCode();
 }
 
 std::string	ServerConf::getRedirHostname(std::string path)
 {
-	Location									location;
+	Location*									location;
 	std::map<std::string, Location*>::iterator	it;
 
 	it = _pathToLocation.find(path);
@@ -452,17 +453,17 @@ std::string	ServerConf::getRedirHostname(std::string path)
 		return it->second->getRedirHostname();
 	}
 
-	if (!findMatchingLocation(path, &location)) {
+	if (!(location = findMatchingLocation(path))) {
 		_pathToLocation[path] = NULL;
 		return (_redirHostname);
 	}
-	_pathToLocation[path] = &location;
-	return location.getRedirHostname();
+	_pathToLocation[path] = location;
+	return location->getRedirHostname();
 }
 
 std::string	ServerConf::getDefaultFile(std::string path)
 {
-	Location									location;
+	Location*									location;
 	std::map<std::string, Location*>::iterator	it;
 
 	it = _pathToLocation.find(path);
@@ -472,11 +473,11 @@ std::string	ServerConf::getDefaultFile(std::string path)
 		return it->second->getRootLocation()+it->second->getIndexLocation();
 	}
 
-	if (!findMatchingLocation(path, &location)) {
+	if (!(location = findMatchingLocation(path))) {
 		_pathToLocation[path] = NULL;
 		return (_root+"/"+_index);
 	}
-	_pathToLocation[path] = &location;
-	return location.getRootLocation()+location.getIndexLocation();
+	_pathToLocation[path] = location;
+	return location->getRootLocation()+location->getIndexLocation();
 }
 

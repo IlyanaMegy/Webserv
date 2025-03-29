@@ -77,7 +77,7 @@ class ServerConf {
 	void 							addIndexToLocations(std::string index);
 	void							addRedirToLocations(std::string statusCode, std::string hostname);
 
-	size_t 							findMatchingLocation(const std::string& uri, Location* bestMatch);
+	Location* 						findMatchingLocation(const std::string& path);
 	std::string						getCompletePath(std::string path);
 
 	std::string						getCgiExecutable(std::string path);
