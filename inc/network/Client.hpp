@@ -6,8 +6,7 @@
 
 
 # include "Socket.hpp"
-# include "../messages/Request.hpp"
-# include "../style.hpp"
+# include "Request.hpp"
 
 # define BUFFER_SIZE 1024
 

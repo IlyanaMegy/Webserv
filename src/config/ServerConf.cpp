@@ -325,15 +325,15 @@ void	ServerConf::addRedirToLocations(std::string statusCode, std::string hostnam
 	for (it = _locations.begin(); it != _locations.end(); it++)
 	if (!it->isRedirLocation()) {
 			it->setRedirStatusCode(statusCode);
-			it->setRedirHostname(hostname);		
+			it->setRedirHostname(hostname);
 	}
 }
 
 size_t ServerConf::findMatchingLocation(const std::string& path, Location* bestMatch) {
-    size_t bestMatchLength = 0;
-    size_t bestMatchLengthTilde = 0;
+	size_t bestMatchLength = 0;
+	size_t bestMatchLengthTilde = 0;
 
-    for (std::vector<Location>::const_iterator it = _locations.begin(); it != _locations.end(); ++it) {
+	for (std::vector<Location>::const_iterator it = _locations.begin(); it != _locations.end(); ++it) {
 		if (it->getIsTilde() && bestMatchLength == 0
 				&& path.rfind(it->getPath()) == (path.length() - it->getPath().length())
 				&& it->getPath().length() > bestMatchLengthTilde) {

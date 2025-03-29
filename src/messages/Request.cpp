@@ -1,6 +1,4 @@
-#include "../../inc/messages/Request.hpp"
-#include "../../inc/network/Server.hpp"	
-#include "../../inc/config/ServerConf.hpp"
+#include "Request.hpp"
 
 #include "Server.hpp"
 #include "CGI.hpp"
@@ -107,27 +105,16 @@ void	Request::parse(void)
 
 void	Request::treat(void)
 {
-	if (_path.length() > 3 && _path.substr(_path.length() - 3, 3) == ".py" && _method != DELETE)
+	if (!_conf->isValidMethod(_path, _method)) {
+		_response.fillError("405", "Method Not Allowed");
+		_stage = DONE;
+		return ;
+	}
+	if (_isCGI(_path) && _method != DELETE)
 		return (treatCGI());
 
 	if (_method == GET)
-	{
-		if (!_arguments.empty()) {
-			std::cout << PINK << "\nREQUEST\nFirst element: " << _arguments.begin()->first << " = " << _arguments.begin()->second << RESET << std::endl;
-		} else {
-			std::cout << PINK << "\nREQUEST\nno request : _arguments is empty." << RESET << std::endl;
-		}
-		if (_path == "/favicon.ico")
-		{
-			std::string faviconPath = _defaultConf->getLocationCompletePath("/favicon.ico") + _path;
-			if (isFileExistAndReadable(faviconPath))
-				_response.fillGET(faviconPath);
-			else
-				_response.fillError("404", "Not Found " + faviconPath);
-		}
-		else
-			_response.fillGET(_path);
-	}
+		_response.fillGET(_path);
 	else if (_method == DELETE)
 		_response.fillDELETE(_path);
 	else
@@ -735,59 +722,15 @@ void	Request::_split(std::vector<std::string>& vector)
 	}
 }
 
+std::string	Request::_fixPath(std::string path)
+{
+	if (path.empty())
+		return path;
+	if (path[0] == '/') {
+		if (path.length() == 1)
+			return "default/site/welcome.html";
+		return path.substr(1, path.length() - 1);
+	}
+	return path;
+}
 
-// void    Request::printInfo(void)
-// {
-//     std::cout << "Untreated message: "
-//         << RUBY << _untreatedMessage << RESET << std::endl;
-//     std::cout << std::endl;
-//     std::cout << "Untreated message length: " 
-//         RED << _untreatedMessage.length() << RESET << std::endl;
-
-
-//     std::cout << " --------- STATUS LINE --------- " << std::endl << std::endl;
-
-//     std::cout << "Method: " << EMRD;
-//     if (_method == GET)
-//         std::cout << "GET";
-//     else if (_method == POST)
-//         std::cout << "POST";
-//     else if (_method == DELETE)
-//         std::cout << "DELETE";
-//     else
-//         std::cout << "NONE";
-//     std::cout << RESET << std::endl;
-//     // std::cout << "URI: " << ORANGE << _uri << RESET << std::endl;
-//     std::cout << "Host: " << GOLD << _host << RESET << std::endl;
-//     // std::cout << "Port: " << YLLW << _port << RESET << std::endl;
-//     std::cout << "Path: " << ORANGE << _path << RESET << std::endl;
-//     std::cout << "Arguments: " << std::endl;
-//     for (std::map<std::string, std::string>::iterator it = _arguments.begin(); it != _arguments.end(); it++) {
-//         std::cout << SALM << it->first << RESET 
-//             << ": " << CORL << it->second << RESET << std::endl;
-//     }
-//     std::cout << std::endl;
-
-
-//     std::cout << " --------- HEADER --------- " << std::endl << std::endl;
-
-//     for (std::map< std::string, std::vector<std::string> >::iterator it = _fields.begin(); it != _fields.end(); it++) {
-//         std::cout << BLUE << it->first << RESET << ": ";
-//         for (std::size_t i = 0; i != it->second.size(); i++) {
-//             std::cout << INDI << it->second[i] << RESET;
-//             if (i + 1 != it->second.size())
-//                 std::cout << ", ";
-//         }
-//         std::cout << std::endl;
-//     }
-//     std::cout << std::endl;
-
-//     std::cout << " --------- CONTENT --------- " << std::endl << std::endl;
-
-//     std::cout << PINK << _body << RESET << std::endl;
-//     std::cout << std::endl;
-//     std::cout << "Body length: " << MAGENTA << _bodyLength << RESET << std::endl;
-//     // std::cout << " --------- RESPONSE --------- " << std::endl << std::endl;
-
-//     // std::cout << GOLD << _response.getMessage() << RESET << std::endl;
-// }
