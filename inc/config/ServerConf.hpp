@@ -12,6 +12,8 @@
 #include "Request.hpp"
 #include "../style.hpp"
 
+#define ERROR_DIR "www/webserv/error"
+
 class ServerConf {
    private:
 	std::string 		_configFile;

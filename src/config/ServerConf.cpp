@@ -15,16 +15,16 @@ ServerConf::ServerConf() {
 }
 
 void ServerConf::initializeErrorPages() {
-    _error_pages["400"] = "www/error/400.html";
-    _error_pages["404"] = "www/error/404.html";
-    _error_pages["405"] = "www/error/405.html";
-    _error_pages["408"] = "www/error/408.html";
-    _error_pages["411"] = "www/error/411.html";
-    _error_pages["413"] = "www/error/413.html";
-    _error_pages["500"] = "www/error/500.html";
-    _error_pages["501"] = "www/error/501.html";
-    _error_pages["502"] = "www/error/502.html";
-    _error_pages["505"] = "www/error/505.html";
+    _error_pages["400"] = ERROR_DIR+std::string("/400.html");
+    _error_pages["404"] = ERROR_DIR+std::string("/404.html");
+    _error_pages["405"] = ERROR_DIR+std::string("/405.html");
+    _error_pages["408"] = ERROR_DIR+std::string("/408.html");
+    _error_pages["411"] = ERROR_DIR+std::string("/411.html");
+    _error_pages["413"] = ERROR_DIR+std::string("/413.html");
+    _error_pages["500"] = ERROR_DIR+std::string("/500.html");
+    _error_pages["501"] = ERROR_DIR+std::string("/501.html");
+    _error_pages["502"] = ERROR_DIR+std::string("/502.html");
+    _error_pages["505"] = ERROR_DIR+std::string("/505.html");
 }
 
 void ServerConf::setServerName(std::string server_name) {
