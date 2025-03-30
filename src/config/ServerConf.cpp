@@ -16,6 +16,7 @@ ServerConf::ServerConf() {
 
 void ServerConf::initializeErrorPages() {
     _error_pages["400"] = ERROR_DIR+std::string("/400.html");
+    _error_pages["403"] = ERROR_DIR+std::string("/403.html");
     _error_pages["404"] = ERROR_DIR+std::string("/404.html");
     _error_pages["405"] = ERROR_DIR+std::string("/405.html");
     _error_pages["408"] = ERROR_DIR+std::string("/408.html");
