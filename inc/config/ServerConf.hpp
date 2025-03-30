@@ -41,7 +41,7 @@ class ServerConf {
 	void 							setRoot(std::string root);
 	void 							setPort(std::string params);
 	void 							setClientMaxBodySize(std::string params);
-	void 							setIndex(std::string index);
+	void 							setDefaultIndex(std::string index);
 	void 							setLocation(std::string path, std::vector<std::string> params, bool isTilde);
 	void 							setAutoindex(std::string autoindex);
 	void 							setDefaultRedirStatusCode(std::string code);
@@ -54,7 +54,7 @@ class ServerConf {
 	unsigned int 						getMaxBodySize(void) const;
 	std::vector<Location> 				getLocations(void) const;
 	std::string 						getRoot(void) const;
-	std::string 						getIndex(void) const;
+	std::string 						getDefaultIndex(void) const;
 	bool 								getAutoindex(void) const;
 	std::string 						getDefaultRedirStatusCode() const;
 	std::string 						getDefaultRedirHostname() const;
@@ -64,6 +64,7 @@ class ServerConf {
 	std::string						getRedirStatusCode(std::string path);
 	std::string						getRedirHostname(std::string path);
 	std::string						getDefaultFile(std::string path);
+	std::string						getIndex(std::string path);
 	
 	const std::vector<Location>::iterator getLocationFromUri(std::string uri);
 

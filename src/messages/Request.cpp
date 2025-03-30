@@ -122,17 +122,24 @@ void	Request::_treatReg(void)
 
 void	Request::_treatDir(void)
 {
-	if (_method != GET) {
+	std::string	defaultFile = _conf->getDefaultFile(_path);
+	struct stat	sb;
+	int			res = stat(defaultFile.c_str(), &sb);
+
+	if (_method != GET || (!res && !S_ISREG(sb.st_mode)))
 		_response.fillError("403", "Forbidden");
-		_stage = DONE;
-	}
-	else {
+	else if (res) {
 		if (!_conf->isAutoindexOn(_path))
 			_response.fillError("403", "Forbidden");
 		else
 			_response.fillAutoindex(_conf->getCompletePath(_path));
-		_stage = DONE;
 	}
+	else {
+		_path = "/"+_conf->getIndex(_path);
+		_response.setVirtualPath(_path);
+		return(_conf->isCgi(_path) ? treatCGI() : _treatReg());
+	}
+	_stage = DONE;
 }
 
 void	Request::treat(void)
