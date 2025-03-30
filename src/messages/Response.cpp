@@ -203,7 +203,6 @@ void	Response::_fillHeader(std::map< std::string, std::vector<std::string> > fie
 	if (!_content.empty())
 		_fields["Content-Length"].push_back(itos(_content.length()));
 	_updateDate();
-	_fillErrorHeader();
 
 	if (!fields.empty())
 		for (std::map< std::string, std::vector<std::string> >::iterator it = fields.begin(); it != fields.end(); it++)
