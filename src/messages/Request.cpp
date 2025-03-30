@@ -775,6 +775,4 @@ void	Request::_split(std::vector<std::string>& vector)
 	}
 }
 
-{
-	}
 
