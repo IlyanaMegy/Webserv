@@ -9,6 +9,9 @@
 # include <iostream>
 # include <sstream>
 # include <unistd.h>
+# include <set>
+# include <sys/types.h>
+# include <dirent.h>
 
 # include "../style.hpp"
 
