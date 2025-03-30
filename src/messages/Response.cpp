@@ -134,8 +134,10 @@ void	Response::fillCGI(CGI* cgi)
 
 void	Response::fillGET(std::string path)
 {
-	if (_fillContent(path))
+	if (_fillContent(path)) {
+		fillError("404", "Not found");
 		return ;
+	}
 	_fillStatusLine("200", "OK");
 	_fillHeader();
 	_isComplete = true;
@@ -256,10 +258,8 @@ int	Response::_fillContent(std::string path)
 	std::string		line;
 	std::ifstream	ifs(path.c_str());
 
-	if (ifs.fail()) {
-		fillError("404", "Not found");
+	if (ifs.fail())
 		return 1;
-	}
 	while (!ifs.eof()) {
 		std::getline(ifs, line);
 		_content+=line+"\n";
