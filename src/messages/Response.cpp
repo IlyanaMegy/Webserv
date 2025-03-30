@@ -159,6 +159,7 @@ void	Response::fillPOST(std::string path, std::string body)
 		return ;
 	}
 	_fillStatusLine("201", "Created");
+	_fields["Location"].push_back(_virtualPath);
 	_fillHeader();
 	_isComplete = true;
 }
