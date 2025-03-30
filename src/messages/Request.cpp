@@ -103,21 +103,13 @@ void	Request::parse(void)
 		_parseBody();
 }
 
-void	Request::treat(void)
+void	Request::_treatReg(void)
 {
-	if (_conf->isRedir(_path)) {
-		_response.fillRedir(_conf->getRedirStatusCode(_path), _conf->getRedirHostname(_path));
-		_stage = DONE;
-		return ;
-	}
-
 	if (!_conf->isValidMethod(_path, _method)) {
 		_response.fillError("405", "Method Not Allowed");
 		_stage = DONE;
 		return ;
 	}
-	if (_conf->isCgi(_path) && _method != DELETE)
-		return (treatCGI());
 
 	if (_method == GET)
 		_response.fillGET(_conf->getCompletePath(_path));
@@ -128,9 +120,56 @@ void	Request::treat(void)
 	_stage = DONE;
 }
 
+void	Request::_treatDir(void)
+{
+	if (_method != GET) {
+		_response.fillError("403", "Forbidden");
+		_stage = DONE;
+	}
+	else {
+		if (!_conf->isAutoindexOn(_path))
+			_response.fillError("403", "Forbidden");
+		else
+			_response.fillAutoindex(_conf->getCompletePath(_path));
+		_stage = DONE;
+	}
+}
+
+void	Request::treat(void)
+{
+	std::string	physicalPath = _conf->getCompletePath(_path);
+	struct stat	sb;
+	int			res = stat(physicalPath.c_str(), &sb);
+
+	if (_conf->isRedir(_path)) {
+		_response.fillRedir(_conf->getRedirStatusCode(_path), _conf->getRedirHostname(_path));
+		_stage = DONE;
+		return ;
+	}
+
+	if (res) {
+		_response.fillError("404", "Not Found");
+		_stage = DONE;
+		return ;
+	}
+
+	if (S_ISDIR(sb.st_mode))
+		return (_treatDir());
+	else if (S_ISREG(sb.st_mode)) {
+		return(_conf->isCgi(_path) ? treatCGI() : _treatReg());
+	}
+	_response.fillError("403", "Forbidden");
+	_stage = DONE;
+}
+
 void	Request::treatCGI(void)
 {
 	if (!_cgi) {
+		if (!_conf->isValidMethod(_path, _method)) {
+			_response.fillError("405", "Method Not Allowed");
+			_stage = DONE;
+			return ;
+		}
 		if (_launchCGI(_conf->getCompletePath(_path))) {
 			_response.fillError("502", "Bad Gateway");
 			_stage = DONE;

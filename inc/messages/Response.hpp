@@ -46,6 +46,7 @@ class Response
 		void		fillPOST(std::string path, std::string body);
 		void		fillCGI(CGI* cgi);
 		void		fillRedir(std::string statusCode, std::string newHostname);
+		void		fillAutoindex(std::string path);
 
 
 		static std::string	itos(int value);
@@ -74,6 +75,7 @@ class Response
 		void	_fillHeader(std::map< std::string, std::vector<std::string> > fields = std::map< std::string, std::vector<std::string> >());
 		void	_fillErrorHeader(void);
 		int		_fillContent(std::string path);
+		int		_fillAutoindexPage(std::string path);
 
 		int		_deleteTarget(std::string path);
 		int		_createTarget(std::string path, std::string body);

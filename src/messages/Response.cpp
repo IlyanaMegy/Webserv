@@ -92,6 +92,17 @@ void	Response::fillError(std::string statusCode, std::string reasonMessage)
 	_isComplete = true;
 }
 
+void	Response::fillAutoindex(std::string path)
+{
+	if (_fillAutoindexPage(path)) {
+		fillError("500", "Internal Server Error");
+		return ;
+	}
+	_fillStatusLine("200", "OK");
+	_fillHeader();
+	_isComplete = true;
+}
+
 void	Response::fillRedir(std::string statusCode, std::string newHostname)
 {
 	static std::map<std::string, std::string>			redirMap = _initRedirMap();
@@ -207,6 +218,37 @@ void	Response::_fillErrorHeader(void)
 		validMethodsString = validMethodsString.empty() ? validMethodsString : validMethodsString.substr(0, validMethodsString.length() - 2);
 		_fields["Allow"].push_back(validMethodsString);
 	}
+}
+
+int	Response::_fillAutoindexPage(std::string path)
+{
+	std::set<std::string>		fileNames;
+	std::string					file;
+	DIR*						dirp;
+	struct dirent*				direntp;
+
+	if (!(dirp = opendir(path.c_str())))
+		return 1;
+	while ((direntp = readdir(dirp))) {
+		file = direntp->d_name;
+		if (direntp->d_type == DT_DIR)
+			file+="/";
+		fileNames.insert(file);
+	}
+	closedir(dirp);
+	fileNames.erase("./");
+
+	_content ="\
+<html>\n\
+<head><title>Index of "+path+"</title></head>\n\
+<body>\n\
+<h1>Index of "+path+"</h1><hr><pre>\n";
+	for (std::set<std::string>::iterator it = fileNames.begin(); it != fileNames.end(); it++)
+		_content+="<a href="+*it+">"+*it+"</a>\n";
+	_content+="\
+</pre><hr></body>\n\
+</html>\n";
+	return 0;
 }
 
 int	Response::_fillContent(std::string path)
