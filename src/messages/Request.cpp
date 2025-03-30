@@ -105,6 +105,12 @@ void	Request::parse(void)
 
 void	Request::treat(void)
 {
+	if (_conf->isRedir(_path)) {
+		_response.fillRedir(_conf->getRedirStatusCode(_path), _conf->getRedirHostname(_path));
+		_stage = DONE;
+		return ;
+	}
+
 	if (!_conf->isValidMethod(_path, _method)) {
 		_response.fillError("405", "Method Not Allowed");
 		_stage = DONE;

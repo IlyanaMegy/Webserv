@@ -44,8 +44,9 @@ class Response
 		void		fillGET(std::string path);
 		void		fillDELETE(std::string path);
 		void		fillPOST(std::string path, std::string body);
-
 		void		fillCGI(CGI* cgi);
+		void		fillRedir(std::string statusCode, std::string newHostname);
+
 
 		static std::string	itos(int value);
 		
@@ -75,9 +76,9 @@ class Response
 		int		_fillContent(std::string path);
 
 		int		_deleteTarget(std::string path);
-
 		int		_createTarget(std::string path, std::string body);
 
+		static std::map<std::string, std::string>	_initRedirMap(void);
 
 };
 

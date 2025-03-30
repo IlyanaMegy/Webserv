@@ -87,6 +87,17 @@ void	Response::fillError(std::string statusCode, std::string reasonMessage)
 	_fillContent(_conf->getPathErrorPage(statusCode));
 	_fillStatusLine(statusCode, reasonMessage);
 	_shouldClose = true;
+	_fillErrorHeader();
+	_fillHeader();
+	_isComplete = true;
+}
+
+void	Response::fillRedir(std::string statusCode, std::string newHostname)
+{
+	static std::map<std::string, std::string>			redirMap = _initRedirMap();
+
+	_fillStatusLine(statusCode, redirMap[statusCode]);
+	_fields["Location"].push_back(newHostname);
 	_fillHeader();
 	_isComplete = true;
 }
@@ -236,7 +247,19 @@ std::string	Response::itos(int value)
 	return res;
 }
 
+std::map<std::string, std::string>	Response::_initRedirMap(void)
 {
+	static std::map<std::string, std::string> redirMap;
+
+	redirMap["300"] = "Multiple Choices";
+	redirMap["301"] = "Moved Permanently";
+	redirMap["302"] = "Found";
+	redirMap["303"] = "See Other";
+	redirMap["304"] = "Not Modified";
+	redirMap["307"] = "Temporary Redirect";
+	redirMap["308"] = "Permanent Redirect";
+
+	return redirMap;
 }
 
 }
