@@ -303,5 +303,3 @@ std::map<std::string, std::string>	Response::_initRedirMap(void)
 
 	return redirMap;
 }
-
-}
