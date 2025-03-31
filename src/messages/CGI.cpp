@@ -362,13 +362,3 @@ std::string	CGI::_findDirectory(std::string path)
 		return "./";
 	return path.substr(0, sepPos + 1);
 }
-
-std::string	CGI::_findName(std::string path)
-{
-	std::size_t	sepPos;
-
-	sepPos = path.rfind("/");
-	if (sepPos == std::string::npos)
-		return path;
-	return path.substr(sepPos + 1, path.length() - (sepPos + 1));
-}
