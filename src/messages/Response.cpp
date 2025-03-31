@@ -4,7 +4,9 @@
 
 #include "CGI.hpp"
 
-Response::Response(void) : _message(""), _shouldClose(false), _isComplete(false), _statusCode(""), _reasonMessage(""), _content("") {}
+Response::Response(void) : _message(""), _shouldClose(false), _isComplete(false), _conf(NULL), _statusCode(""), _reasonMessage(""), _content("") {}
+
+Response::Response(ServerConf* conf) : _message(""), _shouldClose(false), _isComplete(false), _conf(conf), _statusCode(""), _reasonMessage(""), _content("") {}
 
 Response::~Response(void) {}
 
@@ -85,6 +87,28 @@ void	Response::fillError(std::string statusCode, std::string reasonMessage)
 	_fillContent(_conf->getPathErrorPage(statusCode));
 	_fillStatusLine(statusCode, reasonMessage);
 	_shouldClose = true;
+	_fillErrorHeader();
+	_fillHeader();
+	_isComplete = true;
+}
+
+void	Response::fillAutoindex(std::string path)
+{
+	if (_fillAutoindexPage(path)) {
+		fillError("500", "Internal Server Error");
+		return ;
+	}
+	_fillStatusLine("200", "OK");
+	_fillHeader();
+	_isComplete = true;
+}
+
+void	Response::fillRedir(std::string statusCode, std::string newHostname)
+{
+	static std::map<std::string, std::string>			redirMap = _initRedirMap();
+
+	_fillStatusLine(statusCode, redirMap[statusCode]);
+	_fields["Location"].push_back(newHostname);
 	_fillHeader();
 	_isComplete = true;
 }
@@ -110,8 +134,10 @@ void	Response::fillCGI(CGI* cgi)
 
 void	Response::fillGET(std::string path)
 {
-	if (_fillContent(path))
+	if (_fillContent(path)) {
+		fillError("404", "Not found");
 		return ;
+	}
 	_fillStatusLine("200", "OK");
 	_fillHeader();
 	_isComplete = true;
@@ -133,6 +159,7 @@ void	Response::fillPOST(std::string path, std::string body)
 		return ;
 	}
 	_fillStatusLine("201", "Created");
+	_fields["Location"].push_back(_virtualPath);
 	_fillHeader();
 	_isComplete = true;
 }
@@ -176,7 +203,6 @@ void	Response::_fillHeader(std::map< std::string, std::vector<std::string> > fie
 	if (!_content.empty())
 		_fields["Content-Length"].push_back(itos(_content.length()));
 	_updateDate();
-	_fillErrorHeader();
 
 	if (!fields.empty())
 		for (std::map< std::string, std::vector<std::string> >::iterator it = fields.begin(); it != fields.end(); it++)
@@ -196,15 +222,44 @@ void	Response::_fillErrorHeader(void)
 	}
 }
 
+int	Response::_fillAutoindexPage(std::string path)
+{
+	std::set<std::string>		fileNames;
+	std::string					file;
+	DIR*						dirp;
+	struct dirent*				direntp;
+
+	if (!(dirp = opendir(path.c_str())))
+		return 1;
+	while ((direntp = readdir(dirp))) {
+		file = direntp->d_name;
+		if (direntp->d_type == DT_DIR)
+			file+="/";
+		fileNames.insert(file);
+	}
+	closedir(dirp);
+	fileNames.erase("./");
+
+	_content ="\
+<html>\n\
+<head><title>Index of "+path+"</title></head>\n\
+<body>\n\
+<h1>Index of "+path+"</h1><hr><pre>\n";
+	for (std::set<std::string>::iterator it = fileNames.begin(); it != fileNames.end(); it++)
+		_content+="<a href="+*it+">"+*it+"</a>\n";
+	_content+="\
+</pre><hr></body>\n\
+</html>\n";
+	return 0;
+}
+
 int	Response::_fillContent(std::string path)
 {
 	std::string		line;
 	std::ifstream	ifs(path.c_str());
 
-	if (ifs.fail()) {
-		fillError("404", "Not found");
+	if (ifs.fail())
 		return 1;
-	}
 	while (!ifs.eof()) {
 		std::getline(ifs, line);
 		_content+=line+"\n";
@@ -232,4 +287,21 @@ std::string	Response::itos(int value)
 	stream << value;
 	res = stream.str();
 	return res;
+}
+
+std::map<std::string, std::string>	Response::_initRedirMap(void)
+{
+	static std::map<std::string, std::string> redirMap;
+
+	redirMap["300"] = "Multiple Choices";
+	redirMap["301"] = "Moved Permanently";
+	redirMap["302"] = "Found";
+	redirMap["303"] = "See Other";
+	redirMap["304"] = "Not Modified";
+	redirMap["307"] = "Temporary Redirect";
+	redirMap["308"] = "Permanent Redirect";
+
+	return redirMap;
+}
+
 }

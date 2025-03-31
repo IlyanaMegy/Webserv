@@ -6,10 +6,10 @@
 #include "ServerConf.hpp"
 
 Request::Request(void)
-	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _server(NULL), _conf(NULL), _client(NULL), _epoll(NULL), _cgi(NULL), _untreatedMessage("") , _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
+	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _response(NULL), _server(NULL), _conf(NULL), _client(NULL), _epoll(NULL), _cgi(NULL), _untreatedMessage("") , _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
 
 Request::Request(Server* server, Client* client, Epoll* epoll, std::string leftoverMessage)
-	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _server(server), _conf(server->getDefaultConf()), _client(client), _epoll(epoll), _cgi(NULL), _untreatedMessage(leftoverMessage), _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
+	: _stage(SEEKING_STATUS_LINE), _state(TREATING_MESSAGE), _response(server->getDefaultConf()), _server(server), _conf(server->getDefaultConf()), _client(client), _epoll(epoll), _cgi(NULL), _untreatedMessage(leftoverMessage), _fields(std::map< std::string, std::vector<std::string> >()), _isBodyChunked(false), _bodyLength(0), _body("") {}
 
 Request::~Request(void)
 {
@@ -103,15 +103,13 @@ void	Request::parse(void)
 		_parseBody();
 }
 
-void	Request::treat(void)
+void	Request::_treatReg(void)
 {
 	if (!_conf->isValidMethod(_path, _method)) {
 		_response.fillError("405", "Method Not Allowed");
 		_stage = DONE;
 		return ;
 	}
-	if (_conf->isCgi(_path) && _method != DELETE)
-		return (treatCGI());
 
 	if (_method == GET)
 		_response.fillGET(_conf->getCompletePath(_path));
@@ -122,9 +120,63 @@ void	Request::treat(void)
 	_stage = DONE;
 }
 
+void	Request::_treatDir(void)
+{
+	std::string	defaultFile = _conf->getDefaultFile(_path);
+	struct stat	sb;
+	int			res = stat(defaultFile.c_str(), &sb);
+
+	if (_method != GET || (!res && !S_ISREG(sb.st_mode)))
+		_response.fillError("403", "Forbidden");
+	else if (res) {
+		if (!_conf->isAutoindexOn(_path))
+			_response.fillError("403", "Forbidden");
+		else
+			_response.fillAutoindex(_conf->getCompletePath(_path));
+	}
+	else {
+		_path = "/"+_conf->getIndex(_path);
+		_response.setVirtualPath(_path);
+		return(_conf->isCgi(_path) ? treatCGI() : _treatReg());
+	}
+	_stage = DONE;
+}
+
+void	Request::treat(void)
+{
+	std::string	physicalPath = _conf->getCompletePath(_path);
+	struct stat	sb;
+	int			res = stat(physicalPath.c_str(), &sb);
+
+	if (_conf->isRedir(_path)) {
+		_response.fillRedir(_conf->getRedirStatusCode(_path), _conf->getRedirHostname(_path));
+		_stage = DONE;
+		return ;
+	}
+
+	if (res) {
+		_response.fillError("404", "Not Found");
+		_stage = DONE;
+		return ;
+	}
+
+	if (S_ISDIR(sb.st_mode))
+		return (_treatDir());
+	else if (S_ISREG(sb.st_mode)) {
+		return(_conf->isCgi(_path) ? treatCGI() : _treatReg());
+	}
+	_response.fillError("403", "Forbidden");
+	_stage = DONE;
+}
+
 void	Request::treatCGI(void)
 {
 	if (!_cgi) {
+		if (!_conf->isValidMethod(_path, _method)) {
+			_response.fillError("405", "Method Not Allowed");
+			_stage = DONE;
+			return ;
+		}
 		if (_launchCGI(_conf->getCompletePath(_path))) {
 			_response.fillError("502", "Bad Gateway");
 			_stage = DONE;

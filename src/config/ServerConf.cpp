@@ -16,6 +16,7 @@ ServerConf::ServerConf() {
 
 void ServerConf::initializeErrorPages() {
     _error_pages["400"] = ERROR_DIR+std::string("/400.html");
+    _error_pages["403"] = ERROR_DIR+std::string("/403.html");
     _error_pages["404"] = ERROR_DIR+std::string("/404.html");
     _error_pages["405"] = ERROR_DIR+std::string("/405.html");
     _error_pages["408"] = ERROR_DIR+std::string("/408.html");
@@ -66,7 +67,7 @@ void ServerConf::setClientMaxBodySize(std::string params) {
 	_max_body_size = ft_stoi(params);
 }
 
-void ServerConf::setIndex(std::string index) {
+void ServerConf::setDefaultIndex(std::string index) {
 	_index = index;
 }
 
@@ -187,7 +188,7 @@ in_addr_t ServerConf::getHost() const { return (_host); }
 unsigned int ServerConf::getMaxBodySize() const { return (_max_body_size); }
 std::vector<Location> ServerConf::getLocations() const { return (_locations); }
 std::string ServerConf::getRoot() const { return (_root); }
-std::string ServerConf::getIndex() const { return (_index); }
+std::string ServerConf::getDefaultIndex() const { return (_index); }
 bool ServerConf::getAutoindex() const { return (_autoindex); }
 std::string ServerConf::getDefaultRedirStatusCode() const {return _redirStatusCode;}
 std::string ServerConf::getDefaultRedirHostname() const {return _redirHostname;}
@@ -445,6 +446,26 @@ std::string	ServerConf::getRedirHostname(std::string path)
 	}
 	_pathToLocation[path] = location;
 	return location->getRedirHostname();
+}
+
+std::string	ServerConf::getIndex(std::string path)
+{
+	Location*									location;
+	std::map<std::string, Location*>::iterator	it;
+
+	it = _pathToLocation.find(path);
+	if (it != _pathToLocation.end()) {
+		if (!it->second)
+			return _index;
+		return it->second->getIndexLocation();
+	}
+
+	if (!(location = findMatchingLocation(path))) {
+		_pathToLocation[path] = NULL;
+		return (_index);
+	}
+	_pathToLocation[path] = location;
+	return location->getIndexLocation();
 }
 
 std::string	ServerConf::getDefaultFile(std::string path)

@@ -282,7 +282,6 @@ void	CGI::_setEnv(void)
 
 	_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 	
-	_env["PATH_INFO"] = _cgi;
 	
 	_env["QUERY_STRING"] = _request->getQuery();
 	

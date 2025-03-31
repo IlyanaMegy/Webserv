@@ -83,7 +83,7 @@ void	Epoll::deleteFd(int fd)
 
 void	Epoll::wait(void)
 {
-	_ReadyFdsNb = epoll_wait(_epollFd, _events, MAX_EVENTS, -1);
+	_ReadyFdsNb = epoll_wait(_epollFd, _events, MAX_EVENTS, EPOLL_TIMEOUT);
 	if (_ReadyFdsNb == -1)
 		throw std::exception();
 

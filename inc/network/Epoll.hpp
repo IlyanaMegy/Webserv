@@ -12,6 +12,8 @@
 # define MAX_EVENTS 100
 # define TIMEOUT 10
 
+# define EPOLL_TIMEOUT 100
+
 class	Server;
 
 class Epoll

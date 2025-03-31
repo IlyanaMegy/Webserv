@@ -115,7 +115,7 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 			if (params[++i] == "{" || params[i] == "}")
 				throw std::runtime_error("Wrong character in server scope{}");
 			if (params[i] == "~") {
-				path = params[i++] + " ";
+				i++;
 				isTilde = true;
 			}
 			path += params[i];
@@ -175,12 +175,12 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 		}
 		else if (params[i] == "index" && (i + 1) < params.size())
 		{
-			if (!server->getIndex().empty())
+			if (!server->getDefaultIndex().empty())
 				throw std::runtime_error("Index is duplicated");
 			i++;
 			checkToken(params[i]);
 			params[i].erase(params[i].size() - 1);
-			server->setIndex(params[i]);
+			server->setDefaultIndex(params[i]);
 		}
 		else if (params[i] == "autoindex" && (i + 1) < params.size())
 		{
@@ -216,8 +216,8 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 		else if (params[i] != "}" && params[i] != "{")
 			throw std::runtime_error("Unsupported directive");
 	}
-	if (server->getIndex().empty())
-		server->setIndex("index.html");
+	if (server->getDefaultIndex().empty())
+		server->setDefaultIndex("index.html");
 	if (server->getServerName().empty())
 		server->setServerName("[CONFIG] Error : server_name not found or unreadable");
 	if (server->getRoot().empty())
@@ -228,7 +228,7 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 		throw std::runtime_error("[CONFIG] Error : port not found or unreadable");
 	if (server->getHost() == 0)
 		server->setHost("localhost");
-	server->addIndexToLocations(server->getIndex());
+	server->addIndexToLocations(server->getDefaultIndex());
 	if (!server->getDefaultRedirStatusCode().empty())
 		server->addRedirToLocations(server->getDefaultRedirStatusCode(), server->getDefaultRedirHostname());
 	if (server->checkLocationsDuplicate())

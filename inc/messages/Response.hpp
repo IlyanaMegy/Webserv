@@ -9,11 +9,13 @@
 # include <iostream>
 # include <sstream>
 # include <unistd.h>
+# include <set>
+# include <sys/types.h>
+# include <dirent.h>
 
 # include "../style.hpp"
 
 # define SERVERNAME "webserv"
-# define ERRORPATH "./www/webserv/error/"
 # define TIMEBUFFERSIZE 100
 
 class	ServerConf;
@@ -23,6 +25,7 @@ class Response
 {
 	public:
 		Response(void);
+		Response(ServerConf* conf);
 		~Response(void);
 
 		void	setStatusCode(std::string statusCode);
@@ -43,8 +46,10 @@ class Response
 		void		fillGET(std::string path);
 		void		fillDELETE(std::string path);
 		void		fillPOST(std::string path, std::string body);
-
 		void		fillCGI(CGI* cgi);
+		void		fillRedir(std::string statusCode, std::string newHostname);
+		void		fillAutoindex(std::string path);
+
 
 		static std::string	itos(int value);
 		
@@ -72,11 +77,12 @@ class Response
 		void	_fillHeader(std::map< std::string, std::vector<std::string> > fields = std::map< std::string, std::vector<std::string> >());
 		void	_fillErrorHeader(void);
 		int		_fillContent(std::string path);
+		int		_fillAutoindexPage(std::string path);
 
 		int		_deleteTarget(std::string path);
-
 		int		_createTarget(std::string path, std::string body);
 
+		static std::map<std::string, std::string>	_initRedirMap(void);
 
 };
 
