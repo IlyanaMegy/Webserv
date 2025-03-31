@@ -298,7 +298,7 @@ Location* ServerConf::findMatchingLocation(const std::string& path) {
 	size_t 		bestMatchLengthTilde = 0;
 
 	for (std::vector<Location>::iterator it = _locations.begin(); it != _locations.end(); ++it) {
-		if (it->getIsTilde() && bestMatchLength == 0
+		if (it->getIsTilde() && (bestMatchLength == 0 || !it->getCgiPath().empty() || (location && location->getPath() == "/"))
 				&& path.rfind(it->getPath()) == (path.length() - it->getPath().length())
 				&& it->getPath().length() > bestMatchLengthTilde) {
 			location = &(*it);
