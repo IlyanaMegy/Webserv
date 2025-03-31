@@ -233,8 +233,3 @@ std::string	Response::itos(int value)
 	res = stream.str();
 	return res;
 }
-
-{
-}
-
-}

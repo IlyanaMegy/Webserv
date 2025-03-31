@@ -723,15 +723,15 @@ void	Request::_split(std::vector<std::string>& vector)
 	}
 }
 
-std::string	Request::_fixPath(std::string path)
-{
-	if (path.empty())
-		return path;
-	if (path[0] == '/') {
-		if (path.length() == 1)
-			return "default/site/welcome.html";
-		return path.substr(1, path.length() - 1);
-	}
-	return path;
-}
+// std::string	Request::_fixPath(std::string path)
+// {
+// 	if (path.empty())
+// 		return path;
+// 	if (path[0] == '/') {
+// 		if (path.length() == 1)
+// 			return "default/site/welcome.html";
+// 		return path.substr(1, path.length() - 1);
+// 	}
+// 	return path;
+// }
 
