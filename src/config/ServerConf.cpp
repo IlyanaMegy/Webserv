@@ -477,7 +477,7 @@ std::string	ServerConf::getDefaultFile(std::string path)
 	if (it != _pathToLocation.end()) {
 		if (!it->second)
 			return _root+"/"+_index;
-		return it->second->getRootLocation()+it->second->getIndexLocation();
+		return it->second->getRootLocation()+"/"+it->second->getIndexLocation();
 	}
 
 	if (!(location = findMatchingLocation(path))) {
@@ -485,6 +485,6 @@ std::string	ServerConf::getDefaultFile(std::string path)
 		return (_root+"/"+_index);
 	}
 	_pathToLocation[path] = location;
-	return location->getRootLocation()+location->getIndexLocation();
+	return location->getRootLocation()+"/"+location->getIndexLocation();
 }
 
