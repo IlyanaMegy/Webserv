@@ -81,6 +81,7 @@ class CGI
 
 		static std::string	_getFullPath(std::string path);
 		static std::string	_findDirectory(std::string path);
+		static std::string			_findName(std::string path);
 
 		void	_closePipes(std::string method);
 

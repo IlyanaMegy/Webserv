@@ -239,9 +239,9 @@ void	CGI::_launch(void)
 			_env["REQUEST_METHOD"] == "POST" ? _closePipes("") : _closePipes("GET");
 			throw std::exception();
 		}
-		if (chdir((char *)_findDirectory(_env["SCRIPT_NAME"]).c_str()) == -1)
+		if (chdir((char *)_findDirectory(_cgi).c_str()) == -1)
 			throw std::exception();
-		execve(_program.c_str(), (char*[]){(char *)_program.c_str(), (char *)_env["SCRIPT_NAME"].c_str(), NULL}, _envp);
+		execve(_program.c_str(), (char*[]){(char *)_program.c_str(), (char *)_findName(_cgi).c_str(), NULL}, _envp);
 		throw std::exception();
 	}
 
@@ -364,4 +364,13 @@ std::string	CGI::_findDirectory(std::string path)
 	if (sepPos == std::string::npos)
 		return "./";
 	return path.substr(0, sepPos + 1);
+}
+std::string	CGI::_findName(std::string path)
+{
+	std::size_t	sepPos;
+
+	sepPos = path.rfind("/");
+	if (sepPos == std::string::npos)
+		return path;
+	return path.substr(sepPos + 1, path.length() - (sepPos + 1));
 }
