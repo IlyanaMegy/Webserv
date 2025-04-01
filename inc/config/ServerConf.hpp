@@ -37,7 +37,6 @@ class ServerConf {
 	void 							initializeErrorPages();
 
 	void 							setServerName(std::string server_name);
-	void 							setHost(std::string param);
 	void 							setRoot(std::string root);
 	void 							setPort(std::string params);
 	void 							setClientMaxBodySize(std::string params);

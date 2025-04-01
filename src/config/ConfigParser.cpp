@@ -129,15 +129,6 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 			if (i < params.size() && params[i] != "}")
 				throw std::runtime_error("Wrong character in server scope{}");
 		}
-		else if (params[i] == "host" && (i + 1) < params.size())
-		{
-			if (server->getHost())
-				throw std::runtime_error("Host is duplicated");
-			i++;
-			checkToken(params[i]);
-			params[i].erase(params[i].size() - 1);
-			server->setHost(params[i]);
-		}
 		else if (params[i] == "root" && (i + 1) < params.size())
 		{
 			if (!server->getRoot().empty())
@@ -226,8 +217,6 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 		server->addRootToLocations(server->getRoot());
 	if (!server->getPort())
 		throw std::runtime_error("[CONFIG] Error : port not found or unreadable");
-	if (server->getHost() == 0)
-		server->setHost("localhost");
 	server->addIndexToLocations(server->getDefaultIndex());
 	if (!server->getDefaultRedirStatusCode().empty())
 		server->addRedirToLocations(server->getDefaultRedirStatusCode(), server->getDefaultRedirHostname());

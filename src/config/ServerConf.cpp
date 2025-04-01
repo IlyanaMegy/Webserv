@@ -32,14 +32,6 @@ void ServerConf::setServerName(std::string server_name) {
 	_server_name = server_name;
 }
 
-void ServerConf::setHost(std::string param) {
-	if (param == "localhost") param = "127.0.0.1";
-	struct sockaddr_in hostBinary;
-	if (!(inet_pton(AF_INET, param.c_str(), &(hostBinary.sin_addr))))
-		throw std::runtime_error("Wrong syntax: host");
-	_host = inet_addr(param.data());
-}
-
 void ServerConf::setRoot(std::string root) {
 	if (root[root.size() - 1] == '/')
 		root.erase(root.size() - 1);
@@ -48,11 +40,21 @@ void ServerConf::setRoot(std::string root) {
 
 void ServerConf::setPort(std::string params) {
 	unsigned int port = 0;
+	size_t res = 0;
+	std::string host;
+	std::string port_str = params;
 
-	for (size_t i = 0; i < params.length(); i++)
-		if (!std::isdigit(params[i]))
+	if ((res = params.find(":")) != std::string::npos)
+	{
+		host = params.substr(0, res);
+		port_str = params.substr(res + 1);
+		if (host != "localhost" && host != "127.0.0.1")
+			throw std::runtime_error("Wrong syntax: host");
+	}
+	for (size_t i = 0; i < port_str.length(); i++)
+		if (!std::isdigit(port_str[i]))
 			throw std::runtime_error("Wrong syntax: port");
-	port = ft_stoi((params));
+	port = ft_stoi((port_str));
 	if (port < 1 || port > 65636)
 		throw std::runtime_error("Wrong syntax: port");
 	_port = port;
