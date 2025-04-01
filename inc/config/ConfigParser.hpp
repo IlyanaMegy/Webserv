@@ -14,6 +14,7 @@ class ConfigParser {
 	~ConfigParser();
 
 	void createCluster(const std::string &config_file);
+	void checkServersDuplicate();
 	void splitBlocks(std::string &content);
 	void createServer(std::string &config, ServerConf *server);
 

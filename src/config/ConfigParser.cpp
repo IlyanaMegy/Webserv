@@ -61,6 +61,16 @@ void ConfigParser::createCluster(const std::string &config_file) {
 		_servers.push_back(server);
 		createServer(_servers_config[i], server);
 	}
+
+	checkServersDuplicate();
+}
+
+void ConfigParser::checkServersDuplicate()
+{
+	for (std::vector<ServerConf*>::iterator it = _servers.begin(); it != _servers.end(); it++)
+		for (std::vector<ServerConf*>::iterator it2 = _servers.begin(); it2 != _servers.end(); it2++)
+			if (it != it2 && (*it)->getServerName() == (*it2)->getServerName() && (*it)->getPort() == (*it2)->getPort())
+				throw std::runtime_error("Error: Server is duplicated");
 }
 
 std::vector<std::string> splitParametrs(std::string line, std::string sep)
@@ -210,7 +220,7 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 	if (server->getDefaultIndex().empty())
 		server->setDefaultIndex("index.html");
 	if (server->getServerName().empty())
-		server->setServerName("[CONFIG] Error : server_name not found or unreadable");
+		server->setServerName("default_server");
 	if (server->getRoot().empty())
 		server->setRoot("./");
 	if(!server->is_setted_loca_root)
