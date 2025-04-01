@@ -20,7 +20,6 @@ ServerMonitor::ServerMonitor(std::string configFile)
 			continue;
 		server->addConfig(*it);
 		std::cout << MAGENTA << "[CONFIG] Server " << (*it)->getServerName() << " is listening on port " << (*it)->getPort() << RESET << std::endl;
-		std::cout << std::endl;
 	}
 }
 

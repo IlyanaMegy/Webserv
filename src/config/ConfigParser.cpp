@@ -43,7 +43,7 @@ void ConfigParser::createCluster(const std::string &config_file) {
 	std::string content = readFile(config_file);
 	if (content.empty())
 		throw std::runtime_error("Error: Empty configuration file");
-	std::cout << MAGENTA << "\n[CONFIG] Reading " << BOLD << config_file << RESET << std::endl;
+	std::cout << MAGENTA << "\n[CONFIG] Reading " << BOLD << config_file << RESET << std::endl << std::endl;
 
 	removeComments(content);
 	removeWhiteSpace(content);
