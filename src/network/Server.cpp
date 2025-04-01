@@ -144,11 +144,6 @@ void	Server::sendTo(int cgiFd, Epoll* epoll, Request* request)
 	request->getCGI()->closeWriteFd();
 }
 
-
-// const char *Server::SocketCreationErrException::what() const throw() {
-// 	std::cerr << "Erreur lors de la création du socket" << std::endl;
-// }
-
 bool	Server::isConfigKnown(std::string serverName)
 {
 	return _confs.find(serverName) != _confs.end();

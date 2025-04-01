@@ -13,14 +13,9 @@ class ServerMonitor {
 	std::vector<ServerConf *> _confs;
 	std::map<int, Server*>	_servers;
 
-
-	// std::map<int, ServerConf> _servers_lst;
    public:
 	ServerMonitor(std::string configFile);
 	~ServerMonitor(void);
-
-	// void runServers(void);
-	// std::vector<ServerConf *> &getServers() { return _servers; }
 
 	std::map<int, Server*>&	getServers(void);
 

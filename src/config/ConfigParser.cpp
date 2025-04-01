@@ -5,10 +5,8 @@
 ConfigParser::~ConfigParser()
 {
 	for (std::vector<ServerConf*>::iterator it = _servers.begin(); it != _servers.end(); it++)
-		if (*it) {
-			std::cerr << RED << (*it)->getServerName() << " deleted" << RESET << std::endl;
+		if (*it)
 			delete *it;
-		}
 }
 
 static std::string readFile(std::string path) {
@@ -233,6 +231,4 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 		server->addRedirToLocations(server->getDefaultRedirStatusCode(), server->getDefaultRedirHostname());
 	if (server->checkLocationsDuplicate())
 		throw std::runtime_error("[CONFIG] Error : location is duplicated");
-	// if (!server->isValidErrorPages())
-	// 	throw std::runtime_error("Incorrect path for error page or number of error");
 }

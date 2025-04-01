@@ -55,7 +55,6 @@ class Location {
 	std::string _cgiPath;
 	unsigned long _clientMBS;
 	bool _isCgiLocation;
-	// std::pair<int, std::string> _return;
 	std::string					_redirStatusCode;
 	std::string					_redirHostname;
 };
