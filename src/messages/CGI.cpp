@@ -241,7 +241,7 @@ void	CGI::_launch(void)
 		}
 		if (chdir((char *)_findDirectory(_cgi).c_str()) == -1)
 			throw std::exception();
-		execve(_program.c_str(), (char*[]){(char *)_program.c_str(), (char *)_env["SCRIPT_NAME"].c_str(), NULL}, _envp);
+		execve(_program.c_str(), (char*[]){(char *)_program.c_str(), (char *)_findName(_cgi).c_str(), NULL}, _envp);
 		throw std::exception();
 	}
 
@@ -282,15 +282,14 @@ void	CGI::_setEnv(void)
 
 	_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 	
-	
 	_env["QUERY_STRING"] = _request->getQuery();
 	
 	_env["REMOTE_ADDR"] = std::string(inet_ntoa(_client->getSocket().getAddr().sin_addr));
 	
 	_env["REQUEST_METHOD"] = _request->getMethod() == Request::GET ? "GET" : "POST";
 	
-	_env["SCRIPT_NAME"] = _findName(_cgi);
-	
+	_env["SCRIPT_NAME"] = _getFullPath(_cgi);
+
 	_env["SERVER_NAME"] = _request->getConf()->getServerName();
 	
 	_env["SERVER_PORT"] = Response::itos(_request->getServer()->getPort());
@@ -340,6 +339,23 @@ void	CGI::_fillVar(char** varp, std::string key, std::string value)
 	(*varp)[var.length()] = 0;
 }
 
+std::string	CGI::_getFullPath(std::string path)
+{
+	char*	cwd;
+
+	if (path.substr(0, 1) == "/")
+		return path;
+	cwd = getcwd(NULL, 0);
+	if (!cwd)
+		throw std::exception();
+	if (path.substr(0, 2) == "./")
+		path = cwd+path.substr(1, path.length() - 1);
+	else
+		path = cwd+std::string("/")+path;
+	free(cwd);
+	return path;
+}
+
 std::string	CGI::_findDirectory(std::string path)
 {
 	std::size_t	sepPos;
@@ -349,7 +365,6 @@ std::string	CGI::_findDirectory(std::string path)
 		return "./";
 	return path.substr(0, sepPos + 1);
 }
-
 std::string	CGI::_findName(std::string path)
 {
 	std::size_t	sepPos;

@@ -485,6 +485,6 @@ std::string	ServerConf::getDefaultFile(std::string path)
 		return (_root+"/"+_index);
 	}
 	_pathToLocation[path] = location;
-	return location->getRootLocation()+location->getIndexLocation();
+	return location->getRootLocation()+"/"+location->getIndexLocation();
 }
 
