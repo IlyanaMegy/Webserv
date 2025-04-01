@@ -126,6 +126,8 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 				i++;
 				isTilde = true;
 			}
+			else if (params[i][0] != '/')
+				throw std::runtime_error("Bad location");
 			path += params[i];
 			std::vector<std::string> codes;
 			if (params[++i] != "{")
