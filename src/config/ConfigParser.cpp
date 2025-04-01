@@ -151,6 +151,7 @@ void ConfigParser::createServer(std::string &config, ServerConf *server)
 		else if (params[i] == "error_page" && (i + 1) < params.size() && (i + 2) < params.size())
 		{
 			checkToken(params[i + 2]);
+			params[i + 2].erase(params[i + 2].size() - 1);
 			if (server->getPathErrorPage(params[i + 1]).empty())
 				throw std::runtime_error("[CONFIG] Error : Unsupported error_page");
             server->setErrorPage(params[i + 1], params[i + 2]);
