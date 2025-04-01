@@ -343,12 +343,15 @@ std::string	CGI::_getFullPath(std::string path)
 {
 	char*	cwd;
 
-	if (path.substr(0, 2) != "./")
+	if (path.substr(0, 1) == "/")
 		return path;
 	cwd = getcwd(NULL, 0);
 	if (!cwd)
 		throw std::exception();
-	path = cwd+path.substr(1, path.length() - 1);
+	if (path.substr(0, 2) == "./")
+		path = cwd+path.substr(1, path.length() - 1);
+	else
+		path = cwd+std::string("/")+path;
 	free(cwd);
 	return path;
 }
