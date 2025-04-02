@@ -85,8 +85,6 @@ void	Epoll::wait(void)
 	_timeoutFds.clear();
 	_checkTimers();
 	_updateTimers();
-
-	// std::cerr << CYAN << _ReadyFdsNb << " ready sockets!" << RESET << std::endl;
 }
 
 void	Epoll::_checkTimers(void)
