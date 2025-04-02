@@ -65,7 +65,7 @@ void	Server::acceptClient(Epoll &epoll)
 	Client	*client = new Client(this);
 
 	if (!client)
-		throw std::exception();
+		throw std::runtime_error("The server encountered an error");
 	clientSocket = client->getSocket().getFd();
 	_clients[clientSocket] = client;
 	epoll.addFd(clientSocket, EPOLLIN | EPOLLOUT, TIMEOUT);
@@ -78,7 +78,7 @@ void	Server::readFrom(int clientFd, Epoll* epoll)
 
 	res = recv(clientFd, buffer, BUFFER_SIZE - 1, 0);
 	if (res == -1)
-		throw std::exception();
+		throw std::runtime_error("The server encountered an error");
 	if (res == 0) {
 		_clients[clientFd]->setShouldClose(true);
 		return ;
@@ -100,7 +100,7 @@ void	Server::readFrom(int cgiFd, Epoll* epoll, Request* request)
 
 	res = read(cgiFd, buffer, BUFFER_SIZE - 1);
 	if (res == -1)
-		throw std::exception();
+		throw std::runtime_error("The server encountered an error");
 	if (res == 0) {
 		epoll->deleteFd(cgiFd);
 		request->getCGI()->wait();
@@ -126,7 +126,7 @@ void	Server::sendTo(int clientFd)
 		_clients[clientFd]->leftoverMessage = _clients[clientFd]->getRequest()->getUntreatedMessage();
 	responseMessage = response.getMessage();
 	if (send(clientFd, responseMessage.c_str(), responseMessage.length(), 0) == -1)
-		throw std::exception();
+		throw std::runtime_error("The server encountered an error");
 	_clients[clientFd]->deleteRequest();
 }
 

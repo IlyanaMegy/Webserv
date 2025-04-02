@@ -216,33 +216,33 @@ int	CGI::_parseFieldLine(std::string fieldLine)
 void	CGI::_launch(void)
 {
 	if (pipe2(_pipeFdOut, O_CLOEXEC) == -1)
-		throw std::exception();
+		throw std::runtime_error("The server encountered an error");
 
 	if (_env["REQUEST_METHOD"] == "POST")
 		if (pipe2(_pipeFdIn, O_CLOEXEC) == -1) {
 			_closePipes("GET");
-			throw std::exception();
+			throw std::runtime_error("The server encountered an error");
 		}
 
 	if ((_cpid = fork()) == -1) {
 		_env["REQUEST_METHOD"] == "POST" ? _closePipes("") : _closePipes("GET");
-		throw std::exception();
+		throw std::runtime_error("The server encountered an error");
 	}
 	
 	if (_cpid == 0) {
 		if (_env["REQUEST_METHOD"] == "POST")
 			if (dup2(_pipeFdIn[READ_END], STDIN_FILENO) == -1) {
 				_closePipes("");
-				throw std::exception();
+				throw std::runtime_error("The server encountered an error");
 			}
 		if (dup2(_pipeFdOut[WRITE_END], STDOUT_FILENO) == -1) {
 			_env["REQUEST_METHOD"] == "POST" ? _closePipes("") : _closePipes("GET");
-			throw std::exception();
+			throw std::runtime_error("The server encountered an error");
 		}
 		if (chdir((char *)_findDirectory(_cgi).c_str()) == -1)
-			throw std::exception();
+			throw std::runtime_error("The server encountered an error");
 		execve(_program.c_str(), (char*[]){(char *)_program.c_str(), (char *)_findName(_cgi).c_str(), NULL}, _envp);
-		throw std::exception();
+		throw std::runtime_error("The server encountered an error");
 	}
 
 	_epoll->addFd(_pipeFdOut[READ_END], EPOLLIN, TIMEOUT);
@@ -321,7 +321,7 @@ void	CGI::_convertEnv(void)
 {
 	_envp = new char*[_env.size() + 1];
 	if (!_envp)
-		throw std::exception();
+		throw std::runtime_error("The server encountered an error");
 
 	int	i = 0;
 	for (std::map<std::string, std::string>::iterator it = _env.begin(); it != _env.end(); it++) {
@@ -339,7 +339,7 @@ void	CGI::_fillVar(char** varp, std::string key, std::string value)
 
 	*varp = new char[var.length() + 1];
 	if (!(*varp))
-		throw std::exception();
+		throw std::runtime_error("The server encountered an error");
 	memcpy(*varp, var.c_str(), var.length());
 	(*varp)[var.length()] = 0;
 }
@@ -352,7 +352,7 @@ std::string	CGI::_getFullPath(std::string path)
 		return path;
 	cwd = getcwd(NULL, 0);
 	if (!cwd)
-		throw std::exception();
+		throw std::runtime_error("The server encountered an error");
 	if (path.substr(0, 2) == "./")
 		path = cwd+path.substr(1, path.length() - 1);
 	else

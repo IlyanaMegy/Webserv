@@ -6,7 +6,7 @@ Epoll::Epoll(std::map<int, Server*>& servers)
 {
 	_epollFd = epoll_create1(EPOLL_CLOEXEC);
 	if (_epollFd == -1)
-		throw std::exception();
+		throw std::runtime_error("The server encountered an error");
 
 	for (std::map<int, Server*>::iterator it = servers.begin(); it != servers.end(); it++)
 		addFd(it->second->getSocket().getFd(), EPOLLIN);
@@ -54,7 +54,7 @@ void	Epoll::addFd(int fd, int flags, int timeout)
 	event.events = flags;
 	event.data.fd = fd;
 	if (epoll_ctl(_epollFd, EPOLL_CTL_ADD, fd, &event) == -1)
-		throw std::exception();
+		throw std::runtime_error("The server encountered an error");
 	if (timeout != - 1)
 		_addTimer(fd, timeout);
 }
@@ -64,7 +64,7 @@ void	Epoll::_addTimer(int fd, int timeout)
 	struct timeval	tv;
 
 	if (gettimeofday(&tv, NULL))
-		throw std::exception();
+		throw std::runtime_error("The server encountered an error");
 	tv.tv_sec+= timeout;
 	_timeouts[fd] = tv;
 }
@@ -80,7 +80,7 @@ void	Epoll::wait(void)
 {
 	_ReadyFdsNb = epoll_wait(_epollFd, _events, MAX_EVENTS, EPOLL_TIMEOUT);
 	if (_ReadyFdsNb == -1)
-		throw std::exception();
+		throw std::runtime_error("The server encountered an error");
 
 	_timeoutFds.clear();
 	_checkTimers();
@@ -94,7 +94,7 @@ void	Epoll::_checkTimers(void)
 	struct timeval	tv;
 
 	if (gettimeofday(&tv, NULL))
-		throw std::exception();
+		throw std::runtime_error("The server encountered an error");
 	for (std::map<int, struct timeval>::iterator it = _timeouts.begin(); it != _timeouts.end(); it++) {
 		if (_isTimeout(tv, it->second))
 			_timeoutFds.push_back(it->first);

@@ -2,7 +2,7 @@
 # define SIGNAL_HPP
 
 #include <signal.h>
-#include <exception>
+#include <stdexcept>
 
 class Signal
 {
