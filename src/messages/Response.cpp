@@ -57,8 +57,6 @@ void	Response::createMessage(void)
 	_createHeader();
 	_message+="\r\n";
 	_createBody();
-
-	// _printInfo();
 }
 
 void	Response::addCookies(std::vector<std::string>& cookies)
@@ -304,12 +302,4 @@ std::map<std::string, std::string>	Response::_initRedirMap(void)
 	redirMap["308"] = "Permanent Redirect";
 
 	return redirMap;
-}
-
-void	Response::_printInfo(void)
-{
-	if (_shouldClose)
-		std:: cerr << RED << _message << RESET << std::endl;
-	else
-		std:: cerr << GREEN << _message << RESET << std::endl;
 }

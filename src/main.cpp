@@ -26,11 +26,6 @@ void	runServer(std::string configFile)
 		}
 
 		for (int i = 0; i < epoll.getReadyFdsNb(); i++) {
-			// std::cerr << "Current socket fd -> " << GREEN << epoll.getReadyFd(i)
-			// 	<< RESET << std::endl;
-			// usleep(1000000);
-			// std::cerr << "Fd event -> " << GOLD << epoll.getEvent(i) << RESET << std::endl;
-
 			for (std::map<int, Server*>::iterator it = serverMonitor.getServers().begin(); it != serverMonitor.getServers().end(); it++) {
 				if (epoll.getReadyFd(i) == it->first)
 					it->second->acceptClient(epoll);
@@ -48,10 +43,6 @@ void	runServer(std::string configFile)
 					}
 				}
 				else if (Request* request = it->second->findCGIRequest(epoll.getReadyFd(i))) {
-					// std::cerr << "CGI fd: " << BLUE << epoll.getReadyFd(i) << RESET << std::endl;
-					// std::cerr << "EPOLLIN: " << YELLOW << EPOLLIN << RESET << std::endl;
-					// std::cerr << "EPOLLOUT: " << YELLOW << EPOLLOUT << RESET << std::endl;
-					// std::cerr << "EPOLLHUP: " << YELLOW << EPOLLHUP << RESET << std::endl;
 					if (epoll.getReadyFd(i) == request->getCGI()->getReadFd())
 						it->second->readFrom(epoll.getReadyFd(i), &epoll, request);
 					else

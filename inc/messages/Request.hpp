@@ -81,8 +81,6 @@ class Request
 		static bool					isVChar(unsigned char c);
 		static unsigned int			stoi(std::string value);
 
-		void						printInfo(void);
-
 	private:
 
 
