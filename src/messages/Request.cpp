@@ -155,17 +155,16 @@ void	Request::treat(void)
 		return ;
 	}
 
-	if (res) {
+	if (res && _method != POST) {
 		_response.fillError("404", "Not Found");
 		_stage = DONE;
 		return ;
 	}
 
+	if (_method == POST || S_ISREG(sb.st_mode))
+		return(_conf->isCgi(_path) ? treatCGI() : _treatReg());
 	if (S_ISDIR(sb.st_mode))
 		return (_treatDir());
-	else if (S_ISREG(sb.st_mode)) {
-		return(_conf->isCgi(_path) ? treatCGI() : _treatReg());
-	}
 	_response.fillError("403", "Forbidden");
 	_stage = DONE;
 }
