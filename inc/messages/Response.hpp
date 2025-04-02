@@ -13,7 +13,7 @@
 # include <sys/types.h>
 # include <dirent.h>
 
-# include "../style.hpp"
+# include "style.hpp"
 
 # define SERVERNAME "webserv"
 # define TIMEBUFFERSIZE 100
@@ -53,6 +53,8 @@ class Response
 
 		static std::string	itos(int value);
 		
+		void		printBitError(std::fstream fstream);
+
 	private:
 		std::string	_message;
 		bool		_shouldClose;
@@ -83,6 +85,8 @@ class Response
 		int		_createTarget(std::string path, std::string body);
 
 		static std::map<std::string, std::string>	_initRedirMap(void);
+
+		void		_printInfo(void);
 
 };
 

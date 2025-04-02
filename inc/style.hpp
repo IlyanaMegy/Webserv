@@ -1,4 +1,5 @@
 #define BLACK "\033[30m"
+#define RED "\033[31m"
 #define GREEN "\033[32m"
 #define YELLOW "\033[33m"
 // # define BLUE "\033[34m"
@@ -11,14 +12,13 @@
 #define FALSE_EMOJI "❌"
 #define TRUE_EMOJI "✅"
 
-#define RED "\033[0;38;2;255;0;0m"   // Rouge
+#define REDD "\033[0;38;2;255;0;0m"   // Rouge
 #define RED1 "\033[0;38;2;210;10;10m" // Rouge
 #define ORNG "\033[0;38;2;205;105;0m" // Orange
 #define GOLD "\033[0;38;2;255;215;0m" // Or
 #define YLLW "\033[0;38;2;255;255;0m" // Jaune
 #define GRNN "\033[0;38;2;0;128;0m"   // Vert foncé
 #define LIME "\033[0;38;2;0;255;0m"   // Vert clair
-#define LIGHT_GREEN "\033[1;32m"
 // # define CYAN "\033[0;38;2;0;255;255m"     // Cyan
 #define BLUE "\033[0;38;2;80;80;220m"   // Bleu
 #define INDI "\033[0;38;2;75;0;130m"    // Indigo

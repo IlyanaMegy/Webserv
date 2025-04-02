@@ -6,6 +6,8 @@
 #include <iostream>
 #include <stdexcept>
 
+#include "style.hpp"
+
 Socket::Socket(void) : _opt(1), _fd(-1) {}
 
 Socket::Socket(int port) : _opt(1) {

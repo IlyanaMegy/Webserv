@@ -10,6 +10,8 @@
 
 # include "Response.hpp"
 
+# include "style.hpp"
+
 # define MAXSTATUSLINEOCTETS 2000
 # define MAXHEADEROCTETS 4000
 # define MAXBODYOCTETS 2000000000
@@ -78,6 +80,8 @@ class Request
 		static bool					isDelimiter(unsigned char c);
 		static bool					isVChar(unsigned char c);
 		static unsigned int			stoi(std::string value);
+
+		void						printInfo(void);
 
 	private:
 

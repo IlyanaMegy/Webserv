@@ -8,6 +8,8 @@
 # include <string.h>
 # include <vector>
 
+# include "style.hpp"
+
 # define CLOSED -1
 
 class	Epoll;
