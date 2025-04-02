@@ -8,13 +8,8 @@ Epoll::Epoll(std::map<int, Server*>& servers)
 	if (_epollFd == -1)
 		throw std::exception();
 
-	try {
-		for (std::map<int, Server*>::iterator it = servers.begin(); it != servers.end(); it++)
-			addFd(it->second->getSocket().getFd(), EPOLLIN);
-	}
-	catch (std::exception &e) {
-		std::cout << e.what() << std::endl;
-	}
+	for (std::map<int, Server*>::iterator it = servers.begin(); it != servers.end(); it++)
+		addFd(it->second->getSocket().getFd(), EPOLLIN);
 }
 
 Epoll::~Epoll(void)

@@ -32,13 +32,8 @@ void	runServer(std::string configFile)
 			// std::cerr << "Fd event -> " << GOLD << epoll.getEvent(i) << RESET << std::endl;
 
 			for (std::map<int, Server*>::iterator it = serverMonitor.getServers().begin(); it != serverMonitor.getServers().end(); it++) {
-				if (epoll.getReadyFd(i) == it->first) {
-					try {
-						it->second->acceptClient(epoll);
-					} catch (std::exception &e) {
-						std::cout << e.what() << std::endl;
-					}
-				}
+				if (epoll.getReadyFd(i) == it->first)
+					it->second->acceptClient(epoll);
 				else if (it->second->isClientKnown(epoll.getReadyFd(i))) {
 					if (epoll.getEvent(i) == (EPOLLIN | EPOLLOUT)
 					|| epoll.getEvent(i) == EPOLLIN)
