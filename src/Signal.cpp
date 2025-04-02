@@ -4,7 +4,7 @@ bool	Signal::shouldStopServer = false;
 
 void	Signal::setHandler(void)
 {
-	if (signal(SIGINT, &_handleSIGINT) == SIG_ERR)
+	if (signal(SIGINT, &_handleSIGINT) == SIG_ERR || signal(SIGPIPE, SIG_IGN) == SIG_ERR)
 		throw std::exception();
 }
 

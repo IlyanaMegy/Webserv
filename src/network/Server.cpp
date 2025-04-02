@@ -136,7 +136,7 @@ void	Server::sendTo(int cgiFd, Epoll* epoll, Request* request)
 
 	res = write(cgiFd, request->getBody().c_str(), request->getBodyLength());
 	if (res == -1)
-		throw std::exception();
+		return;
 	epoll->deleteFd(cgiFd);
 	request->getCGI()->closeWriteFd();
 }
