@@ -287,13 +287,8 @@ void	CGI::_setEnv(void)
 	_env["REMOTE_ADDR"] = std::string(inet_ntoa(_client->getSocket().getAddr().sin_addr));
 	
 	_env["REQUEST_METHOD"] = _request->getMethod() == Request::GET ? "GET" : "POST";
-	
-	std::cerr << "cgi path:" << GREEN << _cgi << RESET << std::endl;
-
 
 	_env["SCRIPT_NAME"] = _getFullPath(_cgi);
-
-	std::cerr << "full path:" << RED << _env["SCRIPT_NAME"] << RESET << std::endl;
 
 	_env["SERVER_NAME"] = _request->getConf()->getServerName();
 	
