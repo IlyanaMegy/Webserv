@@ -33,7 +33,7 @@ OBJS			:=	${SRCS:${SRCS_DIR}/%.cpp=${OBJS_DIR}/%.o}
 
 
 CC				:=	c++
-CFLAGS			:=	-Wall -Wextra -Werror -std=c++98 -g3
+CFLAGS			:=	-Wall -Wextra -Werror -std=c++98
 CPPFLAGS		:=	-I inc -I inc/config -I inc/network -I inc/messages
 
 RM				:=	${RM} -rf
