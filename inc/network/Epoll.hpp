@@ -10,7 +10,7 @@
 # include <sys/time.h>
 
 # define MAX_EVENTS 100
-# define TIMEOUT 10
+# define TIMEOUT 30
 
 # define EPOLL_TIMEOUT 100
 
