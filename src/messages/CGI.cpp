@@ -239,7 +239,7 @@ void	CGI::_launch(void)
 			_env["REQUEST_METHOD"] == "POST" ? _closePipes("") : _closePipes("GET");
 			throw std::runtime_error("The server encountered an error");
 		}
-		if (chdir((char *)_findDirectory(_cgi).c_str()) == -1)
+		if (chdir((char *)findDirectory(_cgi).c_str()) == -1)
 			throw std::runtime_error("The server encountered an error");
 		execve(_program.c_str(), (char*[]){(char *)_program.c_str(), (char *)_findName(_cgi).c_str(), NULL}, _envp);
 		throw std::runtime_error("The server encountered an error");
@@ -361,7 +361,7 @@ std::string	CGI::_getFullPath(std::string path)
 	return path;
 }
 
-std::string	CGI::_findDirectory(std::string path)
+std::string	CGI::findDirectory(std::string path)
 {
 	std::size_t	sepPos;
 

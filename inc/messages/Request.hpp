@@ -139,6 +139,7 @@ class Request
 		unsigned int				_findChunkLength(void);
 		std::string					_findChunk(unsigned int chunkLength);
 
+		void						_treatPOST(std::string physicalPath, struct stat sb, int res);
 		void						_treatReg(void);
 		void						_treatDir(void);
 

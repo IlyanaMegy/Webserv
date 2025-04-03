@@ -12,7 +12,7 @@
 #include "Request.hpp"
 #include "../style.hpp"
 
-#define ERROR_DIR "www/webserv/error"
+#define ERROR_DIR "www/site/error"
 
 class ServerConf {
    private:

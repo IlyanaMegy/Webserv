@@ -41,6 +41,8 @@ class CGI
 		void	addOutput(std::string buffer);
 		void	wait(void);
 		void	parse(void);
+		
+		static std::string	findDirectory(std::string path);
 
 	private:
 		std::string	_program;
@@ -82,7 +84,6 @@ class CGI
 		int			_parseStatus(std::string status);
 
 		static std::string	_getFullPath(std::string path);
-		static std::string	_findDirectory(std::string path);
 		static std::string			_findName(std::string path);
 
 		void	_closePipes(std::string method);
