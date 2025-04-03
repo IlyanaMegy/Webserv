@@ -18,14 +18,38 @@
             return urlParams.get(param);
         }
         const pseudo = getQueryParam('pseudo');
-        console.log("Pseudo:", pseudo);
+		const usernameElement = document.getElementById('username');
+		const uploadForm = document.getElementById('upload-form');
+		const imageGallery = document.getElementById('image-gallery');
 
         if (pseudo) {
             document.getElementById('username').textContent = pseudo;
             sessionStorage.setItem('pseudo', pseudo);
+			uploadForm.style.display = 'block';
         } else {
             document.getElementById('username').textContent = "Stranger";
+			uploadForm.style.display = 'none';
         }
+	    fetch('uploads/')
+            .then(response => response.text())
+            .then(data => {
+                const parser = new DOMParser();
+                const htmlDoc = parser.parseFromString(data, 'text/html');
+                const links = htmlDoc.querySelectorAll('a');
+                const imagesDiv = document.getElementById('images');
+
+                links.forEach(link => {
+                    const href = link.getAttribute('href');
+                    if (href.match(/\.(jpg|jpeg|png|gif|webp)$/i)) {
+                        const img = document.createElement('img');
+                        img.src = `uploads/${href}`;
+                        img.alt = href;
+                        img.style.width = "150px";
+                        img.style.margin = "10px";
+                        imagesDiv.appendChild(img);
+                    }
+                });
+            });
     });
 	</script>
 </head>
@@ -76,7 +100,7 @@
 					<div class="row">
 						<div class="col-sm-3 description"></div>
 						<div class="col-sm-6 description">
-							<form action="upload.php" method="post" enctype="multipart/form-data">
+							<form id="upload-form" action="upload.py" method="post" enctype="multipart/form-data" style="display: none;">
 								<label for="image" class="form-label me-2 uploading_description">Partage une image !</label>
 								<div class="mb-3 d-flex align-items-center">
 									<input type="file" class="form-control uploading me-2" id="image" name="image" required>
