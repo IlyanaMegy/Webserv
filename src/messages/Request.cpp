@@ -142,6 +142,24 @@ void	Request::_treatDir(void)
 	_stage = DONE;
 }
 
+void	Request::_treatPOST(std::string physicalPath, struct stat sb, int res)
+{
+	struct stat	sbDir;
+	int			resDir = stat(CGI::findDirectory(physicalPath).c_str(), &sbDir);
+
+	if (resDir) {
+		_response.fillError("404", "Not Found");
+		_stage = DONE;
+		return ;
+	}
+	if (!S_ISDIR(sbDir.st_mode) || (!res && !S_ISREG(sb.st_mode))) {
+		_response.fillError("403", "Forbidden");
+		_stage = DONE;
+		return ;
+	}
+	return (_treatReg());
+}
+
 void	Request::treat(void)
 {
 	std::string	physicalPath = _conf->getCompletePath(_path);
@@ -154,16 +172,20 @@ void	Request::treat(void)
 		return ;
 	}
 
-	if (res && _method != POST) {
+	if (_method == POST && !_conf->isCgi(_path))
+		return (_treatPOST(physicalPath, sb, res));
+	
+	if (res) {
 		_response.fillError("404", "Not Found");
 		_stage = DONE;
 		return ;
 	}
 
-	if (_method == POST || S_ISREG(sb.st_mode))
+	if (S_ISREG(sb.st_mode))
 		return(_conf->isCgi(_path) ? treatCGI() : _treatReg());
 	if (S_ISDIR(sb.st_mode))
 		return (_treatDir());
+
 	_response.fillError("403", "Forbidden");
 	_stage = DONE;
 }
